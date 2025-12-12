@@ -1,6 +1,6 @@
 {
 	"name": "@yaos-git/run-tui",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "An interactive terminal UI for running npm scripts concurrently",
 	"main": "dist/cli.js",
 	"bin": {
@@ -13,7 +13,7 @@
 		"dev": "npm run dev:typescript",
 		"dev:typescript": "tsc --watch --noEmit",
 		"dev:test": "vitest --watch",
-		"build": "esbuild src/cli.tsx --bundle --platform=node --format=esm --outfile=dist/cli.js --packages=external",
+		"build": "node esbuild.config.js",
 		"lint": "npm run lint:types && npm run lint:fix && npm run lint:format",
 		"lint:check": "biome lint .",
 		"lint:fix": "biome check . --write",
