@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"lib": ["esnext", "dom"],
+		"jsx": "react-jsx",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"outDir": "./dist"
+	},
+	"ts-node": {
+		"esm": true,
+		"experimentalSpecifierResolution": "node"
+	},
+	"include": ["src/**/*"]
+}

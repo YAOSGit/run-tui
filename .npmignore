@@ -1,0 +1,37 @@
+# Source files (not needed - dist is bundled)
+src
+tsconfig.json
+vitest.config.ts
+biome.json
+
+# Tests
+**/*.test.ts
+**/*.test.tsx
+
+# IDE/Editor
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Coverage
+coverage
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Development
+node_modules
