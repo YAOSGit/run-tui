@@ -7,7 +7,6 @@ await esbuild.build({
 	format: 'esm',
 	outfile: 'dist/cli.js',
 	minify: true,
-	// Mark all packages as external - dependencies are installed via package.json
 	packages: 'external',
 	plugins: [
 		{
@@ -25,7 +24,6 @@ await esbuild.build({
 			},
 		},
 	],
-	// Fix for ESM compatibility
 	mainFields: ['module', 'main'],
 	conditions: ['import', 'node'],
 });

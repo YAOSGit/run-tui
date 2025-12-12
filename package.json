@@ -1,6 +1,6 @@
 {
 	"name": "@yaos-git/run-tui",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "An interactive terminal UI for running npm scripts concurrently",
 	"main": "dist/cli.js",
 	"bin": {
@@ -52,7 +52,6 @@
 		"commander": "^14.0.2",
 		"ink": "^6.5.1",
 		"react": "^19.2.3",
-		"react-reconciler": "^0.33.0",
 		"uuid": "^13.0.0"
 	},
 	"devDependencies": {

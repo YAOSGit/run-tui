@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { Command } from 'commander';
@@ -27,7 +28,7 @@ const availableScripts = Object.keys(packageJson.scripts || {});
 
 program
 	.name('run-tui')
-	.description('Run npm scripts concurrently with an interactive TUI')
+	.description('Run node scripts concurrently with an interactive TUI')
 	.argument('[scripts...]', 'Script names or regex patterns to run')
 	.option('-r, --regex', 'Treat arguments as regex patterns')
 	.option(
