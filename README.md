@@ -222,6 +222,23 @@ run-tui/
 
 ---
 
+## Versioning
+
+This project uses a custom versioning scheme: `MAJORYY.MINOR.PATCH`
+
+| Part | Description | Example |
+|------|-------------|---------|
+| `MAJOR` | Major version number | `1` |
+| `YY` | Year (last 2 digits) | `25` for 2025 |
+| `MINOR` | Minor version | `0` |
+| `PATCH` | Patch version | `0` |
+
+**Example:** `125.0.0` = Major version 1, released in 2025, minor 0, patch 0
+
+This format allows you to quickly identify both the major version and the year of release at a glance.
+
+---
+
 ## License
 
 ISC

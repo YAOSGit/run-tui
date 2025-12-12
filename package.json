@@ -1,6 +1,6 @@
 {
 	"name": "@yaos-git/run-tui",
-	"version": "1.0.2",
+	"version": "125.0.0",
 	"description": "An interactive terminal UI for running npm scripts concurrently",
 	"main": "dist/cli.js",
 	"bin": {
@@ -47,14 +47,14 @@
 	"license": "ISC",
 	"type": "module",
 	"dependencies": {
-		"@inkjs/ui": "^2.0.0",
 		"chalk": "^5.6.2",
 		"commander": "^14.0.2",
-		"ink": "^6.5.1",
-		"react": "^19.2.3",
 		"uuid": "^13.0.0"
 	},
 	"devDependencies": {
+		"@inkjs/ui": "^2.0.0",
+		"ink": "^6.5.1",
+		"react": "^19.2.3",
 		"@biomejs/biome": "^2.3.8",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.0",

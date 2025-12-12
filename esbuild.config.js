@@ -1,4 +1,10 @@
 import * as esbuild from 'esbuild';
+import { builtinModules } from 'node:module';
+
+const requireShim = `
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+`;
 
 await esbuild.build({
 	entryPoints: ['src/cli.tsx'],
@@ -7,12 +13,27 @@ await esbuild.build({
 	format: 'esm',
 	outfile: 'dist/cli.js',
 	minify: true,
-	packages: 'external',
+	external: builtinModules.map((m) => `node:${m}`),
+	banner: {
+		js: requireShim,
+	},
+	supported: {
+		'top-level-await': true,
+	},
 	plugins: [
+		{
+			name: 'node-builtins-to-node-prefix',
+			setup(build) {
+				const filter = new RegExp(`^(${builtinModules.join('|')})$`);
+				build.onResolve({ filter }, (args) => ({
+					path: `node:${args.path}`,
+					external: true,
+				}));
+			},
+		},
 		{
 			name: 'stub-react-devtools',
 			setup(build) {
-				// Stub out react-devtools-core since it's optional and not needed in production
 				build.onResolve({ filter: /^react-devtools-core$/ }, () => ({
 					path: 'react-devtools-core',
 					namespace: 'stub',
