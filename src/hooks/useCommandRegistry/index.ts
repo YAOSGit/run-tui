@@ -5,9 +5,9 @@ import type { CommandContext } from '../../types/CommandContext/index.js';
 import type { PendingConfirmation } from '../../types/PendingConfirmation/index.js';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import {
-	commands,
 	CONFIRM_NO_KEYS,
 	CONFIRM_YES_KEYS,
+	commands,
 } from './useCommandRegistry.consts.js';
 import { isKeyMatch } from './useCommandRegistry.utils.js';
 

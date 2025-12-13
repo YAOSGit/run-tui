@@ -1,4 +1,4 @@
-import { assertType, describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vitest';
 import type { LogType } from '../LogType/index.js';
 import type { TaskStatus } from '../TaskStatus/index.js';
 import type { CommandContext } from './index.js';
@@ -14,7 +14,9 @@ describe('CommandContext type tests', () => {
 		expectTypeOf<CommandContext['runningTasks']>().toEqualTypeOf<string[]>();
 		expectTypeOf<CommandContext['hasRunningTasks']>().toEqualTypeOf<boolean>();
 		expectTypeOf<CommandContext['keepAlive']>().toEqualTypeOf<boolean>();
-		expectTypeOf<CommandContext['showScriptSelector']>().toEqualTypeOf<boolean>();
+		expectTypeOf<
+			CommandContext['showScriptSelector']
+		>().toEqualTypeOf<boolean>();
 		expectTypeOf<CommandContext['logFilter']>().toEqualTypeOf<LogType | null>();
 	});
 

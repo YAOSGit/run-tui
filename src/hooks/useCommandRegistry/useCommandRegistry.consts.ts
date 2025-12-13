@@ -1,4 +1,3 @@
-import type { Command } from '../../types/Command/index.js';
 import { closeTabCommand } from '../../commands/closeTab/index.js';
 import { filterCommand } from '../../commands/filter/index.js';
 import { killCommand } from '../../commands/kill/index.js';
@@ -9,6 +8,7 @@ import {
 import { newScriptCommand } from '../../commands/newScript/index.js';
 import { quitCommand } from '../../commands/quit/index.js';
 import { restartCommand } from '../../commands/restart/index.js';
+import type { Command } from '../../types/Command/index.js';
 
 // Commands in display order for footer
 export const commands: Command[] = [

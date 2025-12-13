@@ -78,7 +78,10 @@ describe('quitCommand', () => {
 		});
 
 		it('returns true when keepAlive is true', () => {
-			const ctx = createMockContext({ hasRunningTasks: false, keepAlive: true });
+			const ctx = createMockContext({
+				hasRunningTasks: false,
+				keepAlive: true,
+			});
 			expect(quitCommand.needsConfirmation?.(ctx)).toBe(true);
 		});
 

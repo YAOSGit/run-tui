@@ -65,7 +65,9 @@ describe('leftArrowCommand', () => {
 
 	describe('execute', () => {
 		it('goes to previous tab', () => {
-			const ctx = createMockContext({ runningTasks: ['build', 'test', 'lint'] });
+			const ctx = createMockContext({
+				runningTasks: ['build', 'test', 'lint'],
+			});
 			leftArrowCommand.execute(ctx);
 
 			expect(ctx.setActiveTabIndex).toHaveBeenCalled();
@@ -75,7 +77,9 @@ describe('leftArrowCommand', () => {
 		});
 
 		it('wraps to last tab when at first tab', () => {
-			const ctx = createMockContext({ runningTasks: ['build', 'test', 'lint'] });
+			const ctx = createMockContext({
+				runningTasks: ['build', 'test', 'lint'],
+			});
 			leftArrowCommand.execute(ctx);
 
 			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
@@ -139,7 +143,9 @@ describe('rightArrowCommand', () => {
 
 	describe('execute', () => {
 		it('goes to next tab', () => {
-			const ctx = createMockContext({ runningTasks: ['build', 'test', 'lint'] });
+			const ctx = createMockContext({
+				runningTasks: ['build', 'test', 'lint'],
+			});
 			rightArrowCommand.execute(ctx);
 
 			expect(ctx.setActiveTabIndex).toHaveBeenCalled();
@@ -149,7 +155,9 @@ describe('rightArrowCommand', () => {
 		});
 
 		it('wraps to first tab when at last tab', () => {
-			const ctx = createMockContext({ runningTasks: ['build', 'test', 'lint'] });
+			const ctx = createMockContext({
+				runningTasks: ['build', 'test', 'lint'],
+			});
 			rightArrowCommand.execute(ctx);
 
 			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
