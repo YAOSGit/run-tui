@@ -1,30 +1,43 @@
-import { Box, useApp, useInput } from 'ink';
+import { Box, Text, useApp, useInput, useStdout } from 'ink';
 import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { CommandContext } from '../../types/CommandContext/index.js';
+import { useCommandRegistry } from '../../hooks/useCommandRegistry/index.js';
 import { useLogs } from '../../hooks/useLogs/index.js';
 import { useProcessManager } from '../../hooks/useProcessManager/index.js';
 import { useTaskStates } from '../../hooks/useTaskStates/index.js';
 import type { LogType } from '../../types/LogType/index.js';
+import { ConfirmDialog } from '../ConfirmDialog/index.js';
 import { Footer } from '../Footer/index.js';
 import { LogView } from '../LogView/index.js';
-import { QuitConfirm } from '../QuitConfirm/index.js';
+import { ScriptSelector } from '../ScriptSelector/index.js';
 import { TabBar } from '../TabBar/index.js';
-import { KEY_COMMANDS, LOG_FILTERS, VISIBLE_LOGS } from './App.consts.js';
 import type { AppProps } from './App.types.js';
-import { isKeyCommand } from './App.utils.js';
 
-const App: React.FC<AppProps> = ({ tasks, packageManager }) => {
+const App: React.FC<AppProps> = ({
+	tasks: initialTasks,
+	packageManager,
+	availableScripts,
+	keepAlive,
+	height,
+}) => {
+	const { stdout } = useStdout();
+	const width = stdout?.columns ?? 80;
+	const [runningTasks, setRunningTasks] = useState<string[]>(initialTasks);
 	const [activeTabIndex, setActiveTabIndex] = useState(0);
-	const [showQuitConfirm, setShowQuitConfirm] = useState(false);
-	const [logFilter, setLogFilter] = useState<LogType | null>(LOG_FILTERS[0]);
+	const [showScriptSelector, setShowScriptSelector] = useState(
+		initialTasks.length === 0 && keepAlive,
+	);
+	const [logFilter, setLogFilter] = useState<LogType | null>(null);
 	const { exit } = useApp();
 
-	const activeTask = tasks[activeTabIndex];
-	const { taskStates, updateTaskState, markStderrSeen } = useTaskStates(tasks);
+	const activeTask = runningTasks[activeTabIndex];
+	const { taskStates, updateTaskState, markStderrSeen, addTask, removeTask } =
+		useTaskStates(initialTasks);
 	const { addLog, getLogsForTask } = useLogs();
 
-	const { killProcess, killAllProcesses } = useProcessManager({
-		tasks,
+	const { spawnTask, killProcess, killAllProcesses } = useProcessManager({
+		tasks: initialTasks,
 		packageManager,
 		onLogEntry: addLog,
 		onTaskStateChange: updateTaskState,
@@ -40,10 +53,76 @@ const App: React.FC<AppProps> = ({ tasks, packageManager }) => {
 		setTimeout(() => process.exit(0), 100);
 	}, [killAllProcesses, exit]);
 
+	const handleSelectScript = useCallback(
+		(script: string) => {
+			addTask(script);
+			setRunningTasks((prev) => [...prev, script]);
+			spawnTask(script);
+			setActiveTabIndex(runningTasks.length);
+			setShowScriptSelector(false);
+		},
+		[addTask, spawnTask, runningTasks.length],
+	);
+
+	const handleCancelSelector = useCallback(() => {
+		if (runningTasks.length === 0 && !keepAlive) {
+			handleQuit();
+		} else {
+			setShowScriptSelector(false);
+		}
+	}, [runningTasks.length, keepAlive, handleQuit]);
+
+	// Build command context
+	const commandContext: CommandContext = useMemo(
+		() => ({
+			activeTask,
+			taskStatus: taskStates[activeTask]?.status,
+			runningTasks,
+			hasRunningTasks,
+			keepAlive,
+			showScriptSelector,
+			logFilter,
+			killProcess,
+			spawnTask,
+			handleQuit,
+			setShowScriptSelector,
+			setLogFilter,
+			removeTask,
+			setRunningTasks,
+			setActiveTabIndex,
+			markStderrSeen,
+		}),
+		[
+			activeTask,
+			taskStates,
+			runningTasks,
+			hasRunningTasks,
+			keepAlive,
+			showScriptSelector,
+			logFilter,
+			killProcess,
+			spawnTask,
+			handleQuit,
+			removeTask,
+			markStderrSeen,
+		],
+	);
+
+	const { handleInput, getVisibleCommands, pendingConfirmation } =
+		useCommandRegistry(commandContext);
+
+	// Handle SIGINT
 	useEffect(() => {
 		const handleSigint = () => {
-			if (hasRunningTasks) {
-				setShowQuitConfirm(true);
+			if (showScriptSelector) {
+				setShowScriptSelector(false);
+				if (runningTasks.length === 0 && !keepAlive) {
+					handleQuit();
+				}
+				return;
+			}
+			if (hasRunningTasks || keepAlive) {
+				handleInput('q', { escape: false, return: false, ctrl: false, shift: false, tab: false, backspace: false, delete: false, upArrow: false, downArrow: false, leftArrow: false, rightArrow: false, pageDown: false, pageUp: false, meta: false } as any);
 			} else {
 				handleQuit();
 			}
@@ -53,53 +132,75 @@ const App: React.FC<AppProps> = ({ tasks, packageManager }) => {
 		return () => {
 			process.off('SIGINT', handleSigint);
 		};
-	}, [hasRunningTasks, handleQuit]);
+	}, [hasRunningTasks, handleQuit, showScriptSelector, runningTasks.length, keepAlive, handleInput]);
 
 	useInput((input, key) => {
-		if (showQuitConfirm) {
-			if (isKeyCommand(key, input, KEY_COMMANDS.CONFIRM_QUIT_YES)) {
-				handleQuit();
-			} else if (isKeyCommand(key, input, KEY_COMMANDS.CONFIRM_QUIT_NO)) {
-				setShowQuitConfirm(false);
-			}
+		if (showScriptSelector) {
+			return;
 		}
 
-		if (isKeyCommand(key, input, KEY_COMMANDS.QUIT)) {
-			if (hasRunningTasks) {
-				setShowQuitConfirm(true);
-			} else {
-				handleQuit();
-			}
-		}
-		if (isKeyCommand(key, input, KEY_COMMANDS.KILL)) {
-			killProcess(activeTask);
-		}
-		if (isKeyCommand(key, input, KEY_COMMANDS.FILTER)) {
-			setLogFilter((prev) => {
-				const currentIndex = LOG_FILTERS.indexOf(prev);
-				return LOG_FILTERS[(currentIndex + 1) % LOG_FILTERS.length];
-			});
-		}
-		if (isKeyCommand(key, input, KEY_COMMANDS.LEFT_ARROW)) {
-			setActiveTabIndex((prev) => {
-				const newIndex = prev === 0 ? tasks.length - 1 : prev - 1;
-				markStderrSeen(tasks[newIndex]);
-				return newIndex;
-			});
-		}
-		if (isKeyCommand(key, input, KEY_COMMANDS.RIGHT_ARROW)) {
-			setActiveTabIndex((prev) => {
-				const newIndex = prev === tasks.length - 1 ? 0 : prev + 1;
-				markStderrSeen(tasks[newIndex]);
-				return newIndex;
-			});
-		}
+		handleInput(input, key);
 	});
 
-	const activeLogs = getLogsForTask(activeTask, logFilter, VISIBLE_LOGS);
-	const runningCount = Object.values(taskStates).filter(
-		(t) => t.status === 'running',
-	).length;
+	const activeLogs = activeTask
+		? getLogsForTask(activeTask, logFilter, height)
+		: [];
+
+	// Show script selector overlay
+	if (showScriptSelector) {
+		return (
+			<Box
+				flexDirection="column"
+				padding={1}
+				borderStyle="round"
+				borderColor="cyan"
+				width={width}
+			>
+				<ScriptSelector
+					availableScripts={availableScripts}
+					runningScripts={runningTasks}
+					onSelect={handleSelectScript}
+					onCancel={handleCancelSelector}
+					height={height}
+				/>
+			</Box>
+		);
+	}
+
+	// Show empty state when no tasks
+	if (runningTasks.length === 0) {
+		return (
+			<Box
+				flexDirection="column"
+				padding={1}
+				borderStyle="round"
+				borderColor="blue"
+				width={width}
+			>
+				<Box
+					flexDirection="column"
+					height={height}
+					justifyContent="center"
+					alignItems="center"
+				>
+					<Text dimColor>No scripts running.</Text>
+					<Text dimColor>
+						Press <Text bold>n</Text> to add a script.
+					</Text>
+				</Box>
+				{pendingConfirmation ? (
+					<ConfirmDialog message={pendingConfirmation.message} />
+				) : (
+					<Footer
+						commands={getVisibleCommands()}
+						activeTask={undefined}
+						status={undefined}
+						logFilter={logFilter}
+					/>
+				)}
+			</Box>
+		);
+	}
 
 	return (
 		<Box
@@ -107,21 +208,30 @@ const App: React.FC<AppProps> = ({ tasks, packageManager }) => {
 			padding={1}
 			borderStyle="round"
 			borderColor="blue"
+			width={width}
 		>
 			<TabBar
-				tasks={tasks}
+				tasks={runningTasks}
 				taskStates={taskStates}
 				activeTabIndex={activeTabIndex}
+				width={width}
 			/>
 			<LogView
 				logs={activeLogs}
 				isRunning={taskStates[activeTask]?.status === 'running'}
+				height={height}
+				width={width}
 			/>
 
-			{showQuitConfirm ? (
-				<QuitConfirm runningCount={runningCount} />
+			{pendingConfirmation ? (
+				<ConfirmDialog
+					message={pendingConfirmation.message}
+					activeTask={activeTask}
+					status={taskStates[activeTask]?.status}
+				/>
 			) : (
 				<Footer
+					commands={getVisibleCommands()}
 					activeTask={activeTask}
 					status={taskStates[activeTask]?.status}
 					logFilter={logFilter}

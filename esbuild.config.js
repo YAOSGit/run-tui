@@ -1,5 +1,10 @@
 import * as esbuild from 'esbuild';
 import { builtinModules } from 'node:module';
+import { readFileSync } from 'node:fs';
+
+// Read version from package.json at build time
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
+const version = packageJson.version;
 
 const requireShim = `
 import { createRequire } from 'node:module';
@@ -16,6 +21,10 @@ await esbuild.build({
 	external: builtinModules.map((m) => `node:${m}`),
 	banner: {
 		js: requireShim,
+	},
+	// Inject version at build time
+	define: {
+		__CLI_VERSION__: JSON.stringify(version),
 	},
 	supported: {
 		'top-level-await': true,

@@ -4,4 +4,5 @@ export interface TabBarProps {
 	tasks: string[];
 	taskStates: Record<string, TaskState>;
 	activeTabIndex: number;
+	width?: number;
 }

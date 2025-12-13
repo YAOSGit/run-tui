@@ -121,6 +121,8 @@ run-tui -p bun dev test
 | Key | Action |
 |-----|--------|
 | `←` `→` | Switch between tabs |
+| `n` | Add a new script to run |
+| `x` | Close completed task tab |
 | `k` | Kill the current task |
 | `f` | Toggle log filter (all → stdout → stderr) |
 | `q` / `Esc` | Quit (with confirmation if tasks are running) |
@@ -130,8 +132,10 @@ run-tui -p bun dev test
 
 | Option | Description |
 |--------|-------------|
+| `-v, --version` | Display version information |
 | `-r, --regex` | Treat arguments as regex patterns |
 | `-p, --package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
+| `-k, --keep-alive` | Keep TUI open even with no scripts (allows adding scripts with `n` key) |
 | `-h, --help` | Display help information |
 
 ---

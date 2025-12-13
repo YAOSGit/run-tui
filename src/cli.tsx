@@ -7,6 +7,9 @@ import { render } from 'ink';
 import App from './components/App/index.js';
 import type { PackageManager } from './types/PackageManager/index.js';
 
+// Version is injected at build time by esbuild
+declare const __CLI_VERSION__: string;
+
 const program = new Command();
 
 const PACKAGE_MANAGERS: PackageManager[] = ['npm', 'yarn', 'pnpm', 'bun'];
@@ -29,6 +32,7 @@ const availableScripts = Object.keys(packageJson.scripts || {});
 program
 	.name('run-tui')
 	.description('Run node scripts concurrently with an interactive TUI')
+	.version(__CLI_VERSION__, '-v, --version', 'Display version information')
 	.argument('[scripts...]', 'Script names or regex patterns to run')
 	.option('-r, --regex', 'Treat arguments as regex patterns')
 	.option(
@@ -36,6 +40,11 @@ program
 		`Package manager to use (${PACKAGE_MANAGERS.join(', ')})`,
 		'npm',
 	)
+	.option(
+		'-k, --keep-alive',
+		'Keep TUI open even with no scripts (allows adding scripts with "n" key)',
+	)
+	.option('-H, --height <lines>', 'Height of the log view in lines', '20')
 	.addHelpText(
 		'after',
 		`\nAvailable scripts:\n${availableScripts.map((s) => `  - ${s}`).join('\n')}`,
@@ -43,9 +52,14 @@ program
 	.action(
 		(
 			scripts: string[],
-			options: { regex?: boolean; packageManager: string },
+			options: {
+				regex?: boolean;
+				packageManager: string;
+				keepAlive?: boolean;
+				height: string;
+			},
 		) => {
-			if (scripts.length === 0) {
+			if (scripts.length === 0 && !options.keepAlive) {
 				program.help();
 			}
 
@@ -84,7 +98,7 @@ program
 
 				requestedScripts = Array.from(matchedScripts);
 
-				if (requestedScripts.length === 0) {
+				if (requestedScripts.length === 0 && !options.keepAlive) {
 					console.error('Error: No scripts matched the provided pattern(s).');
 					console.log('\nAvailable scripts:');
 					for (const s of availableScripts) {
@@ -105,8 +119,16 @@ program
 				requestedScripts = scripts;
 			}
 
+			const height = parseInt(options.height, 10);
+
 			render(
-				<App tasks={requestedScripts} packageManager={pm as PackageManager} />,
+				<App
+					tasks={requestedScripts}
+					packageManager={pm as PackageManager}
+					availableScripts={availableScripts}
+					keepAlive={options.keepAlive ?? false}
+					height={height}
+				/>,
 			);
 		},
 	);

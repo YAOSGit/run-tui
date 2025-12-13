@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import type { TaskState } from '../../types/TaskState/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 
-export const useTaskStates = (tasks: string[]) => {
+export const useTaskStates = (initialTasks: string[]) => {
 	const [taskStates, setTaskStates] = useState<Record<string, TaskState>>(
 		() => {
 			const initial: Record<string, TaskState> = {};
-			tasks.forEach((t) => {
+			initialTasks.forEach((t) => {
 				initial[t] = {
 					name: t,
 					status: TASK_STATUS.PENDING,
@@ -35,9 +35,30 @@ export const useTaskStates = (tasks: string[]) => {
 		}));
 	}, []);
 
+	const addTask = useCallback((taskName: string) => {
+		setTaskStates((prev) => ({
+			...prev,
+			[taskName]: {
+				name: taskName,
+				status: TASK_STATUS.PENDING,
+				exitCode: null,
+				hasUnseenStderr: false,
+			},
+		}));
+	}, []);
+
+	const removeTask = useCallback((taskName: string) => {
+		setTaskStates((prev) => {
+			const { [taskName]: _, ...rest } = prev;
+			return rest;
+		});
+	}, []);
+
 	return {
 		taskStates,
 		updateTaskState,
 		markStderrSeen,
+		addTask,
+		removeTask,
 	};
 };
