@@ -1,8 +1,12 @@
-import { LOG_TYPE } from '../types/LogType/index.js';
-import type { LogType } from '../types/LogType/index.js';
 import type { Command } from '../types/Command/index.js';
+import type { LogType } from '../types/LogType/index.js';
+import { LOG_TYPE } from '../types/LogType/index.js';
 
-const LOG_FILTERS: (LogType | null)[] = [null, LOG_TYPE.STDOUT, LOG_TYPE.STDERR];
+const LOG_FILTERS: (LogType | null)[] = [
+	null,
+	LOG_TYPE.STDOUT,
+	LOG_TYPE.STDERR,
+];
 
 export const filterCommand: Command = {
 	id: 'FILTER',

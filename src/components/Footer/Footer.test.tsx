@@ -1,8 +1,8 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
-import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { LOG_TYPE } from '../../types/LogType/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
+import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { Footer } from './index.js';
 
 const defaultCommands: VisibleCommand[] = [

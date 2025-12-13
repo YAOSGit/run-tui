@@ -1,11 +1,11 @@
-import { Box, Text, useApp, useInput, useStdout } from 'ink';
+import { Box, type Key, Text, useApp, useInput, useStdout } from 'ink';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { CommandContext } from '../../types/CommandContext/index.js';
 import { useCommandRegistry } from '../../hooks/useCommandRegistry/index.js';
 import { useLogs } from '../../hooks/useLogs/index.js';
 import { useProcessManager } from '../../hooks/useProcessManager/index.js';
 import { useTaskStates } from '../../hooks/useTaskStates/index.js';
+import type { CommandContext } from '../../types/CommandContext/index.js';
 import type { LogType } from '../../types/LogType/index.js';
 import { ConfirmDialog } from '../ConfirmDialog/index.js';
 import { Footer } from '../Footer/index.js';
@@ -122,7 +122,22 @@ const App: React.FC<AppProps> = ({
 				return;
 			}
 			if (hasRunningTasks || keepAlive) {
-				handleInput('q', { escape: false, return: false, ctrl: false, shift: false, tab: false, backspace: false, delete: false, upArrow: false, downArrow: false, leftArrow: false, rightArrow: false, pageDown: false, pageUp: false, meta: false } as any);
+				handleInput('q', {
+					escape: false,
+					return: false,
+					ctrl: false,
+					shift: false,
+					tab: false,
+					backspace: false,
+					delete: false,
+					upArrow: false,
+					downArrow: false,
+					leftArrow: false,
+					rightArrow: false,
+					pageDown: false,
+					pageUp: false,
+					meta: false,
+				} as Key);
 			} else {
 				handleQuit();
 			}
@@ -132,7 +147,14 @@ const App: React.FC<AppProps> = ({
 		return () => {
 			process.off('SIGINT', handleSigint);
 		};
-	}, [hasRunningTasks, handleQuit, showScriptSelector, runningTasks.length, keepAlive, handleInput]);
+	}, [
+		hasRunningTasks,
+		handleQuit,
+		showScriptSelector,
+		runningTasks.length,
+		keepAlive,
+		handleInput,
+	]);
 
 	useInput((input, key) => {
 		if (showScriptSelector) {

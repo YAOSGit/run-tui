@@ -13,9 +13,7 @@ export const isKeyMatch = (
 		if (binding.ctrl !== undefined && key.ctrl !== binding.ctrl) return false;
 
 		if (binding.textKey) {
-			return (
-				binding.textKey.toLocaleLowerCase() === input.toLocaleLowerCase()
-			);
+			return binding.textKey.toLocaleLowerCase() === input.toLocaleLowerCase();
 		}
 
 		if (binding.specialKey) {

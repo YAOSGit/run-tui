@@ -31,10 +31,10 @@ export function ConfirmDialog({
 			)}
 			<Box borderStyle="round" borderColor="gray" paddingX={1}>
 				<Text wrap="end">
-				<Text bold color="magenta">
+					<Text bold color="magenta">
 						YAOSGit
-					<Text dimColor> : </Text>
-					run
+						<Text dimColor> : </Text>
+						run
 					</Text>
 					<Text dimColor> │ </Text>
 					<Text bold>y</Text> yes

@@ -1,7 +1,15 @@
 import { Select } from '@inkjs/ui';
 import { Box, Text, useInput } from 'ink';
 import { useMemo } from 'react';
+import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
+import { Footer } from '../Footer/index.js';
 import type { ScriptSelectorProps } from './ScriptSelector.types.js';
+
+const SCRIPT_SELECTOR_COMMANDS: VisibleCommand[] = [
+	{ displayKey: '↑ / ↓', displayText: 'navigate' },
+	{ displayKey: 'Enter', displayText: 'select' },
+	{ displayKey: 'q / ESC', displayText: 'cancel' },
+];
 
 export function ScriptSelector({
 	availableScripts,
@@ -50,21 +58,12 @@ export function ScriptSelector({
 				)}
 			</Box>
 
-			<Box borderStyle="round" borderColor="gray" paddingX={1} marginTop={1}>
-				<Text>
-					<Text bold color="magenta">
-						YAOSGit
-					</Text>
-					<Text dimColor> : </Text>
-					<Text>run</Text>
-					<Text dimColor> │ </Text>
-					<Text bold>↑/↓</Text> navigate
-					<Text dimColor> │ </Text>
-					<Text bold>Enter</Text> select
-					<Text dimColor> │ </Text>
-					<Text bold>ESC/q</Text> cancel
-				</Text>
-			</Box>
+			<Footer
+				commands={SCRIPT_SELECTOR_COMMANDS}
+				activeTask={undefined}
+				status={undefined}
+				logFilter={null}
+			/>
 		</Box>
 	);
 }

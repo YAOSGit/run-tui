@@ -50,9 +50,12 @@ export function TabBar({
 			});
 
 			// Gap between tabs (gap={2} means 2 spaces between each tab)
-			const gapsBetweenTabs = (count: number) => (count > 1 ? (count - 1) * 2 : 0);
+			const gapsBetweenTabs = (count: number) =>
+				count > 1 ? (count - 1) * 2 : 0;
 
-			const totalTabsWidth = tabWidths.reduce((sum, w) => sum + w, 0) + gapsBetweenTabs(tasks.length);
+			const totalTabsWidth =
+				tabWidths.reduce((sum, w) => sum + w, 0) +
+				gapsBetweenTabs(tasks.length);
 			const availableWidth = width - TOTAL_OVERHEAD;
 
 			// If all tabs fit, show them all

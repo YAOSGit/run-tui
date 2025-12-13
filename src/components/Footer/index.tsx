@@ -24,8 +24,8 @@ export function Footer({
 				<Text wrap="end">
 					<Text bold color="magenta">
 						YAOSGit
-					<Text dimColor> : </Text>
-					run
+						<Text dimColor> : </Text>
+						run
 					</Text>
 					{commands.map((cmd) => (
 						<Text key={`${cmd.displayKey}-${cmd.displayText}`}>

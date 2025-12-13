@@ -53,7 +53,7 @@ export const useCommandRegistry = (context: CommandContext) => {
 						const message =
 							typeof command.confirmMessage === 'function'
 								? command.confirmMessage(context)
-								: command.confirmMessage ?? 'Are you sure?';
+								: (command.confirmMessage ?? 'Are you sure?');
 						setPendingConfirmation({ command, message });
 						return;
 					}

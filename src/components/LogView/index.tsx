@@ -36,7 +36,9 @@ export function LogView({
 						<Box key={log.id}>
 							<Text dimColor>[{log.timestamp}]</Text>
 							<Text> </Text>
-							<Text color={log.type === LOG_TYPE.STDERR ? COLOR.RED : undefined}>
+							<Text
+								color={log.type === LOG_TYPE.STDERR ? COLOR.RED : undefined}
+							>
 								{log.text}
 							</Text>
 						</Box>

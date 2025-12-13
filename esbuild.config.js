@@ -1,6 +1,6 @@
-import * as esbuild from 'esbuild';
-import { builtinModules } from 'node:module';
 import { readFileSync } from 'node:fs';
+import { builtinModules } from 'node:module';
+import * as esbuild from 'esbuild';
 
 // Read version from package.json at build time
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));

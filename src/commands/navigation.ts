@@ -8,8 +8,7 @@ export const leftArrowCommand: Command = {
 	isEnabled: (ctx) => !ctx.showScriptSelector && ctx.runningTasks.length > 0,
 	execute: (ctx) => {
 		ctx.setActiveTabIndex((prev) => {
-			const newIndex =
-				prev === 0 ? ctx.runningTasks.length - 1 : prev - 1;
+			const newIndex = prev === 0 ? ctx.runningTasks.length - 1 : prev - 1;
 			ctx.markStderrSeen(ctx.runningTasks[newIndex]);
 			return newIndex;
 		});
@@ -24,8 +23,7 @@ export const rightArrowCommand: Command = {
 	isEnabled: (ctx) => !ctx.showScriptSelector && ctx.runningTasks.length > 0,
 	execute: (ctx) => {
 		ctx.setActiveTabIndex((prev) => {
-			const newIndex =
-				prev === ctx.runningTasks.length - 1 ? 0 : prev + 1;
+			const newIndex = prev === ctx.runningTasks.length - 1 ? 0 : prev + 1;
 			ctx.markStderrSeen(ctx.runningTasks[newIndex]);
 			return newIndex;
 		});

@@ -157,7 +157,7 @@ export const useProcessManager = ({
 		};
 		// Only run on mount with initial tasks
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [tasks, spawnTask, killAllProcesses]);
 
 	return {
 		spawnTask,

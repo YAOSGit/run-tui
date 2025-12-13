@@ -14,7 +14,7 @@ export const quitCommand: Command = {
 	needsConfirmation: (ctx) => ctx.hasRunningTasks || ctx.keepAlive,
 	confirmMessage: (ctx) => {
 		const runningCount = ctx.runningTasks.filter(
-			(task) => ctx.taskStatus === 'running',
+			() => ctx.taskStatus === 'running',
 		).length;
 		if (runningCount > 0) {
 			return `Quit with ${runningCount} running task${runningCount > 1 ? 's' : ''}?`;
