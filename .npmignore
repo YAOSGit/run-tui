@@ -1,5 +1,6 @@
 # Source files (not needed - dist is bundled)
 src
+examples
 tsconfig.json
 vitest.config.ts
 biome.json
