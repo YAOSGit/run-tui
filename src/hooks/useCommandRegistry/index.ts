@@ -1,21 +1,15 @@
 import type { Key } from 'ink';
 import { useCallback, useState } from 'react';
-import { commands } from '../../commands/index.js';
 import { getDisplayKey } from '../../types/Command/index.js';
 import type { CommandContext } from '../../types/CommandContext/index.js';
 import type { PendingConfirmation } from '../../types/PendingConfirmation/index.js';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
+import {
+	commands,
+	CONFIRM_NO_KEYS,
+	CONFIRM_YES_KEYS,
+} from './useCommandRegistry.consts.js';
 import { isKeyMatch } from './useCommandRegistry.utils.js';
-
-const CONFIRM_YES_KEYS = [
-	{ textKey: 'y', ctrl: false },
-	{ specialKey: 'enter', ctrl: false },
-];
-
-const CONFIRM_NO_KEYS = [
-	{ textKey: 'n', ctrl: false },
-	{ specialKey: 'esc', ctrl: false },
-];
 
 export const useCommandRegistry = (context: CommandContext) => {
 	const [pendingConfirmation, setPendingConfirmation] =

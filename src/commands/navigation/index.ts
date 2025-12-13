@@ -1,4 +1,4 @@
-import type { Command } from '../types/Command/index.js';
+import type { Command } from '../../types/Command/index.js';
 
 export const leftArrowCommand: Command = {
 	id: 'LEFT_ARROW',

@@ -115,7 +115,8 @@ describe('Footer', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('RUN-TUI');
+		expect(lastFrame()).toContain('YAOSGit');
+		expect(lastFrame()).toContain('run');
 		expect(lastFrame()).toContain('←/→');
 		expect(lastFrame()).toContain('switch');
 		expect(lastFrame()).toContain('f');
@@ -139,7 +140,8 @@ describe('Footer', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('RUN-TUI');
+		expect(lastFrame()).toContain('YAOSGit');
+		expect(lastFrame()).toContain('run');
 		expect(lastFrame()).not.toContain('running');
 	});
 });

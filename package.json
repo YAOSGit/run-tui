@@ -20,6 +20,7 @@
 		"lint:format": "biome format . --write",
 		"lint:types": "tsc --noEmit",
 		"test": "vitest run",
+		"test:types": "vitest --typecheck --run",
 		"test:watch": "vitest --watch",
 		"ui:vitest": "vitest --ui --coverage",
 		"coverage": "vitest run --coverage",
