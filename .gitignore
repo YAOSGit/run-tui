@@ -27,3 +27,6 @@ npm-debug.log*
 
 # npm pack output
 *.tgz
+
+# Recordings (may contain personal info)
+*.cast
