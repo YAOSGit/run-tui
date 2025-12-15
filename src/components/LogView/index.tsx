@@ -10,11 +10,13 @@ export function LogView({
 	width = 80,
 	isRunning = false,
 }: LogViewProps) {
-	// Calculate divider line length: (width - text - 2 spaces) / 2
-	const getDividerLine = (text: string) => {
-		const textWidth = text.length + 2; // text plus spaces on each side
-		const lineLength = Math.max(0, Math.floor((width - textWidth) / 2));
-		return '─'.repeat(lineLength);
+	// Build full divider string that fits within width
+	// Format: "───── text ─────" (line + space + text + space + line)
+	const getDivider = (text: string) => {
+		const middle = ` ${text} `;
+		const remainingWidth = width - middle.length - 4; // -4 for box borders/padding
+		const lineLength = Math.max(0, Math.floor(remainingWidth / 2));
+		return '─'.repeat(lineLength) + middle + '─'.repeat(lineLength);
 	};
 
 	return (
@@ -28,8 +30,8 @@ export function LogView({
 				logs.map((log) =>
 					log.type === LOG_TYPE.DIVIDER ? (
 						<Box key={log.id}>
-							<Text dimColor>
-								{getDividerLine(log.text)} {log.text} {getDividerLine(log.text)}
+							<Text dimColor wrap="truncate">
+								{getDivider(log.text)}
 							</Text>
 						</Box>
 					) : (
