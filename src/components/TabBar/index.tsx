@@ -9,17 +9,23 @@ import {
 import type { TabBarProps } from './TabBar.types.js';
 
 // Estimate tab width: task name + space + badge brackets and text + gap
-const estimateTabWidth = (taskName: string, status: string): number => {
+const estimateTabWidth = (
+	taskName: string,
+	status: string,
+	hasStderrBadge: boolean,
+): number => {
 	// Badge format: " STATUS " with brackets adds ~3 chars
 	// Spinner is ~1 char
-	// Gap between tabs is 2
-	const badgeWidth = status === 'running' ? 1 : status.length + 2;
-	return taskName.length + 1 + badgeWidth; // name + space + badge
+	// Gap between elements is 1
+	const badgeWidth = status === 'running' ? 1 : status.length + 3;
+	const stderrBadgeWidth = hasStderrBadge ? 5 : 0; // " ERR " + gap
+	return taskName.length + 1 + badgeWidth + stderrBadgeWidth; // name + space + badge + stderr
 };
 
-// Parent Box: border (4) + padding (2) = 6
-// TabBar Box: border (4) + paddingX (2) = 6
-// Plus gap (1) between elements
+// Parent Box: border (2) + padding (2) = 4
+// TabBar Box: border (2) + paddingX (2) = 4
+// Arrow boxes are accounted separately
+// Extra buffer to prevent edge wrapping
 const TOTAL_OVERHEAD = 14;
 
 // Arrow indicators: "◀ N" or "N ▶" plus gaps
@@ -46,7 +52,8 @@ export function TabBar({
 			// Calculate width of each tab
 			const tabWidths = tasks.map((task) => {
 				const status = taskStates[task]?.status ?? 'pending';
-				return estimateTabWidth(task, status);
+				const hasStderrBadge = taskStates[task]?.hasUnseenStderr ?? false;
+				return estimateTabWidth(task, status, hasStderrBadge);
 			});
 
 			// Gap between tabs (gap={2} means 2 spaces between each tab)
