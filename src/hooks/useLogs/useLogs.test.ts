@@ -153,5 +153,85 @@ describe('useLogs', () => {
 			const logs = result.current.getLogsForTask('nonexistent');
 			expect(logs).toEqual([]);
 		});
+
+		it('applies scrollOffset to return earlier logs', () => {
+			const { result } = renderHook(() => useLogs());
+
+			act(() => {
+				for (let i = 0; i < 10; i++) {
+					result.current.addLog(createLogEntry(String(i), 'build', `Log ${i}`));
+				}
+			});
+
+			// With limit 5 and scrollOffset 3, should get logs 2-6 (indices)
+			const scrolledLogs = result.current.getLogsForTask('build', null, 5, 3);
+			expect(scrolledLogs).toHaveLength(5);
+			expect(scrolledLogs[0].text).toBe('Log 2');
+			expect(scrolledLogs[4].text).toBe('Log 6');
+		});
+
+		it('handles scrollOffset at top boundary', () => {
+			const { result } = renderHook(() => useLogs());
+
+			act(() => {
+				for (let i = 0; i < 10; i++) {
+					result.current.addLog(createLogEntry(String(i), 'build', `Log ${i}`));
+				}
+			});
+
+			// With limit 5 and scrollOffset 7, should get logs 0-2 (only 3 logs available at top)
+			const scrolledLogs = result.current.getLogsForTask('build', null, 5, 7);
+			expect(scrolledLogs).toHaveLength(3);
+			expect(scrolledLogs[0].text).toBe('Log 0');
+			expect(scrolledLogs[2].text).toBe('Log 2');
+		});
+	});
+
+	describe('getLogCountForTask', () => {
+		it('returns count of logs for a task', () => {
+			const { result } = renderHook(() => useLogs());
+
+			act(() => {
+				result.current.addLog(createLogEntry('1', 'build', 'Build log 1'));
+				result.current.addLog(createLogEntry('2', 'test', 'Test log'));
+				result.current.addLog(createLogEntry('3', 'build', 'Build log 2'));
+			});
+
+			expect(result.current.getLogCountForTask('build')).toBe(2);
+			expect(result.current.getLogCountForTask('test')).toBe(1);
+		});
+
+		it('returns count filtered by log type', () => {
+			const { result } = renderHook(() => useLogs());
+
+			act(() => {
+				result.current.addLog(
+					createLogEntry('1', 'build', 'stdout 1', LOG_TYPE.STDOUT),
+				);
+				result.current.addLog(
+					createLogEntry('2', 'build', 'stderr 1', LOG_TYPE.STDERR),
+				);
+				result.current.addLog(
+					createLogEntry('3', 'build', 'stdout 2', LOG_TYPE.STDOUT),
+				);
+			});
+
+			expect(result.current.getLogCountForTask('build', LOG_TYPE.STDOUT)).toBe(
+				2,
+			);
+			expect(result.current.getLogCountForTask('build', LOG_TYPE.STDERR)).toBe(
+				1,
+			);
+		});
+
+		it('returns 0 for non-existent task', () => {
+			const { result } = renderHook(() => useLogs());
+
+			act(() => {
+				result.current.addLog(createLogEntry('1', 'build', 'Build log'));
+			});
+
+			expect(result.current.getLogCountForTask('nonexistent')).toBe(0);
+		});
 	});
 });

@@ -12,6 +12,10 @@ const createMockContext = (
 	keepAlive: false,
 	showScriptSelector: false,
 	logFilter: null,
+	scrollOffset: 0,
+	totalLogs: 100,
+	autoScroll: true,
+	viewHeight: 20,
 	killProcess: vi.fn(),
 	spawnTask: vi.fn(),
 	handleQuit: vi.fn(),
@@ -21,6 +25,9 @@ const createMockContext = (
 	setRunningTasks: vi.fn(),
 	setActiveTabIndex: vi.fn(),
 	markStderrSeen: vi.fn(),
+	scrollUp: vi.fn(),
+	scrollDown: vi.fn(),
+	scrollToBottom: vi.fn(),
 	...overrides,
 });
 

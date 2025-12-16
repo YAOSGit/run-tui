@@ -8,12 +8,20 @@ import {
 import { newScriptCommand } from '../../commands/newScript/index.js';
 import { quitCommand } from '../../commands/quit/index.js';
 import { restartCommand } from '../../commands/restart/index.js';
+import {
+	scrollDownCommand,
+	scrollToBottomCommand,
+	scrollUpCommand,
+} from '../../commands/scroll/index.js';
 import type { Command } from '../../types/Command/index.js';
 
 // Commands in display order for footer
 export const commands: Command[] = [
 	leftArrowCommand,
 	rightArrowCommand,
+	scrollUpCommand,
+	scrollDownCommand,
+	scrollToBottomCommand,
 	newScriptCommand,
 	closeTabCommand,
 	restartCommand,

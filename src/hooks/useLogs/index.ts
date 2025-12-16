@@ -17,12 +17,34 @@ export const useLogs = () => {
 	}, []);
 
 	const getLogsForTask = useCallback(
-		(taskName: string, filter: LogType | null = null, limit?: number) => {
+		(
+			taskName: string,
+			filter: LogType | null = null,
+			limit?: number,
+			scrollOffset = 0,
+		) => {
 			let taskLogs = logs.filter((l) => l.task === taskName);
 			if (filter !== null) {
 				taskLogs = taskLogs.filter((l) => l.type === filter);
 			}
-			return limit ? taskLogs.slice(-limit) : taskLogs;
+			if (limit) {
+				// scrollOffset is how many lines from the bottom we've scrolled up
+				const endIndex = taskLogs.length - scrollOffset;
+				const startIndex = Math.max(0, endIndex - limit);
+				return taskLogs.slice(startIndex, endIndex);
+			}
+			return taskLogs;
+		},
+		[logs],
+	);
+
+	const getLogCountForTask = useCallback(
+		(taskName: string, filter: LogType | null = null) => {
+			let taskLogs = logs.filter((l) => l.task === taskName);
+			if (filter !== null) {
+				taskLogs = taskLogs.filter((l) => l.type === filter);
+			}
+			return taskLogs.length;
 		},
 		[logs],
 	);
@@ -31,5 +53,6 @@ export const useLogs = () => {
 		logs,
 		addLog,
 		getLogsForTask,
+		getLogCountForTask,
 	};
 };

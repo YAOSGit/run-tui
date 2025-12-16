@@ -144,4 +144,96 @@ describe('Footer', () => {
 		expect(lastFrame()).toContain('run');
 		expect(lastFrame()).not.toContain('running');
 	});
+
+	describe('scroll indicator', () => {
+		it('displays scroll indicator with line numbers', () => {
+			const { lastFrame } = render(
+				<Footer
+					commands={defaultCommands}
+					activeTask="build"
+					status={TASK_STATUS.RUNNING}
+					logFilter={null}
+					scrollInfo={{
+						startLine: 1,
+						endLine: 20,
+						totalLogs: 100,
+						autoScroll: true,
+					}}
+				/>,
+			);
+
+			expect(lastFrame()).toContain('1-20/100');
+		});
+
+		it('displays play icon when autoScroll is enabled', () => {
+			const { lastFrame } = render(
+				<Footer
+					commands={defaultCommands}
+					activeTask="build"
+					status={TASK_STATUS.RUNNING}
+					logFilter={null}
+					scrollInfo={{
+						startLine: 81,
+						endLine: 100,
+						totalLogs: 100,
+						autoScroll: true,
+					}}
+				/>,
+			);
+
+			expect(lastFrame()).toContain('▶');
+		});
+
+		it('displays pause icon when autoScroll is disabled', () => {
+			const { lastFrame } = render(
+				<Footer
+					commands={defaultCommands}
+					activeTask="build"
+					status={TASK_STATUS.RUNNING}
+					logFilter={null}
+					scrollInfo={{
+						startLine: 1,
+						endLine: 20,
+						totalLogs: 100,
+						autoScroll: false,
+					}}
+				/>,
+			);
+
+			expect(lastFrame()).toContain('⏸');
+		});
+
+		it('does not show scroll indicator when totalLogs is 0', () => {
+			const { lastFrame } = render(
+				<Footer
+					commands={defaultCommands}
+					activeTask="build"
+					status={TASK_STATUS.RUNNING}
+					logFilter={null}
+					scrollInfo={{
+						startLine: 0,
+						endLine: 0,
+						totalLogs: 0,
+						autoScroll: true,
+					}}
+				/>,
+			);
+
+			expect(lastFrame()).not.toContain('0-0/0');
+		});
+
+		it('does not show scroll indicator when scrollInfo is undefined', () => {
+			const { lastFrame } = render(
+				<Footer
+					commands={defaultCommands}
+					activeTask="build"
+					status={TASK_STATUS.RUNNING}
+					logFilter={null}
+				/>,
+			);
+
+			expect(lastFrame()).not.toContain('▶');
+			expect(lastFrame()).not.toContain('⏸');
+		});
+	});
 });

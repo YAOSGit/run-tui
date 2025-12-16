@@ -8,16 +8,29 @@ export function Footer({
 	activeTask,
 	status,
 	logFilter,
+	scrollInfo,
 }: FooterProps) {
+	const scrollIndicator = scrollInfo && scrollInfo.totalLogs > 0 && (
+		<Text dimColor>
+			{scrollInfo.startLine}-{scrollInfo.endLine}/{scrollInfo.totalLogs}
+			{scrollInfo.autoScroll ? (
+				<Text color="green"> ▶</Text>
+			) : (
+				<Text color="yellow"> ⏸</Text>
+			)}
+		</Text>
+	);
+
 	return (
 		<Box marginTop={1} flexDirection="column" gap={1}>
 			{activeTask && status && (
-				<Box>
+				<Box justifyContent="space-between">
 					<StatusMessage variant={STATUS_VARIANTS[status]}>
 						<Text bold>{activeTask}</Text>
 						<Text dimColor> - {status}</Text>
 						<Text dimColor> [{logFilter ?? 'all'}]</Text>
 					</StatusMessage>
+					{scrollIndicator}
 				</Box>
 			)}
 			<Box borderStyle="round" borderColor="gray" paddingX={1}>

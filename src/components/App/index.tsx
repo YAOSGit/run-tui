@@ -1,6 +1,6 @@
 import { Box, type Key, Text, useApp, useInput, useStdout } from 'ink';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useCommandRegistry } from '../../hooks/useCommandRegistry/index.js';
 import { useLogs } from '../../hooks/useLogs/index.js';
 import { useProcessManager } from '../../hooks/useProcessManager/index.js';
@@ -29,12 +29,59 @@ const App: React.FC<AppProps> = ({
 		initialTasks.length === 0 && keepAlive,
 	);
 	const [logFilter, setLogFilter] = useState<LogType | null>(null);
+	const [scrollOffset, setScrollOffset] = useState(0);
+	const [autoScroll, setAutoScroll] = useState(true);
 	const { exit } = useApp();
 
 	const activeTask = runningTasks[activeTabIndex];
 	const { taskStates, updateTaskState, markStderrSeen, addTask, removeTask } =
 		useTaskStates(initialTasks);
-	const { addLog, getLogsForTask } = useLogs();
+	const { addLog, getLogsForTask, getLogCountForTask } = useLogs();
+
+	// Get total logs for current task (for scroll bounds)
+	const totalLogs = activeTask
+		? getLogCountForTask(activeTask, logFilter)
+		: 0;
+
+	// Track previous log count to adjust scroll offset when new logs arrive
+	const prevTotalLogsRef = useRef(totalLogs);
+
+	// Reset scroll and re-enable autoScroll when switching tabs or filters
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset when tab/filter changes
+	useEffect(() => {
+		setScrollOffset(0);
+		setAutoScroll(true);
+		prevTotalLogsRef.current = 0;
+	}, [activeTabIndex, logFilter]);
+
+	// When autoScroll is disabled, adjust scrollOffset to keep view stable as new logs arrive
+	useEffect(() => {
+		if (!autoScroll && totalLogs > prevTotalLogsRef.current) {
+			const newLogs = totalLogs - prevTotalLogsRef.current;
+			setScrollOffset((prev: number) => prev + newLogs);
+		}
+		prevTotalLogsRef.current = totalLogs;
+	}, [totalLogs, autoScroll]);
+
+	const scrollUp = useCallback(() => {
+		setScrollOffset((prev: number) => Math.min(prev + 1, Math.max(0, totalLogs - height)));
+		setAutoScroll(false); // Disable auto-scroll when user scrolls up
+	}, [totalLogs, height]);
+
+	const scrollDown = useCallback(() => {
+		setScrollOffset((prev: number) => {
+			const newOffset = Math.max(0, prev - 1);
+			if (newOffset === 0) {
+				setAutoScroll(true); // Re-enable auto-scroll when at bottom
+			}
+			return newOffset;
+		});
+	}, []);
+
+	const scrollToBottom = useCallback(() => {
+		setScrollOffset(0);
+		setAutoScroll(true);
+	}, []);
 
 	const { spawnTask, killProcess, killAllProcesses } = useProcessManager({
 		tasks: initialTasks,
@@ -82,6 +129,10 @@ const App: React.FC<AppProps> = ({
 			keepAlive,
 			showScriptSelector,
 			logFilter,
+			scrollOffset,
+			totalLogs,
+			autoScroll,
+			viewHeight: height,
 			killProcess,
 			spawnTask,
 			handleQuit,
@@ -91,6 +142,9 @@ const App: React.FC<AppProps> = ({
 			setRunningTasks,
 			setActiveTabIndex,
 			markStderrSeen,
+			scrollUp,
+			scrollDown,
+			scrollToBottom,
 		}),
 		[
 			activeTask,
@@ -100,11 +154,18 @@ const App: React.FC<AppProps> = ({
 			keepAlive,
 			showScriptSelector,
 			logFilter,
+			scrollOffset,
+			totalLogs,
+			autoScroll,
+			height,
 			killProcess,
 			spawnTask,
 			handleQuit,
 			removeTask,
 			markStderrSeen,
+			scrollUp,
+			scrollDown,
+			scrollToBottom,
 		],
 	);
 
@@ -165,8 +226,18 @@ const App: React.FC<AppProps> = ({
 	});
 
 	const activeLogs = activeTask
-		? getLogsForTask(activeTask, logFilter, height)
+		? getLogsForTask(activeTask, logFilter, height, scrollOffset)
 		: [];
+
+	// Calculate scroll info for footer indicator
+	const scrollInfo = activeTask
+		? {
+				startLine: Math.max(1, totalLogs - scrollOffset - height + 1),
+				endLine: Math.max(0, totalLogs - scrollOffset),
+				totalLogs,
+				autoScroll,
+			}
+		: undefined;
 
 	// Show script selector overlay
 	if (showScriptSelector) {
@@ -257,6 +328,7 @@ const App: React.FC<AppProps> = ({
 					activeTask={activeTask}
 					status={taskStates[activeTask]?.status}
 					logFilter={logFilter}
+					scrollInfo={scrollInfo}
 				/>
 			)}
 		</Box>

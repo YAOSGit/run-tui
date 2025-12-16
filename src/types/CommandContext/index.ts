@@ -10,6 +10,10 @@ export interface CommandContext {
 	keepAlive: boolean;
 	showScriptSelector: boolean;
 	logFilter: LogType | null;
+	scrollOffset: number;
+	totalLogs: number;
+	autoScroll: boolean;
+	viewHeight: number;
 
 	// Actions
 	killProcess: (task: string) => void;
@@ -21,4 +25,7 @@ export interface CommandContext {
 	setRunningTasks: React.Dispatch<React.SetStateAction<string[]>>;
 	setActiveTabIndex: React.Dispatch<React.SetStateAction<number>>;
 	markStderrSeen: (task: string) => void;
+	scrollUp: () => void;
+	scrollDown: () => void;
+	scrollToBottom: () => void;
 }
