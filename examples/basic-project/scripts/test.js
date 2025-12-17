@@ -48,9 +48,15 @@ let failed = 0;
 function runNextTest() {
 	if (suiteIndex >= testSuites.length) {
 		// Summary
-		console.log(`\n${colors.bold}Test Suites:${colors.reset} ${colors.green}${testSuites.length} passed${colors.reset}, ${testSuites.length} total`);
-		console.log(`${colors.bold}Tests:${colors.reset}       ${colors.green}${passed} passed${colors.reset}, ${passed + failed} total`);
-		console.log(`${colors.dim}Time:        ${((passed + failed) * 0.015).toFixed(2)}s${colors.reset}\n`);
+		console.log(
+			`\n${colors.bold}Test Suites:${colors.reset} ${colors.green}${testSuites.length} passed${colors.reset}, ${testSuites.length} total`,
+		);
+		console.log(
+			`${colors.bold}Tests:${colors.reset}       ${colors.green}${passed} passed${colors.reset}, ${passed + failed} total`,
+		);
+		console.log(
+			`${colors.dim}Time:        ${((passed + failed) * 0.015).toFixed(2)}s${colors.reset}\n`,
+		);
 		process.exit(failed > 0 ? 1 : 0);
 		return;
 	}
@@ -65,10 +71,14 @@ function runNextTest() {
 
 	setTimeout(() => {
 		if (test.pass) {
-			console.log(`   ${colors.green}✓${colors.reset} ${colors.dim}${test.name} (${test.time}ms)${colors.reset}`);
+			console.log(
+				`   ${colors.green}✓${colors.reset} ${colors.dim}${test.name} (${test.time}ms)${colors.reset}`,
+			);
 			passed++;
 		} else {
-			console.log(`   ${colors.red}✕${colors.reset} ${test.name} (${test.time}ms)`);
+			console.log(
+				`   ${colors.red}✕${colors.reset} ${test.name} (${test.time}ms)`,
+			);
 			failed++;
 		}
 

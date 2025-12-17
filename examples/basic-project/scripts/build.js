@@ -19,15 +19,23 @@ const steps = [
 	{ msg: 'Generating source maps...', delay: 300 },
 ];
 
-console.log(`\n${colors.cyan}${colors.bold}Building for production...${colors.reset}\n`);
+console.log(
+	`\n${colors.cyan}${colors.bold}Building for production...${colors.reset}\n`,
+);
 
 let currentStep = 0;
 
 function runStep() {
 	if (currentStep >= steps.length) {
-		console.log(`\n${colors.green}${colors.bold}✓ Build completed successfully!${colors.reset}`);
-		console.log(`${colors.dim}  Output: dist/bundle.js (245 KB)${colors.reset}`);
-		console.log(`${colors.dim}  Time: ${(steps.reduce((a, s) => a + s.delay, 0) / 1000).toFixed(2)}s${colors.reset}\n`);
+		console.log(
+			`\n${colors.green}${colors.bold}✓ Build completed successfully!${colors.reset}`,
+		);
+		console.log(
+			`${colors.dim}  Output: dist/bundle.js (245 KB)${colors.reset}`,
+		);
+		console.log(
+			`${colors.dim}  Time: ${(steps.reduce((a, s) => a + s.delay, 0) / 1000).toFixed(2)}s${colors.reset}\n`,
+		);
 		process.exit(0);
 		return;
 	}

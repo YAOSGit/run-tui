@@ -39,9 +39,7 @@ const App: React.FC<AppProps> = ({
 	const { addLog, getLogsForTask, getLogCountForTask } = useLogs();
 
 	// Get total logs for current task (for scroll bounds)
-	const totalLogs = activeTask
-		? getLogCountForTask(activeTask, logFilter)
-		: 0;
+	const totalLogs = activeTask ? getLogCountForTask(activeTask, logFilter) : 0;
 
 	// Track previous log count to adjust scroll offset when new logs arrive
 	const prevTotalLogsRef = useRef(totalLogs);
@@ -64,7 +62,9 @@ const App: React.FC<AppProps> = ({
 	}, [totalLogs, autoScroll]);
 
 	const scrollUp = useCallback(() => {
-		setScrollOffset((prev: number) => Math.min(prev + 1, Math.max(0, totalLogs - height)));
+		setScrollOffset((prev: number) =>
+			Math.min(prev + 1, Math.max(0, totalLogs - height)),
+		);
 		setAutoScroll(false); // Disable auto-scroll when user scrolls up
 	}, [totalLogs, height]);
 

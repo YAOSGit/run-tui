@@ -10,22 +10,29 @@
 		"dist"
 	],
 	"scripts": {
-		"dev": "npm run dev:typescript",
-		"dev:typescript": "tsc --watch --noEmit",
+		"dev": "run-tui -r \"^dev:\"",
+		"dev:typescript": "tsgo --watch --noEmit -p tsconfig.app.json",
 		"dev:test": "vitest --watch",
 		"build": "node esbuild.config.js",
-		"lint": "npm run lint:types && npm run lint:fix && npm run lint:format",
+		"lint": "npm run lint:types && npm run lint:fix && npm run lint:format && npm run lint:audit",
 		"lint:check": "biome lint .",
 		"lint:fix": "biome check . --write",
 		"lint:format": "biome format . --write",
-		"lint:types": "tsc --noEmit",
-		"test": "vitest run",
-		"test:types": "vitest --typecheck --run",
-		"test:watch": "vitest --watch",
+		"lint:types": "tsgo --noEmit -p tsconfig.app.json",
+		"lint:audit": "npm audit",
+		"test": "npm run test:unit && npm run test:react && npm run test:types",
+		"test:unit": "vitest run -c vitest.unit.config.ts",
+		"test:react": "vitest run -c vitest.react.config.ts",
+		"test:types": "vitest run -c vitest.type.config.ts",
 		"ui:vitest": "vitest --ui --coverage",
+		"ui:vitest:unit": "vitest --ui --coverage -c vitest.unit.config.ts",
+		"ui:vitest:react": "vitest --ui --coverage -c vitest.react.config.ts",
+		"ui:vitest:types": "vitest --ui --coverage -c vitest.type.config.ts",
 		"coverage": "vitest run --coverage",
-		"validate": "npm run lint:types && npm run lint:check && npm run test",
-		"prepublishOnly": "npm run validate && npm run build"
+		"coverage:unit": "vitest run --coverage -c vitest.unit.config.ts",
+		"coverage:react": "vitest run --coverage -c vitest.react.config.ts",
+		"coverage:types": "vitest run --coverage -c vitest.type.config.ts",
+		"prepublishOnly": "npm run lint:types && npm run lint:check && npm run test && npm run lint:audit && npm run build"
 	},
 	"repository": {
 		"type": "git",
@@ -53,6 +60,7 @@
 		"uuid": "^13.0.0"
 	},
 	"devDependencies": {
+		"@yaos-git/run-tui": "^125.2.0",
 		"@inkjs/ui": "^2.0.0",
 		"ink": "^6.5.1",
 		"react": "^19.2.3",
@@ -65,7 +73,7 @@
 		"esbuild": "^0.27.1",
 		"ink-testing-library": "^4.0.0",
 		"jsdom": "^27.3.0",
-		"ts-node": "^10.9.2",
+		"@typescript/native-preview": "^7.0.0-dev.20251216",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.15"
 	}

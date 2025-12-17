@@ -28,8 +28,12 @@ let fileIndex = 0;
 
 function lintNextFile() {
 	if (fileIndex >= files.length) {
-		console.log(`\n${colors.green}${colors.bold}✓ All files passed linting${colors.reset}`);
-		console.log(`${colors.dim}  ${files.length} files checked${colors.reset}\n`);
+		console.log(
+			`\n${colors.green}${colors.bold}✓ All files passed linting${colors.reset}`,
+		);
+		console.log(
+			`${colors.dim}  ${files.length} files checked${colors.reset}\n`,
+		);
 		process.exit(0);
 		return;
 	}
@@ -37,11 +41,16 @@ function lintNextFile() {
 	const file = files[fileIndex];
 	process.stdout.write(`${colors.dim}Checking ${file}...${colors.reset}`);
 
-	setTimeout(() => {
-		process.stdout.write(`\r${colors.green}✓${colors.reset} ${file}${' '.repeat(30)}\n`);
-		fileIndex++;
-		lintNextFile();
-	}, Math.random() * 100 + 50);
+	setTimeout(
+		() => {
+			process.stdout.write(
+				`\r${colors.green}✓${colors.reset} ${file}${' '.repeat(30)}\n`,
+			);
+			fileIndex++;
+			lintNextFile();
+		},
+		Math.random() * 100 + 50,
+	);
 }
 
 lintNextFile();

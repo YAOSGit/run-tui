@@ -18,6 +18,7 @@ await esbuild.build({
 	format: 'esm',
 	outfile: 'dist/cli.js',
 	minify: true,
+	tsconfig: 'tsconfig.app.json',
 	external: builtinModules.map((m) => `node:${m}`),
 	banner: {
 		js: requireShim,

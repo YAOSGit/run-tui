@@ -35,9 +35,7 @@ export const scrollToBottomCommand: Command = {
 	keys: [{ textKey: 'b' }],
 	displayText: 'bottom',
 	isEnabled: (ctx) =>
-		!ctx.showScriptSelector &&
-		ctx.runningTasks.length > 0 &&
-		!ctx.autoScroll,
+		!ctx.showScriptSelector && ctx.runningTasks.length > 0 && !ctx.autoScroll,
 	execute: (ctx) => {
 		ctx.scrollToBottom();
 	},
