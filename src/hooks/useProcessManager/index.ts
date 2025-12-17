@@ -1,6 +1,6 @@
 import { type ChildProcess, spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { useCallback, useEffect, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { LOG_TYPE } from '../../types/LogType/index.js';
 import { SIGNALS } from '../../types/Signals/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
@@ -54,7 +54,7 @@ export const useProcessManager = ({
 				lines.forEach((line) => {
 					if (line.trim() === '') return;
 					onLogEntry({
-						id: uuidv4(),
+						id: randomUUID(),
 						task: taskName,
 						text: line,
 						type,
@@ -90,7 +90,7 @@ export const useProcessManager = ({
 
 			child.on('error', (err) => {
 				onLogEntry({
-					id: uuidv4(),
+					id: randomUUID(),
 					task: taskName,
 					text: `Process error: ${err.message}`,
 					type: LOG_TYPE.STDERR,
@@ -119,7 +119,7 @@ export const useProcessManager = ({
 			}
 			if (addDivider) {
 				onLogEntry({
-					id: uuidv4(),
+					id: randomUUID(),
 					task: taskName,
 					text: 'Process killed',
 					type: LOG_TYPE.DIVIDER,

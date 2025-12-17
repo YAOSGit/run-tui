@@ -1,6 +1,6 @@
 {
 	"name": "@yaos-git/run-tui",
-	"version": "125.2.0",
+	"version": "125.2.1",
 	"description": "An interactive terminal UI for running npm scripts concurrently",
 	"main": "dist/cli.js",
 	"bin": {
@@ -33,7 +33,7 @@
 		"coverage:unit": "vitest run --coverage -c vitest.unit.config.ts",
 		"coverage:react": "vitest run --coverage -c vitest.react.config.ts",
 		"coverage:types": "vitest run --coverage -c vitest.type.config.ts",
-		"prepublishOnly": "npm run lint:types && npm run lint:check && npm run test && npm run lint:audit && npm run build"
+		"prepublishOnly": "npm run lint:types && npm run lint:check && npm run test:e2e && npm run test:unit && npm run test:react && npm run lint:audit && npm run build"
 	},
 	"repository": {
 		"type": "git",
@@ -52,13 +52,14 @@
 		"ink",
 		"react"
 	],
-	"author": "",
+	"author": "Ygor de Paula",
+	"email": "ygorh.de.paula@gmail.com",
+	"url": "https://github.com/YAOSGit/run-tui",
 	"license": "ISC",
 	"type": "module",
 	"dependencies": {
 		"chalk": "^5.6.2",
-		"commander": "^14.0.2",
-		"uuid": "^13.0.0"
+		"commander": "^14.0.2"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
@@ -67,8 +68,8 @@
 		"@testing-library/react": "^16.3.0",
 		"@types/node": "^25.0.1",
 		"@types/react": "^19.2.7",
-		"@types/uuid": "^10.0.0",
 		"@typescript/native-preview": "^7.0.0-dev.20251216",
+		"@vitest/coverage-v8": "^4.0.15",
 		"@yaos-git/run-tui": "^125.2.0",
 		"esbuild": "^0.27.1",
 		"happy-dom": "^20.0.11",

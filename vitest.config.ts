@@ -8,5 +8,9 @@ export default defineConfig({
 			'./vitest.react.config.ts',
 			'./vitest.e2e.config.ts',
 		],
+		coverage: {
+			include: ['src/**/*.{ts,tsx}'],
+			exclude: ['e2e/**', 'src/app/**', 'node_modules/**', '**/*.test.{ts,tsx}', '**/*.test-d.ts'],
+		},
 	},
 });

@@ -12,5 +12,8 @@ export default defineConfig({
 		},
 		include: ['**/*.test-d.ts'],
 		exclude: ['node_modules', '**/*.test.ts', '**/*.test.tsx'],
+		sequence: {
+			groupOrder: 1,
+		},
 	},
 });

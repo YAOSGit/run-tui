@@ -23,10 +23,15 @@ vi.mock('node:child_process', async (importOriginal) => {
 	};
 });
 
-// Mock uuid
-vi.mock('uuid', () => ({
-	v4: () => 'test-uuid',
-}));
+// Mock crypto.randomUUID
+vi.mock('node:crypto', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('node:crypto')>();
+	return {
+		...actual,
+		default: { ...actual, randomUUID: () => 'test-uuid' },
+		randomUUID: () => 'test-uuid',
+	};
+});
 
 import { useProcessManager } from './index.js';
 

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [125.2.1] - 2025-12-17
+
+### Added
+- End-to-end (E2E) test suite using node-pty for realistic terminal testing
+  - CLI arguments tests
+  - Keyboard interaction tests
+  - Process lifecycle tests
+  - State transition tests
+- New dependencies: `node-pty` and `strip-ansi` for E2E testing
+
+### Changed
+- Reorganized test configuration with separate vitest configs:
+  - `vitest.unit.config.ts` - Unit tests
+  - `vitest.react.config.ts` - React component tests
+  - `vitest.type.config.ts` - TypeScript type tests
+  - `vitest.e2e.config.ts` - End-to-end tests
+- Updated test scripts in package.json for better test organization
+- Improved useProcessManager hook implementation
+
+### Documentation
+- Updated README with comprehensive keyboard shortcuts including scroll commands
+- Updated project structure to reflect new architecture (providers, commands, hooks)
+- Updated testing scripts documentation to reflect new test organization
+
 ## [125.2.0] - 2025-12-16
 
 ### Added

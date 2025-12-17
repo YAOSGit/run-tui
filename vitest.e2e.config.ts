@@ -15,5 +15,8 @@ export default defineConfig({
 		pool: 'forks',
 		maxWorkers: 1,
 		isolate: false,
+		sequence: {
+			groupOrder: 2,
+		},
 	},
 });

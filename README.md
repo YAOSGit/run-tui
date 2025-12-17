@@ -125,9 +125,13 @@ run-tui -p bun dev test
 | Key | Action |
 |-----|--------|
 | `←` `→` | Switch between tabs |
+| `↑` `↓` | Scroll logs up/down |
+| `Page Up` / `Page Down` | Scroll logs by page |
+| `Home` / `End` | Jump to top/bottom of logs |
 | `n` | Add a new script to run |
 | `x` | Close completed task tab |
 | `k` | Kill the current task |
+| `r` | Restart the current task |
 | `f` | Toggle log filter (all → stdout → stderr) |
 | `q` / `Esc` | Quit (with confirmation if tasks are running) |
 | `y` / `n` | Confirm or cancel quit |
@@ -174,11 +178,13 @@ run-tui -p bun dev test
 
 | Script | Description |
 |--------|-------------|
-| `npm test` | Run tests once with Vitest |
-| `npm run test:watch` | Run tests in watch mode |
+| `npm test` | Run all tests (unit, react, types, e2e) |
+| `npm run test:unit` | Run unit tests |
+| `npm run test:react` | Run React component tests |
+| `npm run test:types` | Run TypeScript type tests |
+| `npm run test:e2e` | Run end-to-end tests |
 | `npm run ui:vitest` | Open Vitest UI with coverage |
 | `npm run coverage` | Run tests with coverage report |
-| `npm run validate` | Run type checking + linting + tests |
 
 ---
 
@@ -209,22 +215,61 @@ run-tui -p bun dev test
 ```
 run-tui/
 ├── src/
-│   ├── cli.tsx                 # CLI entry point
+│   ├── app/                    # Application entry points
+│   │   ├── cli.tsx             # CLI entry point
+│   │   ├── app.tsx             # Main application component
+│   │   ├── providers.tsx       # Context providers composition
+│   │   └── index.tsx           # App exports
 │   ├── components/             # React components
-│   │   ├── App/                # Main application component
 │   │   ├── TabBar/             # Tab navigation
 │   │   ├── LogView/            # Log display area
 │   │   ├── Footer/             # Status bar and shortcuts
-│   │   └── QuitConfirm/        # Quit confirmation dialog
+│   │   ├── ConfirmDialog/      # Generic confirmation dialog
+│   │   └── ScriptSelector/     # Script selection UI
+│   ├── commands/               # Keyboard command handlers
+│   │   ├── closeTab/           # Close tab command
+│   │   ├── filter/             # Log filter command
+│   │   ├── kill/               # Kill process command
+│   │   ├── navigation/         # Tab navigation commands
+│   │   ├── newScript/          # Add new script command
+│   │   ├── quit/               # Quit application command
+│   │   ├── restart/            # Restart process command
+│   │   └── scroll/             # Log scroll commands
 │   ├── hooks/                  # Custom React hooks
 │   │   ├── useProcessManager/  # Process spawning and management
 │   │   ├── useLogs/            # Log storage and filtering
-│   │   └── useTaskStates/      # Task status tracking
+│   │   ├── useTasksState/      # Task status tracking
+│   │   ├── useUIState/         # UI state management
+│   │   └── useView/            # View/scroll state management
+│   ├── providers/              # React context providers
+│   │   ├── CommandsProvider/   # Command registry and execution
+│   │   ├── LogsProvider/       # Log entries context
+│   │   ├── TasksProvider/      # Task state context
+│   │   ├── UIStateProvider/    # UI state context
+│   │   └── ViewProvider/       # View state context
 │   └── types/                  # TypeScript type definitions
+│       ├── Command/            # Command type definitions
+│       ├── KeyBinding/         # Key binding types
+│       ├── LogEntry/           # Log entry types
+│       ├── LogType/            # Log type constants
+│       ├── PackageManager/     # Package manager types
+│       ├── TaskState/          # Task state types
+│       ├── TaskStatus/         # Task status constants
+│       └── VisibleCommand/     # Visible command types
+├── e2e/                        # End-to-end tests
+│   ├── cli-args.e2e.ts         # CLI argument tests
+│   ├── keyboard.e2e.ts         # Keyboard interaction tests
+│   ├── process-lifecycle.e2e.ts # Process lifecycle tests
+│   ├── state-transitions.e2e.ts # State transition tests
+│   └── utils/                  # E2E test utilities
 ├── dist/                       # Built output
 ├── biome.json                  # Biome configuration
 ├── tsconfig.json               # TypeScript configuration
 ├── vitest.config.ts            # Vitest configuration
+├── vitest.unit.config.ts       # Unit test configuration
+├── vitest.react.config.ts      # React test configuration
+├── vitest.type.config.ts       # Type test configuration
+├── vitest.e2e.config.ts        # E2E test configuration
 └── package.json
 ```
 
