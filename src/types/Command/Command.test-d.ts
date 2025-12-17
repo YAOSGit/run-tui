@@ -1,5 +1,5 @@
 import { assertType, describe, expectTypeOf, it } from 'vitest';
-import type { CommandContext } from '../CommandContext/index.js';
+import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 import type { KeyBinding } from '../KeyBinding/index.js';
 import { type Command, getDisplayKey } from './index.js';
 
@@ -14,31 +14,31 @@ describe('Command type tests', () => {
 		expectTypeOf<Command['displayKey']>().toEqualTypeOf<string | undefined>();
 	});
 
-	it('isEnabled is a function taking CommandContext returning boolean', () => {
+	it('isEnabled is a function taking CommandProviders returning boolean', () => {
 		expectTypeOf<Command['isEnabled']>().toBeFunction();
 		expectTypeOf<Command['isEnabled']>().parameters.toEqualTypeOf<
-			[CommandContext]
+			[CommandProviders]
 		>();
 		expectTypeOf<Command['isEnabled']>().returns.toEqualTypeOf<boolean>();
 	});
 
-	it('execute is a function taking CommandContext returning void', () => {
+	it('execute is a function taking CommandProviders returning void', () => {
 		expectTypeOf<Command['execute']>().toBeFunction();
 		expectTypeOf<Command['execute']>().parameters.toEqualTypeOf<
-			[CommandContext]
+			[CommandProviders]
 		>();
 		expectTypeOf<Command['execute']>().returns.toEqualTypeOf<void>();
 	});
 
 	it('needsConfirmation is optional function', () => {
 		expectTypeOf<Command['needsConfirmation']>().toEqualTypeOf<
-			((ctx: CommandContext) => boolean) | undefined
+			((p: CommandProviders) => boolean) | undefined
 		>();
 	});
 
 	it('confirmMessage can be string or function', () => {
 		expectTypeOf<Command['confirmMessage']>().toEqualTypeOf<
-			string | ((ctx: CommandContext) => string) | undefined
+			string | ((p: CommandProviders) => string) | undefined
 		>();
 	});
 
@@ -58,10 +58,10 @@ describe('Command type tests', () => {
 			keys: [{ textKey: 'q' }, { specialKey: 'esc' }],
 			displayKey: 'q / ESC',
 			displayText: 'quit',
-			isEnabled: (ctx) => !ctx.showScriptSelector,
-			execute: (ctx) => ctx.handleQuit(),
-			needsConfirmation: (ctx) => ctx.hasRunningTasks,
-			confirmMessage: (ctx) => `Quit with ${ctx.runningTasks.length} tasks?`,
+			isEnabled: (p) => !p.ui.showScriptSelector,
+			execute: (p) => p.quit(),
+			needsConfirmation: (p) => p.tasks.hasRunningTasks,
+			confirmMessage: (p) => `Quit with ${p.tasks.tasks.length} tasks?`,
 		});
 	});
 

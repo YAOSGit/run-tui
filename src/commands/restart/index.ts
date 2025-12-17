@@ -4,13 +4,19 @@ export const restartCommand: Command = {
 	id: 'RESTART',
 	keys: [{ textKey: 'r', ctrl: false }],
 	displayText: 'restart',
-	isEnabled: (ctx) =>
-		!ctx.showScriptSelector &&
-		ctx.runningTasks.length > 0 &&
-		(ctx.taskStatus === 'success' || ctx.taskStatus === 'error'),
-	execute: (ctx) => {
-		if (ctx.activeTask) {
-			ctx.spawnTask(ctx.activeTask);
+	isEnabled: (p) => {
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
+		return (
+			!p.ui.showScriptSelector &&
+			p.tasks.tasks.length > 0 &&
+			(taskStatus === 'success' || taskStatus === 'error')
+		);
+	},
+	execute: (p) => {
+		if (p.view.activeTask) {
+			p.tasks.restartTask(p.view.activeTask);
 		}
 	},
 };

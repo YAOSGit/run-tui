@@ -4,8 +4,8 @@ export const newScriptCommand: Command = {
 	id: 'NEW_SCRIPT',
 	keys: [{ textKey: 'n', ctrl: false }],
 	displayText: 'new',
-	isEnabled: (ctx) => !ctx.showScriptSelector,
-	execute: (ctx) => {
-		ctx.setShowScriptSelector(true);
+	isEnabled: (p) => !p.ui.showScriptSelector,
+	execute: (p) => {
+		p.ui.openScriptSelector();
 	},
 };

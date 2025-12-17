@@ -1,217 +1,290 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { CommandContext } from '../../types/CommandContext/index.js';
+import { describe, it, expect, vi } from 'vitest';
 import {
+	scrollUpCommand,
 	scrollDownCommand,
 	scrollToBottomCommand,
-	scrollUpCommand,
 } from './index.js';
+import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 
-const createMockContext = (
-	overrides: Partial<CommandContext> = {},
-): CommandContext => ({
-	activeTask: 'build',
-	taskStatus: 'running',
-	runningTasks: ['build', 'test'],
-	hasRunningTasks: true,
+const createMockProviders = (
+	overrides: Partial<{
+		showScriptSelector: boolean;
+		tasks: string[];
+		totalLogs: number;
+		viewHeight: number;
+		scrollOffset: number;
+		autoScroll: boolean;
+	}> = {},
+): CommandProviders => ({
+	tasks: {
+		tasks: overrides.tasks ?? ['task1'],
+		taskStates: {},
+		hasRunningTasks: false,
+		addTask: vi.fn(),
+		closeTask: vi.fn(),
+		restartTask: vi.fn(),
+		killTask: vi.fn(),
+		killAllTasks: vi.fn(),
+		markStderrSeen: vi.fn(),
+		getTaskStatus: vi.fn(),
+	},
+	logs: {
+		addLog: vi.fn(),
+		getLogsForTask: vi.fn().mockReturnValue([]),
+		getLogCountForTask: vi.fn().mockReturnValue(0),
+		clearLogsForTask: vi.fn(),
+	},
+	view: {
+		activeTabIndex: 0,
+		activeTask: 'task1',
+		logFilter: null,
+		scrollOffset: overrides.scrollOffset ?? 0,
+		autoScroll: overrides.autoScroll ?? true,
+		viewHeight: overrides.viewHeight ?? 20,
+		totalLogs: overrides.totalLogs ?? 10,
+		navigateLeft: vi.fn(),
+		navigateRight: vi.fn(),
+		setActiveTabIndex: vi.fn(),
+		cycleLogFilter: vi.fn(),
+		scrollUp: vi.fn(),
+		scrollDown: vi.fn(),
+		scrollToBottom: vi.fn(),
+	},
+	ui: {
+		showScriptSelector: overrides.showScriptSelector ?? false,
+		pendingConfirmation: null,
+		openScriptSelector: vi.fn(),
+		closeScriptSelector: vi.fn(),
+		requestConfirmation: vi.fn(),
+		confirmPending: vi.fn(),
+		cancelPending: vi.fn(),
+	},
 	keepAlive: false,
-	showScriptSelector: false,
-	logFilter: null,
-	scrollOffset: 0,
-	totalLogs: 100,
-	autoScroll: true,
-	viewHeight: 20,
-	killProcess: vi.fn(),
-	spawnTask: vi.fn(),
-	handleQuit: vi.fn(),
-	setShowScriptSelector: vi.fn(),
-	setLogFilter: vi.fn(),
-	removeTask: vi.fn(),
-	setRunningTasks: vi.fn(),
-	setActiveTabIndex: vi.fn(),
-	markStderrSeen: vi.fn(),
-	scrollUp: vi.fn(),
-	scrollDown: vi.fn(),
-	scrollToBottom: vi.fn(),
-	...overrides,
+	quit: vi.fn(),
 });
 
 describe('scrollUpCommand', () => {
-	describe('properties', () => {
-		it('has correct id', () => {
-			expect(scrollUpCommand.id).toBe('SCROLL_UP');
-		});
+	it('has correct id', () => {
+		expect(scrollUpCommand.id).toBe('SCROLL_UP');
+	});
 
-		it('has correct keys', () => {
-			expect(scrollUpCommand.keys).toEqual([{ specialKey: 'up' }]);
-		});
+	it('has correct keys', () => {
+		expect(scrollUpCommand.keys).toEqual([{ specialKey: 'up' }]);
+	});
 
-		it('has correct displayKey', () => {
-			expect(scrollUpCommand.displayKey).toBe('↑ / ↓');
-		});
+	it('has correct displayKey', () => {
+		expect(scrollUpCommand.displayKey).toBe('↑ / ↓');
+	});
 
-		it('has correct displayText', () => {
-			expect(scrollUpCommand.displayText).toBe('scroll');
-		});
+	it('has correct displayText', () => {
+		expect(scrollUpCommand.displayText).toBe('scroll');
 	});
 
 	describe('isEnabled', () => {
-		it('returns false when script selector is shown', () => {
-			const ctx = createMockContext({ showScriptSelector: true });
-			expect(scrollUpCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when no running tasks', () => {
-			const ctx = createMockContext({ runningTasks: [] });
-			expect(scrollUpCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when totalLogs is less than viewHeight', () => {
-			const ctx = createMockContext({ totalLogs: 10, viewHeight: 20 });
-			expect(scrollUpCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when already at top (scrollOffset at max)', () => {
-			const ctx = createMockContext({
-				totalLogs: 100,
-				viewHeight: 20,
-				scrollOffset: 80, // At top (100 - 20 = 80)
-			});
-			expect(scrollUpCommand.isEnabled(ctx)).toBe(false);
-		});
-
 		it('returns true when can scroll up', () => {
-			const ctx = createMockContext({
-				totalLogs: 100,
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				totalLogs: 50,
+				viewHeight: 20,
+				scrollOffset: 10,
+			});
+			expect(scrollUpCommand.isEnabled(providers)).toBe(true);
+		});
+
+		it('returns false when script selector is shown', () => {
+			const providers = createMockProviders({
+				showScriptSelector: true,
+				tasks: ['task1'],
+				totalLogs: 50,
+				viewHeight: 20,
+				scrollOffset: 10,
+			});
+			expect(scrollUpCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when no tasks exist', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: [],
+				totalLogs: 50,
+				viewHeight: 20,
+				scrollOffset: 10,
+			});
+			expect(scrollUpCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when content fits in view', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				totalLogs: 10,
 				viewHeight: 20,
 				scrollOffset: 0,
 			});
-			expect(scrollUpCommand.isEnabled(ctx)).toBe(true);
+			expect(scrollUpCommand.isEnabled(providers)).toBe(false);
 		});
 
-		it('returns true when partially scrolled', () => {
-			const ctx = createMockContext({
-				totalLogs: 100,
+		it('returns false when already at top', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				totalLogs: 50,
 				viewHeight: 20,
-				scrollOffset: 50,
+				scrollOffset: 30, // At max (50 - 20)
 			});
-			expect(scrollUpCommand.isEnabled(ctx)).toBe(true);
+			expect(scrollUpCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
 		it('calls scrollUp', () => {
-			const ctx = createMockContext();
-			scrollUpCommand.execute(ctx);
-			expect(ctx.scrollUp).toHaveBeenCalled();
+			const providers = createMockProviders();
+			scrollUpCommand.execute(providers);
+			expect(providers.view.scrollUp).toHaveBeenCalledOnce();
 		});
 	});
 });
 
 describe('scrollDownCommand', () => {
-	describe('properties', () => {
-		it('has correct id', () => {
-			expect(scrollDownCommand.id).toBe('SCROLL_DOWN');
-		});
+	it('has correct id', () => {
+		expect(scrollDownCommand.id).toBe('SCROLL_DOWN');
+	});
 
-		it('has correct keys', () => {
-			expect(scrollDownCommand.keys).toEqual([{ specialKey: 'down' }]);
-		});
+	it('has correct keys', () => {
+		expect(scrollDownCommand.keys).toEqual([{ specialKey: 'down' }]);
+	});
 
-		it('has correct displayKey', () => {
-			expect(scrollDownCommand.displayKey).toBe('↑ / ↓');
-		});
+	it('has correct displayKey', () => {
+		expect(scrollDownCommand.displayKey).toBe('↑ / ↓');
+	});
 
-		it('has correct displayText', () => {
-			expect(scrollDownCommand.displayText).toBe('scroll');
-		});
+	it('has correct displayText', () => {
+		expect(scrollDownCommand.displayText).toBe('scroll');
 	});
 
 	describe('isEnabled', () => {
-		it('returns false when script selector is shown', () => {
-			const ctx = createMockContext({ showScriptSelector: true });
-			expect(scrollDownCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when no running tasks', () => {
-			const ctx = createMockContext({ runningTasks: [] });
-			expect(scrollDownCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when totalLogs is less than viewHeight', () => {
-			const ctx = createMockContext({ totalLogs: 10, viewHeight: 20 });
-			expect(scrollDownCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when already at bottom (scrollOffset is 0)', () => {
-			const ctx = createMockContext({
-				totalLogs: 100,
-				viewHeight: 20,
-				scrollOffset: 0,
-			});
-			expect(scrollDownCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns true when scrolled up', () => {
-			const ctx = createMockContext({
-				totalLogs: 100,
+		it('returns true when can scroll down', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				totalLogs: 50,
 				viewHeight: 20,
 				scrollOffset: 10,
 			});
-			expect(scrollDownCommand.isEnabled(ctx)).toBe(true);
+			expect(scrollDownCommand.isEnabled(providers)).toBe(true);
+		});
+
+		it('returns false when script selector is shown', () => {
+			const providers = createMockProviders({
+				showScriptSelector: true,
+				tasks: ['task1'],
+				totalLogs: 50,
+				viewHeight: 20,
+				scrollOffset: 10,
+			});
+			expect(scrollDownCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when no tasks exist', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: [],
+				totalLogs: 50,
+				viewHeight: 20,
+				scrollOffset: 10,
+			});
+			expect(scrollDownCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when content fits in view', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				totalLogs: 10,
+				viewHeight: 20,
+				scrollOffset: 0,
+			});
+			expect(scrollDownCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when already at bottom', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				totalLogs: 50,
+				viewHeight: 20,
+				scrollOffset: 0, // At bottom
+			});
+			expect(scrollDownCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
 		it('calls scrollDown', () => {
-			const ctx = createMockContext({ scrollOffset: 10 });
-			scrollDownCommand.execute(ctx);
-			expect(ctx.scrollDown).toHaveBeenCalled();
+			const providers = createMockProviders();
+			scrollDownCommand.execute(providers);
+			expect(providers.view.scrollDown).toHaveBeenCalledOnce();
 		});
 	});
 });
 
 describe('scrollToBottomCommand', () => {
-	describe('properties', () => {
-		it('has correct id', () => {
-			expect(scrollToBottomCommand.id).toBe('SCROLL_TO_BOTTOM');
-		});
+	it('has correct id', () => {
+		expect(scrollToBottomCommand.id).toBe('SCROLL_TO_BOTTOM');
+	});
 
-		it('has correct keys', () => {
-			expect(scrollToBottomCommand.keys).toEqual([{ textKey: 'b' }]);
-		});
+	it('has correct keys', () => {
+		expect(scrollToBottomCommand.keys).toEqual([{ textKey: 'b' }]);
+	});
 
-		it('has correct displayText', () => {
-			expect(scrollToBottomCommand.displayText).toBe('bottom');
-		});
+	it('has correct displayText', () => {
+		expect(scrollToBottomCommand.displayText).toBe('bottom');
 	});
 
 	describe('isEnabled', () => {
+		it('returns true when not at bottom (autoScroll false)', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				autoScroll: false,
+			});
+			expect(scrollToBottomCommand.isEnabled(providers)).toBe(true);
+		});
+
 		it('returns false when script selector is shown', () => {
-			const ctx = createMockContext({ showScriptSelector: true });
-			expect(scrollToBottomCommand.isEnabled(ctx)).toBe(false);
+			const providers = createMockProviders({
+				showScriptSelector: true,
+				tasks: ['task1'],
+				autoScroll: false,
+			});
+			expect(scrollToBottomCommand.isEnabled(providers)).toBe(false);
 		});
 
-		it('returns false when no running tasks', () => {
-			const ctx = createMockContext({ runningTasks: [] });
-			expect(scrollToBottomCommand.isEnabled(ctx)).toBe(false);
+		it('returns false when no tasks exist', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: [],
+				autoScroll: false,
+			});
+			expect(scrollToBottomCommand.isEnabled(providers)).toBe(false);
 		});
 
-		it('returns false when autoScroll is enabled', () => {
-			const ctx = createMockContext({ autoScroll: true });
-			expect(scrollToBottomCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns true when autoScroll is disabled', () => {
-			const ctx = createMockContext({ autoScroll: false });
-			expect(scrollToBottomCommand.isEnabled(ctx)).toBe(true);
+		it('returns false when already at bottom (autoScroll true)', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: ['task1'],
+				autoScroll: true,
+			});
+			expect(scrollToBottomCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
 		it('calls scrollToBottom', () => {
-			const ctx = createMockContext({ autoScroll: false });
-			scrollToBottomCommand.execute(ctx);
-			expect(ctx.scrollToBottom).toHaveBeenCalled();
+			const providers = createMockProviders();
+			scrollToBottomCommand.execute(providers);
+			expect(providers.view.scrollToBottom).toHaveBeenCalledOnce();
 		});
 	});
 });

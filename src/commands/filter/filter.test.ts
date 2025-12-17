@@ -1,99 +1,104 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { CommandContext } from '../../types/CommandContext/index.js';
-import { LOG_TYPE } from '../../types/LogType/index.js';
+import { describe, it, expect, vi } from 'vitest';
 import { filterCommand } from './index.js';
+import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 
-const createMockContext = (
-	overrides: Partial<CommandContext> = {},
-): CommandContext => ({
-	activeTask: 'build',
-	taskStatus: 'running',
-	runningTasks: ['build', 'test'],
-	hasRunningTasks: true,
+const createMockProviders = (
+	overrides: Partial<{
+		showScriptSelector: boolean;
+		tasks: string[];
+	}> = {},
+): CommandProviders => ({
+	tasks: {
+		tasks: overrides.tasks ?? ['task1'],
+		taskStates: {},
+		hasRunningTasks: false,
+		addTask: vi.fn(),
+		closeTask: vi.fn(),
+		restartTask: vi.fn(),
+		killTask: vi.fn(),
+		killAllTasks: vi.fn(),
+		markStderrSeen: vi.fn(),
+		getTaskStatus: vi.fn(),
+	},
+	logs: {
+		addLog: vi.fn(),
+		getLogsForTask: vi.fn().mockReturnValue([]),
+		getLogCountForTask: vi.fn().mockReturnValue(0),
+		clearLogsForTask: vi.fn(),
+	},
+	view: {
+		activeTabIndex: 0,
+		activeTask: 'task1',
+		logFilter: null,
+		scrollOffset: 0,
+		autoScroll: true,
+		viewHeight: 20,
+		totalLogs: 10,
+		navigateLeft: vi.fn(),
+		navigateRight: vi.fn(),
+		setActiveTabIndex: vi.fn(),
+		cycleLogFilter: vi.fn(),
+		scrollUp: vi.fn(),
+		scrollDown: vi.fn(),
+		scrollToBottom: vi.fn(),
+	},
+	ui: {
+		showScriptSelector: overrides.showScriptSelector ?? false,
+		pendingConfirmation: null,
+		openScriptSelector: vi.fn(),
+		closeScriptSelector: vi.fn(),
+		requestConfirmation: vi.fn(),
+		confirmPending: vi.fn(),
+		cancelPending: vi.fn(),
+	},
 	keepAlive: false,
-	showScriptSelector: false,
-	logFilter: null,
-	scrollOffset: 0,
-	totalLogs: 100,
-	autoScroll: true,
-	viewHeight: 20,
-	killProcess: vi.fn(),
-	spawnTask: vi.fn(),
-	handleQuit: vi.fn(),
-	setShowScriptSelector: vi.fn(),
-	setLogFilter: vi.fn(),
-	removeTask: vi.fn(),
-	setRunningTasks: vi.fn(),
-	setActiveTabIndex: vi.fn(),
-	markStderrSeen: vi.fn(),
-	scrollUp: vi.fn(),
-	scrollDown: vi.fn(),
-	scrollToBottom: vi.fn(),
-	...overrides,
+	quit: vi.fn(),
 });
 
 describe('filterCommand', () => {
-	describe('properties', () => {
-		it('has correct id', () => {
-			expect(filterCommand.id).toBe('FILTER');
-		});
+	it('has correct id', () => {
+		expect(filterCommand.id).toBe('FILTER');
+	});
 
-		it('has correct keys', () => {
-			expect(filterCommand.keys).toEqual([{ textKey: 'f', ctrl: false }]);
-		});
+	it('has correct keys', () => {
+		expect(filterCommand.keys).toEqual([{ textKey: 'f', ctrl: false }]);
+	});
 
-		it('has correct displayText', () => {
-			expect(filterCommand.displayText).toBe('filter');
-		});
+	it('has correct displayText', () => {
+		expect(filterCommand.displayText).toBe('filter');
 	});
 
 	describe('isEnabled', () => {
-		it('returns false when script selector is shown', () => {
-			const ctx = createMockContext({ showScriptSelector: true });
-			expect(filterCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when no running tasks', () => {
-			const ctx = createMockContext({ runningTasks: [] });
-			expect(filterCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns true when tasks are running and script selector is hidden', () => {
-			const ctx = createMockContext({
+		it('returns true when script selector is hidden and tasks exist', () => {
+			const providers = createMockProviders({
 				showScriptSelector: false,
-				runningTasks: ['build'],
+				tasks: ['task1'],
 			});
-			expect(filterCommand.isEnabled(ctx)).toBe(true);
+			expect(filterCommand.isEnabled(providers)).toBe(true);
+		});
+
+		it('returns false when script selector is shown', () => {
+			const providers = createMockProviders({
+				showScriptSelector: true,
+				tasks: ['task1'],
+			});
+			expect(filterCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when no tasks exist', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: [],
+			});
+			expect(filterCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('cycles from null to stdout', () => {
-			const ctx = createMockContext({ logFilter: null });
-			filterCommand.execute(ctx);
-
-			expect(ctx.setLogFilter).toHaveBeenCalled();
-			const updateFn = (ctx.setLogFilter as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(null)).toBe(LOG_TYPE.STDOUT);
-		});
-
-		it('cycles from stdout to stderr', () => {
-			const ctx = createMockContext({ logFilter: LOG_TYPE.STDOUT });
-			filterCommand.execute(ctx);
-
-			const updateFn = (ctx.setLogFilter as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(LOG_TYPE.STDOUT)).toBe(LOG_TYPE.STDERR);
-		});
-
-		it('cycles from stderr back to null', () => {
-			const ctx = createMockContext({ logFilter: LOG_TYPE.STDERR });
-			filterCommand.execute(ctx);
-
-			const updateFn = (ctx.setLogFilter as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(LOG_TYPE.STDERR)).toBe(null);
+		it('calls cycleLogFilter', () => {
+			const providers = createMockProviders();
+			filterCommand.execute(providers);
+			expect(providers.view.cycleLogFilter).toHaveBeenCalledOnce();
 		});
 	});
 });

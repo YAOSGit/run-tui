@@ -12,7 +12,7 @@ const require = createRequire(import.meta.url);
 `;
 
 await esbuild.build({
-	entryPoints: ['src/cli.tsx'],
+	entryPoints: ['src/app/cli.tsx'],
 	bundle: true,
 	platform: 'node',
 	format: 'esm',

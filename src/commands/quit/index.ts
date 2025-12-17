@@ -7,14 +7,15 @@ export const quitCommand: Command = {
 		{ specialKey: 'esc', ctrl: false },
 	],
 	displayText: 'quit',
-	isEnabled: (ctx) => !ctx.showScriptSelector,
-	execute: (ctx) => {
-		ctx.handleQuit();
+	isEnabled: (p) => !p.ui.showScriptSelector,
+	execute: (p) => {
+		p.tasks.killAllTasks();
+		p.quit();
 	},
-	needsConfirmation: (ctx) => ctx.hasRunningTasks || ctx.keepAlive,
-	confirmMessage: (ctx) => {
-		const runningCount = ctx.runningTasks.filter(
-			() => ctx.taskStatus === 'running',
+	needsConfirmation: (p) => p.tasks.hasRunningTasks || p.keepAlive,
+	confirmMessage: (p) => {
+		const runningCount = Object.values(p.tasks.taskStates).filter(
+			(t) => t.status === 'running',
 		).length;
 		if (runningCount > 0) {
 			return `Quit with ${runningCount} running task${runningCount > 1 ? 's' : ''}?`;

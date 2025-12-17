@@ -4,15 +4,21 @@ export const killCommand: Command = {
 	id: 'KILL',
 	keys: [{ textKey: 'k', ctrl: false }],
 	displayText: 'kill',
-	isEnabled: (ctx) =>
-		!ctx.showScriptSelector &&
-		ctx.runningTasks.length > 0 &&
-		ctx.taskStatus === 'running',
-	execute: (ctx) => {
-		if (ctx.activeTask) {
-			ctx.killProcess(ctx.activeTask);
+	isEnabled: (p) => {
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
+		return (
+			!p.ui.showScriptSelector &&
+			p.tasks.tasks.length > 0 &&
+			taskStatus === 'running'
+		);
+	},
+	execute: (p) => {
+		if (p.view.activeTask) {
+			p.tasks.killTask(p.view.activeTask);
 		}
 	},
 	needsConfirmation: () => true,
-	confirmMessage: (ctx) => `Kill ${ctx.activeTask}?`,
+	confirmMessage: (p) => `Kill ${p.view.activeTask}?`,
 };

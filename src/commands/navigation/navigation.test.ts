@@ -1,188 +1,160 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { CommandContext } from '../../types/CommandContext/index.js';
+import { describe, it, expect, vi } from 'vitest';
 import { leftArrowCommand, rightArrowCommand } from './index.js';
+import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 
-const createMockContext = (
-	overrides: Partial<CommandContext> = {},
-): CommandContext => ({
-	activeTask: 'build',
-	taskStatus: 'running',
-	runningTasks: ['build', 'test', 'lint'],
-	hasRunningTasks: true,
+const createMockProviders = (
+	overrides: Partial<{
+		showScriptSelector: boolean;
+		tasks: string[];
+	}> = {},
+): CommandProviders => ({
+	tasks: {
+		tasks: overrides.tasks ?? ['task1'],
+		taskStates: {},
+		hasRunningTasks: false,
+		addTask: vi.fn(),
+		closeTask: vi.fn(),
+		restartTask: vi.fn(),
+		killTask: vi.fn(),
+		killAllTasks: vi.fn(),
+		markStderrSeen: vi.fn(),
+		getTaskStatus: vi.fn(),
+	},
+	logs: {
+		addLog: vi.fn(),
+		getLogsForTask: vi.fn().mockReturnValue([]),
+		getLogCountForTask: vi.fn().mockReturnValue(0),
+		clearLogsForTask: vi.fn(),
+	},
+	view: {
+		activeTabIndex: 0,
+		activeTask: 'task1',
+		logFilter: null,
+		scrollOffset: 0,
+		autoScroll: true,
+		viewHeight: 20,
+		totalLogs: 10,
+		navigateLeft: vi.fn(),
+		navigateRight: vi.fn(),
+		setActiveTabIndex: vi.fn(),
+		cycleLogFilter: vi.fn(),
+		scrollUp: vi.fn(),
+		scrollDown: vi.fn(),
+		scrollToBottom: vi.fn(),
+	},
+	ui: {
+		showScriptSelector: overrides.showScriptSelector ?? false,
+		pendingConfirmation: null,
+		openScriptSelector: vi.fn(),
+		closeScriptSelector: vi.fn(),
+		requestConfirmation: vi.fn(),
+		confirmPending: vi.fn(),
+		cancelPending: vi.fn(),
+	},
 	keepAlive: false,
-	showScriptSelector: false,
-	logFilter: null,
-	scrollOffset: 0,
-	totalLogs: 100,
-	autoScroll: true,
-	viewHeight: 20,
-	killProcess: vi.fn(),
-	spawnTask: vi.fn(),
-	handleQuit: vi.fn(),
-	setShowScriptSelector: vi.fn(),
-	setLogFilter: vi.fn(),
-	removeTask: vi.fn(),
-	setRunningTasks: vi.fn(),
-	setActiveTabIndex: vi.fn(),
-	markStderrSeen: vi.fn(),
-	scrollUp: vi.fn(),
-	scrollDown: vi.fn(),
-	scrollToBottom: vi.fn(),
-	...overrides,
+	quit: vi.fn(),
 });
 
 describe('leftArrowCommand', () => {
-	describe('properties', () => {
-		it('has correct id', () => {
-			expect(leftArrowCommand.id).toBe('LEFT_ARROW');
-		});
+	it('has correct id', () => {
+		expect(leftArrowCommand.id).toBe('LEFT_ARROW');
+	});
 
-		it('has correct keys', () => {
-			expect(leftArrowCommand.keys).toEqual([{ specialKey: 'left' }]);
-		});
+	it('has correct keys', () => {
+		expect(leftArrowCommand.keys).toEqual([{ specialKey: 'left' }]);
+	});
 
-		it('has correct displayKey', () => {
-			expect(leftArrowCommand.displayKey).toBe('← / →');
-		});
+	it('has correct displayKey', () => {
+		expect(leftArrowCommand.displayKey).toBe('← / →');
+	});
 
-		it('has correct displayText', () => {
-			expect(leftArrowCommand.displayText).toBe('switch');
-		});
+	it('has correct displayText', () => {
+		expect(leftArrowCommand.displayText).toBe('switch');
 	});
 
 	describe('isEnabled', () => {
-		it('returns false when script selector is shown', () => {
-			const ctx = createMockContext({ showScriptSelector: true });
-			expect(leftArrowCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when no running tasks', () => {
-			const ctx = createMockContext({ runningTasks: [] });
-			expect(leftArrowCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns true when tasks are running and script selector is hidden', () => {
-			const ctx = createMockContext({
+		it('returns true when script selector is hidden and tasks exist', () => {
+			const providers = createMockProviders({
 				showScriptSelector: false,
-				runningTasks: ['build'],
+				tasks: ['task1'],
 			});
-			expect(leftArrowCommand.isEnabled(ctx)).toBe(true);
+			expect(leftArrowCommand.isEnabled(providers)).toBe(true);
+		});
+
+		it('returns false when script selector is shown', () => {
+			const providers = createMockProviders({
+				showScriptSelector: true,
+				tasks: ['task1'],
+			});
+			expect(leftArrowCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when no tasks exist', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: [],
+			});
+			expect(leftArrowCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('goes to previous tab', () => {
-			const ctx = createMockContext({
-				runningTasks: ['build', 'test', 'lint'],
-			});
-			leftArrowCommand.execute(ctx);
-
-			expect(ctx.setActiveTabIndex).toHaveBeenCalled();
-			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(1)).toBe(0);
-		});
-
-		it('wraps to last tab when at first tab', () => {
-			const ctx = createMockContext({
-				runningTasks: ['build', 'test', 'lint'],
-			});
-			leftArrowCommand.execute(ctx);
-
-			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(0)).toBe(2);
-		});
-
-		it('marks stderr as seen for the new tab', () => {
-			const runningTasks = ['build', 'test', 'lint'];
-			const ctx = createMockContext({ runningTasks });
-			leftArrowCommand.execute(ctx);
-
-			// The markStderrSeen is called inside setActiveTabIndex callback
-			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			// Simulate calling the update function (this will call markStderrSeen)
-			updateFn(1);
-			expect(ctx.markStderrSeen).toHaveBeenCalledWith('build');
+		it('calls navigateLeft', () => {
+			const providers = createMockProviders();
+			leftArrowCommand.execute(providers);
+			expect(providers.view.navigateLeft).toHaveBeenCalledOnce();
 		});
 	});
 });
 
 describe('rightArrowCommand', () => {
-	describe('properties', () => {
-		it('has correct id', () => {
-			expect(rightArrowCommand.id).toBe('RIGHT_ARROW');
-		});
+	it('has correct id', () => {
+		expect(rightArrowCommand.id).toBe('RIGHT_ARROW');
+	});
 
-		it('has correct keys', () => {
-			expect(rightArrowCommand.keys).toEqual([{ specialKey: 'right' }]);
-		});
+	it('has correct keys', () => {
+		expect(rightArrowCommand.keys).toEqual([{ specialKey: 'right' }]);
+	});
 
-		it('has correct displayKey', () => {
-			expect(rightArrowCommand.displayKey).toBe('← / →');
-		});
+	it('has correct displayKey', () => {
+		expect(rightArrowCommand.displayKey).toBe('← / →');
+	});
 
-		it('has correct displayText', () => {
-			expect(rightArrowCommand.displayText).toBe('switch');
-		});
+	it('has correct displayText', () => {
+		expect(rightArrowCommand.displayText).toBe('switch');
 	});
 
 	describe('isEnabled', () => {
-		it('returns false when script selector is shown', () => {
-			const ctx = createMockContext({ showScriptSelector: true });
-			expect(rightArrowCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns false when no running tasks', () => {
-			const ctx = createMockContext({ runningTasks: [] });
-			expect(rightArrowCommand.isEnabled(ctx)).toBe(false);
-		});
-
-		it('returns true when tasks are running and script selector is hidden', () => {
-			const ctx = createMockContext({
+		it('returns true when script selector is hidden and tasks exist', () => {
+			const providers = createMockProviders({
 				showScriptSelector: false,
-				runningTasks: ['build'],
+				tasks: ['task1'],
 			});
-			expect(rightArrowCommand.isEnabled(ctx)).toBe(true);
+			expect(rightArrowCommand.isEnabled(providers)).toBe(true);
+		});
+
+		it('returns false when script selector is shown', () => {
+			const providers = createMockProviders({
+				showScriptSelector: true,
+				tasks: ['task1'],
+			});
+			expect(rightArrowCommand.isEnabled(providers)).toBe(false);
+		});
+
+		it('returns false when no tasks exist', () => {
+			const providers = createMockProviders({
+				showScriptSelector: false,
+				tasks: [],
+			});
+			expect(rightArrowCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('goes to next tab', () => {
-			const ctx = createMockContext({
-				runningTasks: ['build', 'test', 'lint'],
-			});
-			rightArrowCommand.execute(ctx);
-
-			expect(ctx.setActiveTabIndex).toHaveBeenCalled();
-			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(0)).toBe(1);
-		});
-
-		it('wraps to first tab when at last tab', () => {
-			const ctx = createMockContext({
-				runningTasks: ['build', 'test', 'lint'],
-			});
-			rightArrowCommand.execute(ctx);
-
-			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			expect(updateFn(2)).toBe(0);
-		});
-
-		it('marks stderr as seen for the new tab', () => {
-			const runningTasks = ['build', 'test', 'lint'];
-			const ctx = createMockContext({ runningTasks });
-			rightArrowCommand.execute(ctx);
-
-			// The markStderrSeen is called inside setActiveTabIndex callback
-			const updateFn = (ctx.setActiveTabIndex as ReturnType<typeof vi.fn>).mock
-				.calls[0][0];
-			// Simulate calling the update function (this will call markStderrSeen)
-			updateFn(0);
-			expect(ctx.markStderrSeen).toHaveBeenCalledWith('test');
+		it('calls navigateRight', () => {
+			const providers = createMockProviders();
+			rightArrowCommand.execute(providers);
+			expect(providers.view.navigateRight).toHaveBeenCalledOnce();
 		});
 	});
 });

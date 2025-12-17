@@ -1,15 +1,15 @@
-import type { CommandContext } from '../CommandContext/index.js';
 import type { KeyBinding } from '../KeyBinding/index.js';
+import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 
 export interface Command {
 	id: string;
 	keys: KeyBinding[];
-	displayKey?: string; // Optional - will be calculated from keys if not provided
+	displayKey?: string;
 	displayText: string;
-	isEnabled: (ctx: CommandContext) => boolean;
-	execute: (ctx: CommandContext) => void;
-	needsConfirmation?: (ctx: CommandContext) => boolean;
-	confirmMessage?: string | ((ctx: CommandContext) => string);
+	isEnabled: (p: CommandProviders) => boolean;
+	execute: (p: CommandProviders) => void;
+	needsConfirmation?: (p: CommandProviders) => boolean;
+	confirmMessage?: string | ((p: CommandProviders) => string);
 }
 
 const SPECIAL_KEY_DISPLAY: Record<string, string> = {

@@ -5,13 +5,13 @@ export const scrollUpCommand: Command = {
 	keys: [{ specialKey: 'up' }],
 	displayKey: '↑ / ↓',
 	displayText: 'scroll',
-	isEnabled: (ctx) =>
-		!ctx.showScriptSelector &&
-		ctx.runningTasks.length > 0 &&
-		ctx.totalLogs > ctx.viewHeight && // Only enable if there are more logs than view height
-		ctx.scrollOffset < ctx.totalLogs - ctx.viewHeight, // Can scroll up if not at top
-	execute: (ctx) => {
-		ctx.scrollUp();
+	isEnabled: (p) =>
+		!p.ui.showScriptSelector &&
+		p.tasks.tasks.length > 0 &&
+		p.view.totalLogs > p.view.viewHeight &&
+		p.view.scrollOffset < p.view.totalLogs - p.view.viewHeight,
+	execute: (p) => {
+		p.view.scrollUp();
 	},
 };
 
@@ -20,13 +20,13 @@ export const scrollDownCommand: Command = {
 	keys: [{ specialKey: 'down' }],
 	displayKey: '↑ / ↓',
 	displayText: 'scroll',
-	isEnabled: (ctx) =>
-		!ctx.showScriptSelector &&
-		ctx.runningTasks.length > 0 &&
-		ctx.totalLogs > ctx.viewHeight && // Only enable if there are more logs than view height
-		ctx.scrollOffset > 0, // Can scroll down if not at bottom
-	execute: (ctx) => {
-		ctx.scrollDown();
+	isEnabled: (p) =>
+		!p.ui.showScriptSelector &&
+		p.tasks.tasks.length > 0 &&
+		p.view.totalLogs > p.view.viewHeight &&
+		p.view.scrollOffset > 0,
+	execute: (p) => {
+		p.view.scrollDown();
 	},
 };
 
@@ -34,9 +34,11 @@ export const scrollToBottomCommand: Command = {
 	id: 'SCROLL_TO_BOTTOM',
 	keys: [{ textKey: 'b' }],
 	displayText: 'bottom',
-	isEnabled: (ctx) =>
-		!ctx.showScriptSelector && ctx.runningTasks.length > 0 && !ctx.autoScroll,
-	execute: (ctx) => {
-		ctx.scrollToBottom();
+	isEnabled: (p) =>
+		!p.ui.showScriptSelector &&
+		p.tasks.tasks.length > 0 &&
+		!p.view.autoScroll,
+	execute: (p) => {
+		p.view.scrollToBottom();
 	},
 };
