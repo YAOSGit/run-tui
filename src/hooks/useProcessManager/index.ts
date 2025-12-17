@@ -1,61 +1,14 @@
 import { type ChildProcess, spawn } from 'node:child_process';
 import { useCallback, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { LogEntry } from '../../types/LogEntry/index.js';
 import { LOG_TYPE } from '../../types/LogType/index.js';
-import type { PackageManager } from '../../types/PackageManager/index.js';
-import { PACKAGE_MANAGER } from '../../types/PackageManager/index.js';
 import { SIGNALS } from '../../types/Signals/index.js';
-import type { TaskState } from '../../types/TaskState/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
-
-// Utils
-const getCommand = (pm: PackageManager): string => {
-	if (process.platform === 'win32') {
-		return pm === PACKAGE_MANAGER.NPM ? 'npm.cmd' : pm;
-	}
-	return pm;
-};
-
-// biome-ignore lint/suspicious/noControlCharactersInRegex: this is specific for terminal control sequences
-const stripControlSequences = (text: string): string => {
-	return (
-		text
-			// Remove clear screen sequences
-			.replace(/\x1b\[2J/g, '')
-			// Remove cursor home/position sequences
-			.replace(/\x1b\[H/g, '')
-			.replace(/\x1b\[\d*;\d*H/g, '')
-			.replace(/\x1b\[\d*;\d*f/g, '')
-			// Remove cursor movement (up, down, forward, back)
-			.replace(/\x1b\[\d*[ABCD]/g, '')
-			// Remove cursor save/restore
-			.replace(/\x1b\[s/g, '')
-			.replace(/\x1b\[u/g, '')
-			// Remove erase in line/display
-			.replace(/\x1b\[K/g, '')
-			.replace(/\x1b\[\d*K/g, '')
-			.replace(/\x1b\[J/g, '')
-			.replace(/\x1b\[\d*J/g, '')
-			// Remove scroll sequences
-			.replace(/\x1b\[\d*S/g, '')
-			.replace(/\x1b\[\d*T/g, '')
-			// Remove alternate screen buffer
-			.replace(/\x1b\[\?1049[hl]/g, '')
-			.replace(/\x1b\[\?47[hl]/g, '')
-			// Remove cursor visibility
-			.replace(/\x1b\[\?25[hl]/g, '')
-			// Remove carriage return that might cause issues
-			.replace(/\r/g, '')
-	);
-};
-
-export interface UseProcessManagerOptions {
-	initialTasks: string[];
-	packageManager: PackageManager;
-	onLogEntry: (entry: LogEntry) => void;
-	onTaskStateChange: (taskName: string, updates: Partial<TaskState>) => void;
-}
+import type { UseProcessManagerOptions } from './useProcessManager.types.js';
+import {
+	getCommand,
+	stripControlSequences,
+} from './useProcessManager.utils.js';
 
 export const useProcessManager = ({
 	initialTasks,
@@ -195,7 +148,7 @@ export const useProcessManager = ({
 		spawnedTasks.current.clear();
 	}, []);
 
-	// Spawn initial tasks on mount
+	// biome-ignore lint/correctness/useExhaustiveDependencies: this is specific for initial tasks
 	useEffect(() => {
 		initialTasks.forEach((taskName) => {
 			spawnProcess(taskName);
@@ -204,8 +157,6 @@ export const useProcessManager = ({
 		return () => {
 			killAllProcesses();
 		};
-		// Only run on mount
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return {

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 import {
-	scrollUpCommand,
 	scrollDownCommand,
 	scrollToBottomCommand,
+	scrollUpCommand,
 } from './index.js';
-import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 
 const createMockProviders = (
 	overrides: Partial<{

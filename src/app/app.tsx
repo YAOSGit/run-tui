@@ -1,16 +1,16 @@
 import { Box, type Key, Text, useInput } from 'ink';
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
-import { useCommands } from '../providers/CommandsProvider/index.js';
-import { useLogs } from '../providers/LogsProvider/index.js';
-import { useTasks } from '../providers/TasksProvider/index.js';
-import { useUIState } from '../providers/UIStateProvider/index.js';
-import { useView } from '../providers/ViewProvider/index.js';
 import { ConfirmDialog } from '../components/ConfirmDialog/index.js';
 import { Footer } from '../components/Footer/index.js';
 import { LogView } from '../components/LogView/index.js';
 import { ScriptSelector } from '../components/ScriptSelector/index.js';
 import { TabBar } from '../components/TabBar/index.js';
+import { useCommands } from '../providers/CommandsProvider/index.js';
+import { useLogs } from '../providers/LogsProvider/index.js';
+import { useTasks } from '../providers/TasksProvider/index.js';
+import { useUIState } from '../providers/UIStateProvider/index.js';
+import { useView } from '../providers/ViewProvider/index.js';
 
 export interface AppContentProps {
 	availableScripts: string[];
@@ -95,7 +95,14 @@ export const AppContent: React.FC<AppContentProps> = ({
 		return () => {
 			process.off('SIGINT', handleSigint);
 		};
-	}, [tasks.hasRunningTasks, tasks.tasks.length, keepAlive, handleQuitWithCleanup, ui, commands]);
+	}, [
+		tasks.hasRunningTasks,
+		tasks.tasks.length,
+		keepAlive,
+		handleQuitWithCleanup,
+		ui,
+		commands,
+	]);
 
 	// Handle keyboard input
 	useInput((input, key) => {

@@ -1,9 +1,9 @@
 import { useApp, useStdout } from 'ink';
 import type React from 'react';
 import { useCallback, useMemo } from 'react';
+import type { PackageManager } from '../types/PackageManager/index.js';
 import { AppContent } from './app.js';
 import { AppProviders } from './providers.js';
-import { PackageManager } from '../types/PackageManager/index.js';
 
 interface AppProps {
 	tasks: string[];

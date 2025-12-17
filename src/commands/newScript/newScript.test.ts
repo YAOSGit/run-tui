@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { newScriptCommand } from './index.js';
+import { describe, expect, it, vi } from 'vitest';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import { newScriptCommand } from './index.js';
 
 const createMockProviders = (
 	overrides: Partial<{

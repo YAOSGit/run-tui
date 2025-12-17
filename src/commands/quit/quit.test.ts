@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { quitCommand } from './index.js';
+import { describe, expect, it, vi } from 'vitest';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 import type { TaskState } from '../../types/TaskState/index.js';
+import { quitCommand } from './index.js';
 
 const createMockProviders = (
 	overrides: Partial<{

@@ -6,8 +6,11 @@ import { useLogs } from '../LogsProvider/index.js';
 import { useTasks } from '../TasksProvider/index.js';
 import { useUIState } from '../UIStateProvider/index.js';
 import { useView } from '../ViewProvider/index.js';
-import { commands } from './CommandsProvider.commands.js';
-import { CONFIRM_NO_KEYS, CONFIRM_YES_KEYS } from './CommandsProvider.consts.js';
+import {
+	COMMANDS,
+	CONFIRM_NO_KEYS,
+	CONFIRM_YES_KEYS,
+} from './CommandsProvider.consts.js';
 import type {
 	Command,
 	CommandProviders,
@@ -68,8 +71,11 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 			}
 
 			// Find and execute matching command
-			for (const command of commands) {
-				if (isKeyMatch(key, input, command.keys) && command.isEnabled(providers)) {
+			for (const command of COMMANDS) {
+				if (
+					isKeyMatch(key, input, command.keys) &&
+					command.isEnabled(providers)
+				) {
 					// Check if command needs confirmation
 					if (command.needsConfirmation?.(providers)) {
 						const message =
@@ -94,7 +100,7 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 		const seen = new Set<string>();
 		const visible: VisibleCommand[] = [];
 
-		for (const command of commands) {
+		for (const command of COMMANDS) {
 			const displayKey = command.displayKey ?? getDisplayKey(command.keys);
 
 			// Skip duplicates (e.g., left/right arrows share same display)

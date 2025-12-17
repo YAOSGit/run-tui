@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Command } from 'commander';
 import { render } from 'ink';
-import App from './index.js';
 import type { PackageManager } from '../types/PackageManager/index.js';
+import App from './index.js';
 
 // Version is injected at build time by esbuild
 declare const __CLI_VERSION__: string;

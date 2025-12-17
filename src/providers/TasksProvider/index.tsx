@@ -1,9 +1,7 @@
 import type React from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
-import {
-	useProcessManager,
-	useTasksState,
-} from '../../hooks/useTasks/index.js';
+import { useProcessManager } from '../../hooks/useProcessManager/index.js';
+import { useTasksState } from '../../hooks/useTasksState/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 import type {
 	TasksContextValue,

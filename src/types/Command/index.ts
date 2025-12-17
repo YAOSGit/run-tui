@@ -1,5 +1,5 @@
-import type { KeyBinding } from '../KeyBinding/index.js';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import type { KeyBinding } from '../KeyBinding/index.js';
 
 export interface Command {
 	id: string;

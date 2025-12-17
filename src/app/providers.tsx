@@ -1,7 +1,5 @@
 import type React from 'react';
-import {
-	CommandsProvider,
-} from '../providers/CommandsProvider/index.js';
+import { CommandsProvider } from '../providers/CommandsProvider/index.js';
 import { LogsProvider, useLogs } from '../providers/LogsProvider/index.js';
 import { TasksProvider } from '../providers/TasksProvider/index.js';
 import { UIStateProvider } from '../providers/UIStateProvider/index.js';
