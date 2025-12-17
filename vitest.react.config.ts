@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	test: {
-		name: 'react',
+		name: { label: 'react', color: 'blue' },
 		environment: 'jsdom',
 		globals: true,
 		typecheck: {

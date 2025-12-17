@@ -6,6 +6,7 @@ export default defineConfig({
 			'./vitest.unit.config.ts',
 			'./vitest.type.config.ts',
 			'./vitest.react.config.ts',
+			'./vitest.e2e.config.ts',
 		],
 	},
 });

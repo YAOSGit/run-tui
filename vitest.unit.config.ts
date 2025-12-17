@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	test: {
-		name: 'unit',
+		name: { label: 'unit', color: 'green' },
 		environment: 'node',
 		globals: true,
 		typecheck: {

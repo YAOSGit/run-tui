@@ -17,7 +17,7 @@
 </div>
 
 <p align="center">
-  <img src="examples/asciinema/gifs/demo.gif" alt="run-tui demo" width="800">
+  <img src="docs/asciinema/gifs/demo.gif" alt="run-tui demo" width="800">
 </p>
 
 ---

@@ -20,7 +20,8 @@
 		"lint:format": "biome format . --write",
 		"lint:types": "tsgo --noEmit -p tsconfig.app.json",
 		"lint:audit": "npm audit",
-		"test": "npm run test:unit && npm run test:react && npm run test:types",
+		"test": "npm run test:unit && npm run test:react && npm run test:types && npm run test:e2e",
+		"test:e2e": "npm run build && vitest run -c vitest.e2e.config.ts",
 		"test:unit": "vitest run -c vitest.unit.config.ts",
 		"test:react": "vitest run -c vitest.react.config.ts",
 		"test:types": "vitest run -c vitest.type.config.ts",
@@ -74,7 +75,9 @@
 		"ink": "^6.5.1",
 		"ink-testing-library": "^4.0.0",
 		"jsdom": "^27.3.0",
+		"node-pty": "^1.0.0",
 		"react": "^19.2.3",
+		"strip-ansi": "^7.1.2",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.15"
 	}
