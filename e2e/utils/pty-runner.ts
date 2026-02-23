@@ -26,10 +26,7 @@ export class PTYRunner extends EventEmitter {
 	}
 
 	async start(args: string[] = []): Promise<void> {
-		const cliPath = path.resolve(
-			import.meta.dirname,
-			'../../dist/cli.js',
-		);
+		const cliPath = path.resolve(import.meta.dirname, '../../dist/cli.js');
 
 		this.pty = pty.spawn('node', [cliPath, ...args], {
 			name: 'xterm-256color',

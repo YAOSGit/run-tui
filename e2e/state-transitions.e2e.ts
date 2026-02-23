@@ -4,7 +4,10 @@ import { PTYRunner } from './utils';
 
 describe('State Transitions', () => {
 	let runner: PTYRunner;
-	const fixturesPath = path.resolve(import.meta.dirname, '../examples/basic-project');
+	const fixturesPath = path.resolve(
+		import.meta.dirname,
+		'../examples/basic-project',
+	);
 
 	beforeEach(() => {
 		runner = new PTYRunner({ cwd: fixturesPath });
@@ -60,14 +63,19 @@ describe('State Transitions', () => {
 			await runner.start(['build', 'dev']);
 
 			// build should complete quickly
-			await runner.waitForText('Build completed successfully', { timeout: 10000 });
+			await runner.waitForText('Build completed successfully', {
+				timeout: 10000,
+			});
 
 			// Switch to dev tab to see its output
 			runner.sendKey('right');
 			await new Promise((resolve) => setTimeout(resolve, 200));
 
 			// dev should still be running - look for its startup message or any output
-			await runner.waitForPattern(/Starting development server|Server running|Watching/, { timeout: 8000 });
+			await runner.waitForPattern(
+				/Starting development server|Server running|Watching/,
+				{ timeout: 8000 },
+			);
 		});
 	});
 });

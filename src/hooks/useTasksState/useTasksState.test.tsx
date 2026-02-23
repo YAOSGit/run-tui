@@ -18,6 +18,9 @@ describe('useTasksState', () => {
 				status: 'pending',
 				exitCode: null,
 				hasUnseenStderr: false,
+				restartCount: 0,
+				startedAt: null,
+				endedAt: null,
 			});
 		});
 
@@ -78,6 +81,9 @@ describe('useTasksState', () => {
 				status: 'pending',
 				exitCode: null,
 				hasUnseenStderr: false,
+				restartCount: 0,
+				startedAt: null,
+				endedAt: null,
 			});
 		});
 	});

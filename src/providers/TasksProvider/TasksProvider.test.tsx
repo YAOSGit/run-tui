@@ -17,22 +17,31 @@ vi.mock('../../hooks/useProcessManager/index.js', () => ({
 		spawnProcess: mockSpawnProcess,
 		killProcess: mockKillProcess,
 		killAllProcesses: mockKillAllProcesses,
+		clearRestartTimer: vi.fn(),
+		resetRestartCount: vi.fn(),
 	}),
 }));
 
 import { TasksProvider, useTasks } from './index.js';
 
 const createWrapper =
-	(props: { initialTasks?: string[]; packageManager?: 'npm' | 'yarn' | 'pnpm' | 'bun' } = {}) =>
-	({ children }: { children: React.ReactNode }) => (
-		<TasksProvider
-			initialTasks={props.initialTasks ?? ['task1']}
-			packageManager={props.packageManager ?? 'npm'}
-			onLogEntry={vi.fn()}
-		>
-			{children}
-		</TasksProvider>
-	);
+	(
+		props: {
+			initialTasks?: string[];
+			packageManager?: 'npm' | 'yarn' | 'pnpm' | 'bun';
+		} = {},
+	) =>
+		({ children }: { children: React.ReactNode }) => (
+			<TasksProvider
+				initialTasks={props.initialTasks ?? ['task1']}
+				packageManager={props.packageManager ?? 'npm'}
+				restartConfig={{ enabled: false, delayMs: 100, maxAttempts: 1 }}
+				scriptArgs={[]}
+				onLogEntry={vi.fn()}
+			>
+				{children}
+			</TasksProvider>
+		);
 
 describe('TasksProvider', () => {
 	describe('useTasks hook', () => {
@@ -79,6 +88,9 @@ describe('TasksProvider', () => {
 				status: TASK_STATUS.PENDING,
 				exitCode: null,
 				hasUnseenStderr: false,
+				restartCount: 0,
+				startedAt: null,
+				endedAt: null,
 			});
 		});
 	});
@@ -113,6 +125,9 @@ describe('TasksProvider', () => {
 				status: TASK_STATUS.PENDING,
 				exitCode: null,
 				hasUnseenStderr: false,
+				restartCount: 0,
+				startedAt: null,
+				endedAt: null,
 			});
 		});
 	});

@@ -22,6 +22,32 @@ describe('getCommand', () => {
 	});
 });
 
+describe('getCommand on Windows', () => {
+	beforeEach(() => {
+		vi.stubGlobal('process', { ...process, platform: 'win32' });
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	it('returns npm.cmd for npm', () => {
+		expect(getCommand('npm')).toBe('npm.cmd');
+	});
+
+	it('returns yarn.cmd for yarn', () => {
+		expect(getCommand('yarn')).toBe('yarn.cmd');
+	});
+
+	it('returns pnpm.cmd for pnpm', () => {
+		expect(getCommand('pnpm')).toBe('pnpm.cmd');
+	});
+
+	it('returns bun.exe for bun', () => {
+		expect(getCommand('bun')).toBe('bun.exe');
+	});
+});
+
 describe('stripControlSequences', () => {
 	it('returns plain text unchanged', () => {
 		expect(stripControlSequences('Hello World')).toBe('Hello World');

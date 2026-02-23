@@ -1,1 +1,1 @@
-export const MAX_LOGS = 1000;
+export const MAX_LOGS_PER_TASK = 1000;

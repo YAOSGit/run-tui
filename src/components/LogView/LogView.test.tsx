@@ -1,5 +1,6 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
+import { LINE_OVERFLOW } from '../../types/LineOverflow/index.js';
 import { LOG_TYPE } from '../../types/LogType/index.js';
 import { LogView } from './index.js';
 
@@ -28,7 +29,7 @@ describe('LogView', () => {
 
 	it('renders log entries', () => {
 		const logs = [createLog('1', 'First log'), createLog('2', 'Second log')];
-		const { lastFrame } = render(<LogView logs={logs} />);
+		const { lastFrame } = render(<LogView logs={logs} showTimestamps={true} />);
 
 		expect(lastFrame()).toContain('First log');
 		expect(lastFrame()).toContain('Second log');
@@ -67,5 +68,31 @@ describe('LogView', () => {
 		const { lastFrame } = render(<LogView logs={logs} height={10} />);
 
 		expect(lastFrame()).toContain('test');
+	});
+
+	describe('lineOverflow prop', () => {
+		it('renders with wrap mode without errors', () => {
+			const logs = [createLog('1', 'a'.repeat(200))];
+			const { lastFrame } = render(
+				<LogView logs={logs} lineOverflow={LINE_OVERFLOW.WRAP} />,
+			);
+			expect(lastFrame()).toContain('aaa');
+		});
+
+		it('renders with truncate mode without errors', () => {
+			const logs = [createLog('1', 'a'.repeat(200))];
+			const { lastFrame } = render(
+				<LogView logs={logs} lineOverflow={LINE_OVERFLOW.TRUNCATE} />,
+			);
+			expect(lastFrame()).toContain('aaa');
+		});
+
+		it('renders with truncate-end mode without errors', () => {
+			const logs = [createLog('1', 'a'.repeat(200))];
+			const { lastFrame } = render(
+				<LogView logs={logs} lineOverflow={LINE_OVERFLOW.TRUNCATE_END} />,
+			);
+			expect(lastFrame()).toContain('aaa');
+		});
 	});
 });

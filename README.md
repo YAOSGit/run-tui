@@ -60,8 +60,19 @@
 
 - **Tabbed Interface**: Each script runs in its own tab with status indicators
 - **Live Log Streaming**: Real-time output from all running processes
+- **Split View Mode**: Press `s` to split the terminal viewport horizontally, monitoring two tasks simultaneously
+- **Compact View**: Press `m` to toggle a dense, single-line overview of all configured tasks
+- **Focus Mode**: Press `F` to maximize log viewing area by dynamically hiding the UI chrome
+- **Tab Pinning**: Press `p` to pin high-priority tasks to the left side of the tab bar
 - **Log Type Filtering**: Filter logs by stdout, stderr, or show all
+- **Search in Logs**: Press `/` to interactively search log outputs using highlighting and `n`/`N` navigation
+- **Toggle Timestamps**: Press `t` to dynamically display execution timings alongside your logs
+- **Duplicate Tab Detection**: Warns preventing accidental double-execution of the same script
+- **Exporting Logs**: Save logs to disk (`l`/`L`) or copy them directly to clipboard (`y`)
+- **Clear Logs**: Instantly clear clutter from your active tab (`c`) or all tabs (`C`)
+- **Fuzzy Script Finder**: Intelligently filter `package.json` scripts with typo tolerance when spawning new tabs
 - **Stderr Notifications**: Visual indicator when a background tab has new stderr output
+- **Auto-Restart on Failure**: Pass `--restart-on-failure` to auto-reboot crashed tasks with visual counters
 - **Process Control**: Kill individual scripts or all running processes
 - **Graceful Shutdown**: Confirmation prompt before killing running tasks
 
@@ -132,9 +143,20 @@ run-tui -p bun dev test
 | `x` | Close completed task tab |
 | `k` | Kill the current task |
 | `r` | Restart the current task |
+| `s` | Toggle Split View mode (horizontal dual panes) |
+| `Tab` | Switch active pane focus (when in Split View) |
+| `p` | Toggle Tab Pinning |
+| `m` | Toggle Compact View mode |
+| `F` | Toggle Focus Mode (hides top/bottom bars) |
+| `/` | Search logs (`n`/`N` to navigate matches) |
+| `t` | Toggle log timestamps |
+| `c` | Clear the active tab's logs |
+| `C` | Clear all running tabs' logs |
+| `l` | Export the active task's logs to a markdown file |
+| `L` | Export all running tasks' logs |
+| `y` | Copy active logs to clipboard (inside TUI), OR confirm quit/kill |
 | `f` | Toggle log filter (all → stdout → stderr) |
 | `q` / `Esc` | Quit (with confirmation if tasks are running) |
-| `y` / `n` | Confirm or cancel quit |
 
 ### CLI Options
 
@@ -144,6 +166,10 @@ run-tui -p bun dev test
 | `-r, --regex` | Treat arguments as regex patterns |
 | `-p, --package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 | `-k, --keep-alive` | Keep TUI open even with no scripts (allows adding scripts with `n` key) |
+| `--restart-on-failure` | Automatically restart scripts that exit with non-zero codes |
+| `--restart-delay <ms>` | Milliseconds to wait before restarting (default: 1000) |
+| `--max-restarts <n>` | Maximum number of automated retries (default: 5) |
+| `--restart-codes <codes>` | Comma-separated exit codes that trigger a restart |
 | `-h, --help` | Display help information |
 
 ---

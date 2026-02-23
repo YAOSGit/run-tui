@@ -8,25 +8,27 @@ describe('ScriptSelector', () => {
 		runningScripts: ['build'],
 		onSelect: vi.fn(),
 		onCancel: vi.fn(),
-		height: 10,
+		height: 20,
 	};
 
 	it('displays the title', () => {
 		const { lastFrame } = render(<ScriptSelector {...defaultProps} />);
-
 		expect(lastFrame()).toContain('Select a script to run');
+	});
+
+	it('displays a search prompt', () => {
+		const { lastFrame } = render(<ScriptSelector {...defaultProps} />);
+		expect(lastFrame()).toContain('>');
 	});
 
 	it('displays YAOSGit branding in footer', () => {
 		const { lastFrame } = render(<ScriptSelector {...defaultProps} />);
-
 		expect(lastFrame()).toContain('YAOSGit');
 		expect(lastFrame()).toContain('run');
 	});
 
 	it('displays navigation commands in footer', () => {
 		const { lastFrame } = render(<ScriptSelector {...defaultProps} />);
-
 		expect(lastFrame()).toContain('navigate');
 		expect(lastFrame()).toContain('select');
 		expect(lastFrame()).toContain('cancel');
@@ -40,11 +42,9 @@ describe('ScriptSelector', () => {
 				runningScripts={['build']}
 			/>,
 		);
-
-		// 'build' should not be in the list since it's already running
-		// We can't directly check the Select options, but we can verify
-		// the component renders without the running script being selectable
-		expect(lastFrame()).toBeDefined();
+		// build should not appear in results (it's running)
+		// The match count should reflect 2 available scripts (test, lint)
+		expect(lastFrame()).toContain('2 scripts');
 	});
 
 	it('shows message when all scripts are running', () => {
@@ -55,7 +55,6 @@ describe('ScriptSelector', () => {
 				runningScripts={['build', 'test']}
 			/>,
 		);
-
 		expect(lastFrame()).toContain('All scripts are already running');
 		expect(lastFrame()).toContain('Press ESC or q to go back');
 	});
@@ -67,7 +66,6 @@ describe('ScriptSelector', () => {
 		);
 
 		stdin.write('\x1B'); // Escape key
-
 		expect(onCancel).toHaveBeenCalled();
 	});
 
@@ -78,7 +76,6 @@ describe('ScriptSelector', () => {
 		);
 
 		stdin.write('q');
-
 		expect(onCancel).toHaveBeenCalled();
 	});
 
@@ -89,7 +86,6 @@ describe('ScriptSelector', () => {
 		);
 
 		stdin.write('Q');
-
 		expect(onCancel).toHaveBeenCalled();
 	});
 
@@ -101,7 +97,6 @@ describe('ScriptSelector', () => {
 				runningScripts={[]}
 			/>,
 		);
-
 		expect(lastFrame()).toContain('All scripts are already running');
 	});
 
@@ -113,9 +108,19 @@ describe('ScriptSelector', () => {
 				runningScripts={[]}
 			/>,
 		);
-
-		// All scripts should be available for selection
-		expect(lastFrame()).toBeDefined();
 		expect(lastFrame()).not.toContain('All scripts are already running');
+		expect(lastFrame()).toContain('2 scripts');
+	});
+
+	it('shows scripts in the list when no query', () => {
+		const { lastFrame } = render(
+			<ScriptSelector
+				{...defaultProps}
+				availableScripts={['build', 'test']}
+				runningScripts={[]}
+			/>,
+		);
+		expect(lastFrame()).toContain('build');
+		expect(lastFrame()).toContain('test');
 	});
 });

@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { LOG_TYPE } from '../../types/LogType/index.js';
 import { LogsProvider } from '../LogsProvider/index.js';
 import { TasksProvider } from '../TasksProvider/index.js';
-import { ViewProvider, useView } from './index.js';
+import { useView, ViewProvider } from './index.js';
 
 // Create hoisted mock functions for useProcessManager
 const mockSpawnProcess = vi.hoisted(() => vi.fn());
@@ -25,19 +25,21 @@ vi.mock('../../hooks/useProcessManager/index.js', () => ({
 
 const createWrapper =
 	(props: { initialTasks?: string[]; viewHeight?: number } = {}) =>
-	({ children }: { children: React.ReactNode }) => (
-		<LogsProvider>
-			<TasksProvider
-				initialTasks={props.initialTasks ?? ['task1', 'task2']}
-				packageManager="npm"
-				onLogEntry={vi.fn()}
-			>
-				<ViewProvider viewHeight={props.viewHeight ?? 20}>
-					{children}
-				</ViewProvider>
-			</TasksProvider>
-		</LogsProvider>
-	);
+		({ children }: { children: React.ReactNode }) => (
+			<LogsProvider>
+				<TasksProvider
+					initialTasks={props.initialTasks ?? ['task1', 'task2']}
+					packageManager="npm"
+					onLogEntry={vi.fn()}
+					restartConfig={{ enabled: true, delayMs: 1000, maxAttempts: 5 }}
+					scriptArgs={[]}
+				>
+					<ViewProvider viewHeight={props.viewHeight ?? 20}>
+						{children}
+					</ViewProvider>
+				</TasksProvider>
+			</LogsProvider>
+		);
 
 describe('ViewProvider', () => {
 	describe('useView hook', () => {
@@ -55,8 +57,8 @@ describe('ViewProvider', () => {
 			expect(result.current).toHaveProperty('activeTabIndex');
 			expect(result.current).toHaveProperty('activeTask');
 			expect(result.current).toHaveProperty('logFilter');
-			expect(result.current).toHaveProperty('scrollOffset');
-			expect(result.current).toHaveProperty('autoScroll');
+			expect(result.current).toHaveProperty('primaryScrollOffset');
+			expect(result.current).toHaveProperty('primaryAutoScroll');
 			expect(result.current).toHaveProperty('viewHeight');
 			expect(result.current).toHaveProperty('totalLogs');
 			expect(result.current).toHaveProperty('navigateLeft');
@@ -66,6 +68,9 @@ describe('ViewProvider', () => {
 			expect(result.current).toHaveProperty('scrollUp');
 			expect(result.current).toHaveProperty('scrollDown');
 			expect(result.current).toHaveProperty('scrollToBottom');
+			expect(result.current).toHaveProperty('showRenameInput');
+			expect(result.current).toHaveProperty('openRenameInput');
+			expect(result.current).toHaveProperty('closeRenameInput');
 		});
 	});
 
@@ -99,7 +104,7 @@ describe('ViewProvider', () => {
 				wrapper: createWrapper(),
 			});
 
-			expect(result.current.autoScroll).toBe(true);
+			expect(result.current.primaryAutoScroll).toBe(true);
 		});
 
 		it('has correct viewHeight', () => {
@@ -224,7 +229,7 @@ describe('ViewProvider', () => {
 			});
 
 			// With no logs, scrollOffset stays at 0
-			expect(result.current.scrollOffset).toBe(0);
+			expect(result.current.primaryScrollOffset).toBe(0);
 		});
 
 		it('scrollUp is callable', () => {
@@ -238,7 +243,7 @@ describe('ViewProvider', () => {
 			});
 
 			// scrollUp disables autoScroll
-			expect(result.current.autoScroll).toBe(false);
+			expect(result.current.primaryAutoScroll).toBe(false);
 		});
 
 		it('scrollToBottom resets scrollOffset to 0 and enables autoScroll', () => {
@@ -251,15 +256,15 @@ describe('ViewProvider', () => {
 				result.current.scrollUp();
 			});
 
-			expect(result.current.autoScroll).toBe(false);
+			expect(result.current.primaryAutoScroll).toBe(false);
 
 			// Scroll to bottom
 			act(() => {
 				result.current.scrollToBottom();
 			});
 
-			expect(result.current.scrollOffset).toBe(0);
-			expect(result.current.autoScroll).toBe(true);
+			expect(result.current.primaryScrollOffset).toBe(0);
+			expect(result.current.primaryAutoScroll).toBe(true);
 		});
 
 		it('scrolling up disables autoScroll', () => {
@@ -271,7 +276,7 @@ describe('ViewProvider', () => {
 				result.current.scrollUp();
 			});
 
-			expect(result.current.autoScroll).toBe(false);
+			expect(result.current.primaryAutoScroll).toBe(false);
 		});
 	});
 });

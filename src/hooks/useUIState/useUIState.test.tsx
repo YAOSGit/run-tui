@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { LINE_OVERFLOW } from '../../types/LineOverflow/index.js';
 import { useUIState } from './index.js';
 
 describe('useUIState', () => {
@@ -44,6 +45,44 @@ describe('useUIState', () => {
 			});
 
 			expect(result.current.showScriptSelector).toBe(false);
+		});
+	});
+
+	describe('help menu', () => {
+		it('has showHelp false by default', () => {
+			const { result } = renderHook(() => useUIState());
+			expect(result.current.showHelp).toBe(false);
+		});
+
+		it('openHelp sets showHelp to true', () => {
+			const { result } = renderHook(() => useUIState());
+			act(() => {
+				result.current.openHelp();
+			});
+			expect(result.current.showHelp).toBe(true);
+		});
+
+		it('closeHelp sets showHelp to false', () => {
+			const { result } = renderHook(() => useUIState());
+			act(() => {
+				result.current.openHelp();
+			});
+			act(() => {
+				result.current.closeHelp();
+			});
+			expect(result.current.showHelp).toBe(false);
+		});
+
+		it('toggleHelp toggles showHelp', () => {
+			const { result } = renderHook(() => useUIState());
+			act(() => {
+				result.current.toggleHelp();
+			});
+			expect(result.current.showHelp).toBe(true);
+			act(() => {
+				result.current.toggleHelp();
+			});
+			expect(result.current.showHelp).toBe(false);
 		});
 	});
 
@@ -106,6 +145,34 @@ describe('useUIState', () => {
 
 			expect(onConfirm).not.toHaveBeenCalled();
 			expect(result.current.pendingConfirmation).toBeNull();
+		});
+	});
+
+	describe('lineOverflow', () => {
+		it('defaults to wrap', () => {
+			const { result } = renderHook(() => useUIState());
+			expect(result.current.lineOverflow).toBe(LINE_OVERFLOW.WRAP);
+		});
+
+		it('cycleLineOverflow cycles wrap -> truncate -> truncate-end -> wrap', () => {
+			const { result } = renderHook(() => useUIState());
+
+			expect(result.current.lineOverflow).toBe(LINE_OVERFLOW.WRAP);
+
+			act(() => {
+				result.current.cycleLineOverflow();
+			});
+			expect(result.current.lineOverflow).toBe(LINE_OVERFLOW.TRUNCATE);
+
+			act(() => {
+				result.current.cycleLineOverflow();
+			});
+			expect(result.current.lineOverflow).toBe(LINE_OVERFLOW.TRUNCATE_END);
+
+			act(() => {
+				result.current.cycleLineOverflow();
+			});
+			expect(result.current.lineOverflow).toBe(LINE_OVERFLOW.WRAP);
 		});
 	});
 });

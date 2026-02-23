@@ -1,5 +1,6 @@
 import type { Key } from 'ink';
 import type { KeyBinding } from '../../types/KeyBinding/index.js';
+import { MOD_KEY } from '../../utils/platform/index.js';
 
 export const isKeyMatch = (
 	key: Key,
@@ -11,6 +12,13 @@ export const isKeyMatch = (
 			return false;
 		if (binding.meta !== undefined && key.meta !== binding.meta) return false;
 		if (binding.ctrl !== undefined && key.ctrl !== binding.ctrl) return false;
+		if (binding.leftArrow !== undefined && key.leftArrow !== binding.leftArrow)
+			return false;
+		if (
+			binding.rightArrow !== undefined &&
+			key.rightArrow !== binding.rightArrow
+		)
+			return false;
 
 		if (binding.textKey) {
 			return binding.textKey.toLocaleLowerCase() === input.toLocaleLowerCase();
@@ -70,11 +78,24 @@ const SPECIAL_KEY_DISPLAY: Record<string, string> = {
 export const getDisplayKey = (keys: KeyBinding[]): string => {
 	return keys
 		.map((binding) => {
+			let prefix = '';
+			if (binding.ctrl) prefix += 'ctrl + ';
+			if (binding.meta)
+				prefix += `${MOD_KEY}\xA0+\xA0`;
+			// Only show shift+ if it's a visible text key or an explicit special key,
+			// since shift is technically already implied by capitalized ascii (e.g. 'N' instead of 'shift+N')
+			// but for clarity we'll show it for special commands when requested
+			if (binding.shift && (binding.specialKey || binding.textKey)) {
+				prefix += 'shift + ';
+			}
+
 			if (binding.textKey) {
-				return binding.textKey;
+				return prefix + binding.textKey;
 			}
 			if (binding.specialKey) {
-				return SPECIAL_KEY_DISPLAY[binding.specialKey] ?? binding.specialKey;
+				const keyName =
+					SPECIAL_KEY_DISPLAY[binding.specialKey] ?? binding.specialKey;
+				return prefix + keyName;
 			}
 			return '';
 		})

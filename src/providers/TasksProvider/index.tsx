@@ -14,22 +14,38 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 	children,
 	initialTasks,
 	packageManager,
+	restartConfig,
+	scriptArgs,
 	onLogEntry,
 }) => {
 	const {
 		tasks,
+		pinnedTasks,
+		tabAliases,
 		taskStates,
 		hasRunningTasks,
 		updateTaskState,
 		addTaskState,
 		removeTaskState,
 		markStderrSeen,
+		toggleTaskPin,
+		renameTask,
 		getTaskStatus,
+		moveTaskLeft,
+		moveTaskRight,
 	} = useTasksState(initialTasks);
 
-	const { spawnProcess, killProcess, killAllProcesses } = useProcessManager({
+	const {
+		spawnProcess,
+		killProcess,
+		killAllProcesses,
+		clearRestartTimer,
+		resetRestartCount,
+	} = useProcessManager({
 		initialTasks,
 		packageManager,
+		restartConfig,
+		scriptArgs,
 		onLogEntry,
 		onTaskStateChange: updateTaskState,
 	});
@@ -51,17 +67,22 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 		[removeTaskState],
 	);
 
-	// Public: Restart a completed task
+	// Public: Restart a completed or restarting task
 	const restartTask = useCallback(
 		(taskName: string) => {
+			clearRestartTimer(taskName);
+			resetRestartCount(taskName);
 			updateTaskState(taskName, {
 				status: TASK_STATUS.PENDING,
 				exitCode: null,
 				hasUnseenStderr: false,
+				restartCount: 0,
+				startedAt: null,
+				endedAt: null,
 			});
 			spawnProcess(taskName);
 		},
-		[updateTaskState, spawnProcess],
+		[updateTaskState, spawnProcess, clearRestartTimer, resetRestartCount],
 	);
 
 	// Public: Kill a running task
@@ -72,6 +93,18 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 		[killProcess],
 	);
 
+	// Public: Cancel a pending restart
+	const cancelRestart = useCallback(
+		(taskName: string) => {
+			clearRestartTimer(taskName);
+			resetRestartCount(taskName);
+			updateTaskState(taskName, {
+				status: TASK_STATUS.ERROR,
+			});
+		},
+		[clearRestartTimer, resetRestartCount, updateTaskState],
+	);
+
 	// Public: Kill all tasks (for quit)
 	const killAllTasks = useCallback(() => {
 		killAllProcesses();
@@ -80,6 +113,8 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 	const value: TasksContextValue = useMemo(
 		() => ({
 			tasks,
+			pinnedTasks,
+			tabAliases,
 			taskStates,
 			hasRunningTasks,
 			addTask,
@@ -87,11 +122,18 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 			restartTask,
 			killTask,
 			killAllTasks,
+			cancelRestart,
 			markStderrSeen,
+			toggleTaskPin,
+			renameTask,
 			getTaskStatus,
+			moveTaskLeft,
+			moveTaskRight,
 		}),
 		[
 			tasks,
+			pinnedTasks,
+			tabAliases,
 			taskStates,
 			hasRunningTasks,
 			addTask,
@@ -99,8 +141,13 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 			restartTask,
 			killTask,
 			killAllTasks,
+			cancelRestart,
 			markStderrSeen,
+			toggleTaskPin,
+			renameTask,
 			getTaskStatus,
+			moveTaskLeft,
+			moveTaskRight,
 		],
 	);
 

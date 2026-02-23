@@ -5,6 +5,7 @@ import path from 'node:path';
 import { Command } from 'commander';
 import { render } from 'ink';
 import type { PackageManager } from '../types/PackageManager/index.js';
+import type { RestartConfig } from '../types/RestartConfig/index.js';
 import App from './index.js';
 
 // Version is injected at build time by esbuild
@@ -19,20 +20,53 @@ const cwd = process.cwd();
 const packageJsonPath = path.join(cwd, 'package.json');
 
 let packageJson: { scripts?: Record<string, string> };
-try {
-	const data = fs.readFileSync(packageJsonPath, 'utf-8');
-	packageJson = JSON.parse(data);
-} catch {
-	console.error('Could not read package.json in current directory.');
-	process.exit(1);
+
+if (!fs.existsSync(packageJsonPath)) {
+	console.error('Error: No package.json found in current directory.');
+	console.error(`Looked in: ${cwd}`);
+	console.error(
+		'\nMake sure you run this command from a directory with a package.json file.',
+	);
+	process.exit(2);
 }
 
-const availableScripts = Object.keys(packageJson.scripts || {});
+try {
+	const data = fs.readFileSync(packageJsonPath, 'utf-8');
+	try {
+		packageJson = JSON.parse(data) as { scripts?: Record<string, string> };
+	} catch (parseError) {
+		console.error('Error: package.json contains invalid JSON.');
+		console.error(`Parse error: ${(parseError as Error).message}`);
+		process.exit(3);
+	}
+} catch (readError) {
+	if ((readError as NodeJS.ErrnoException).code === 'EACCES') {
+		console.error('Error: Permission denied reading package.json.');
+		console.error('Check file permissions and try again.');
+	} else {
+		console.error(
+			`Error reading package.json: ${(readError as Error).message}`,
+		);
+	}
+	process.exit(4);
+}
+
+const availableScripts = Object.keys(packageJson.scripts ?? {});
+
+if (availableScripts.length === 0) {
+	console.error('Warning: No scripts found in package.json.');
+}
+
+const versionInfo = [
+	`run-tui v${__CLI_VERSION__}`,
+	`Node.js ${process.version}`,
+	`Platform: ${process.platform} ${process.arch}`,
+].join('\n');
 
 program
 	.name('run-tui')
 	.description('Run node scripts concurrently with an interactive TUI')
-	.version(__CLI_VERSION__, '-v, --version', 'Display version information')
+	.version(versionInfo, '-v, --version', 'Display version information')
 	.argument('[scripts...]', 'Script names or regex patterns to run')
 	.option('-r, --regex', 'Treat arguments as regex patterns')
 	.option(
@@ -44,7 +78,26 @@ program
 		'-k, --keep-alive',
 		'Keep TUI open even with no scripts (allows adding scripts with "n" key)',
 	)
-	.option('-H, --height <lines>', 'Height of the log view in lines', '20')
+	.option('-H, --height <lines>', 'Height of the log view in lines')
+	.option(
+		'--restart-on-failure',
+		'Automatically restart tasks when they fail (exit code !== 0)',
+		false,
+	)
+	.option(
+		'--restart-delay <ms>',
+		'Delay in milliseconds before restarting a failed task',
+		'2000',
+	)
+	.option(
+		'--max-restarts <count>',
+		'Maximum number of restart attempts per task',
+		'3',
+	)
+	.option(
+		'--restart-codes <codes>',
+		'Comma-separated list of exit codes to restrict restarts to (e.g. "1,137")',
+	)
 	.addHelpText(
 		'after',
 		`\nAvailable scripts:\n${availableScripts.map((s) => `  - ${s}`).join('\n')}`,
@@ -56,7 +109,11 @@ program
 				regex?: boolean;
 				packageManager: string;
 				keepAlive?: boolean;
-				height: string;
+				height?: string;
+				restartOnFailure: boolean;
+				restartDelay: string;
+				maxRestarts: string;
+				restartCodes?: string;
 			},
 		) => {
 			if (scripts.length === 0 && !options.keepAlive) {
@@ -116,10 +173,27 @@ program
 					);
 					process.exit(1);
 				}
+
+				// Support duplicate tabs intentionally by not using `Set` reductions
 				requestedScripts = scripts;
 			}
 
-			const height = parseInt(options.height, 10);
+			const height = options.height ? parseInt(options.height, 10) : undefined;
+
+			let exitCodes: number[] | undefined;
+			if (options.restartCodes) {
+				exitCodes = options.restartCodes
+					.split(',')
+					.map((c) => parseInt(c.trim(), 10))
+					.filter((c) => !Number.isNaN(c));
+			}
+
+			const restartConfig: RestartConfig = {
+				enabled: options.restartOnFailure,
+				delayMs: parseInt(options.restartDelay, 10),
+				maxAttempts: parseInt(options.maxRestarts, 10),
+				exitCodes,
+			};
 
 			render(
 				<App
@@ -128,9 +202,21 @@ program
 					availableScripts={availableScripts}
 					keepAlive={options.keepAlive ?? false}
 					height={height}
+					restartConfig={restartConfig}
+					scriptArgs={scriptArgs}
 				/>,
 			);
 		},
 	);
 
-program.parse();
+// Intercept '--' before commander processes it
+const dashDashIndex = process.argv.indexOf('--');
+let appArgv = process.argv;
+let scriptArgs: string[] = [];
+
+if (dashDashIndex !== -1) {
+	appArgv = process.argv.slice(0, dashDashIndex);
+	scriptArgs = process.argv.slice(dashDashIndex + 1);
+}
+
+program.parse(appArgv);

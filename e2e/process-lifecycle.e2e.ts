@@ -4,7 +4,10 @@ import { PTYRunner } from './utils';
 
 describe('Process Lifecycle', () => {
 	let runner: PTYRunner;
-	const fixturesPath = path.resolve(import.meta.dirname, '../examples/basic-project');
+	const fixturesPath = path.resolve(
+		import.meta.dirname,
+		'../examples/basic-project',
+	);
 
 	beforeEach(() => {
 		runner = new PTYRunner({ cwd: fixturesPath });

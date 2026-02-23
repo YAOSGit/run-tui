@@ -1,8 +1,9 @@
 /**
  * @vitest-environment happy-dom
  */
-import { act, renderHook } from '@testing-library/react';
+
 import { EventEmitter } from 'node:events';
+import { act, renderHook } from '@testing-library/react';
 import type { Mock } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LogEntry } from '../../types/LogEntry/index.js';
@@ -13,8 +14,7 @@ const mockSpawn = vi.hoisted(() => vi.fn());
 
 // Mock child_process
 vi.mock('node:child_process', async (importOriginal) => {
-	const actual =
-		await importOriginal<typeof import('node:child_process')>();
+	const actual = await importOriginal<typeof import('node:child_process')>();
 	return {
 		__esModule: true,
 		...actual,
@@ -78,7 +78,9 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1', 'task2'],
 					packageManager: 'npm',
-					onLogEntry,
+					onLogEntry: vi.fn(),
+					restartConfig: { enabled: false, delayMs: 0, maxAttempts: 0 },
+					scriptArgs: [],
 					onTaskStateChange,
 				}),
 			);
@@ -99,14 +101,19 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
 			);
 
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				status: 'running',
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					status: 'running',
+				}),
+			);
 		});
 	});
 
@@ -116,6 +123,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -134,6 +143,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: [],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -144,9 +155,12 @@ describe('useProcessManager', () => {
 			});
 
 			expect(mockSpawn).toHaveBeenCalledTimes(1);
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				status: 'running',
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					status: 'running',
+				}),
+			);
 		});
 	});
 
@@ -156,6 +170,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -179,6 +195,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -196,6 +214,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -215,6 +235,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -238,6 +260,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -247,9 +271,12 @@ describe('useProcessManager', () => {
 				mockChild.stderr.emit('data', Buffer.from('Error\n'));
 			});
 
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				hasUnseenStderr: true,
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					hasUnseenStderr: true,
+				}),
+			);
 		});
 	});
 
@@ -259,6 +286,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -268,10 +297,13 @@ describe('useProcessManager', () => {
 				mockChild.emit('close', 0);
 			});
 
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				status: 'success',
-				exitCode: 0,
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					status: 'success',
+					exitCode: 0,
+				}),
+			);
 		});
 
 		it('sets status to error on non-zero exit code', () => {
@@ -279,6 +311,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -288,10 +322,13 @@ describe('useProcessManager', () => {
 				mockChild.emit('close', 1);
 			});
 
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				status: 'error',
-				exitCode: 1,
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					status: 'error',
+					exitCode: 1,
+				}),
+			);
 		});
 	});
 
@@ -301,6 +338,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -318,10 +357,13 @@ describe('useProcessManager', () => {
 				}),
 			);
 
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				status: 'error',
-				exitCode: 1,
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					status: 'error',
+					exitCode: 1,
+				}),
+			);
 		});
 	});
 
@@ -331,6 +373,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -354,6 +398,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -375,6 +421,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -392,10 +440,13 @@ describe('useProcessManager', () => {
 			});
 
 			// Should still be success because it was killed
-			expect(onTaskStateChange).toHaveBeenCalledWith('task1', {
-				status: 'success',
-				exitCode: 1,
-			});
+			expect(onTaskStateChange).toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					status: 'success',
+					exitCode: 1,
+				}),
+			);
 		});
 	});
 
@@ -408,6 +459,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1', 'task2'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -428,6 +481,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -456,6 +511,8 @@ describe('useProcessManager', () => {
 				useProcessManager({
 					initialTasks: ['task1'],
 					packageManager: 'npm',
+					restartConfig: { enabled: false, delayMs: 100, maxAttempts: 1 },
+					scriptArgs: [],
 					onLogEntry,
 					onTaskStateChange,
 				}),
@@ -472,9 +529,12 @@ describe('useProcessManager', () => {
 			});
 
 			// Should not mark hasUnseenStderr
-			expect(onTaskStateChange).not.toHaveBeenCalledWith('task1', {
-				hasUnseenStderr: true,
-			});
+			expect(onTaskStateChange).not.toHaveBeenCalledWith(
+				'task1',
+				expect.objectContaining({
+					hasUnseenStderr: true,
+				}),
+			);
 		});
 	});
 });

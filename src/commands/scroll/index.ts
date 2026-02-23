@@ -9,7 +9,7 @@ export const scrollUpCommand: Command = {
 		!p.ui.showScriptSelector &&
 		p.tasks.tasks.length > 0 &&
 		p.view.totalLogs > p.view.viewHeight &&
-		p.view.scrollOffset < p.view.totalLogs - p.view.viewHeight,
+		p.view.primaryScrollOffset < p.view.totalLogs - p.view.viewHeight,
 	execute: (p) => {
 		p.view.scrollUp();
 	},
@@ -24,7 +24,7 @@ export const scrollDownCommand: Command = {
 		!p.ui.showScriptSelector &&
 		p.tasks.tasks.length > 0 &&
 		p.view.totalLogs > p.view.viewHeight &&
-		p.view.scrollOffset > 0,
+		p.view.primaryScrollOffset > 0,
 	execute: (p) => {
 		p.view.scrollDown();
 	},
@@ -35,7 +35,9 @@ export const scrollToBottomCommand: Command = {
 	keys: [{ textKey: 'b' }],
 	displayText: 'bottom',
 	isEnabled: (p) =>
-		!p.ui.showScriptSelector && p.tasks.tasks.length > 0 && !p.view.autoScroll,
+		!p.ui.showScriptSelector &&
+		p.tasks.tasks.length > 0 &&
+		!p.view.primaryAutoScroll,
 	execute: (p) => {
 		p.view.scrollToBottom();
 	},

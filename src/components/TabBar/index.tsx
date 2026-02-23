@@ -2,6 +2,7 @@ import { Badge, Spinner } from '@inkjs/ui';
 import { Box, Text } from 'ink';
 import { useMemo } from 'react';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
+import { TaskTime } from '../TaskTime/index.js';
 import {
 	TAB_BAR_INDEX_COLORS,
 	TAB_BAR_STATUS_COLORS,
@@ -13,13 +14,24 @@ const estimateTabWidth = (
 	taskName: string,
 	status: string,
 	hasStderrBadge: boolean,
+	isPinned: boolean,
 ): number => {
 	// Badge format: " STATUS " with brackets adds ~3 chars
 	// Spinner is ~1 char
 	// Gap between elements is 1
 	const badgeWidth = status === 'running' ? 1 : status.length + 3;
 	const stderrBadgeWidth = hasStderrBadge ? 5 : 0; // " ERR " + gap
-	return taskName.length + 1 + badgeWidth + stderrBadgeWidth; // name + space + badge + stderr
+	const pinWidth = isPinned ? 3 : 0; // "📌 "
+	const timeWidth = status !== 'pending' ? 8 : 0; // e.g. " (2m 1s)" overhead
+	return (
+		taskName.length +
+		1 +
+		badgeWidth +
+		stderrBadgeWidth +
+		pinWidth +
+		timeWidth +
+		4
+	); // name + space + badge + stderr + restart/pin/time overhead
 };
 
 // Parent Box: border (2) + padding (2) = 4
@@ -34,6 +46,8 @@ const ARROW_WIDTH = 6;
 export function TabBar({
 	tasks,
 	taskStates,
+	pinnedTasks,
+	tabAliases,
 	activeTabIndex,
 	width = 80,
 }: TabBarProps) {
@@ -53,7 +67,14 @@ export function TabBar({
 			const tabWidths = tasks.map((task) => {
 				const status = taskStates[task]?.status ?? 'pending';
 				const hasStderrBadge = taskStates[task]?.hasUnseenStderr ?? false;
-				return estimateTabWidth(task, status, hasStderrBadge);
+				const isPinned = pinnedTasks.includes(task);
+				const displayTaskName = tabAliases[task] ?? task;
+				return estimateTabWidth(
+					displayTaskName,
+					status,
+					hasStderrBadge,
+					isPinned,
+				);
 			});
 
 			// Gap between tabs (gap={2} means 2 spaces between each tab)
@@ -116,7 +137,7 @@ export function TabBar({
 				showLeftArrow: start > 0,
 				showRightArrow: end < tasks.length - 1,
 			};
-		}, [tasks, taskStates, activeTabIndex, width]);
+		}, [tasks, taskStates, pinnedTasks, tabAliases, activeTabIndex, width]);
 
 	const hiddenRight = tasks.length - startIndex - visibleTasks.length;
 
@@ -140,17 +161,34 @@ export function TabBar({
 					const color =
 						TAB_BAR_INDEX_COLORS[originalIndex % TAB_BAR_INDEX_COLORS.length];
 					const showStderrFlag = taskState?.hasUnseenStderr;
+					const isPinned = pinnedTasks.includes(task);
+					const displayTaskName = tabAliases[task] ?? task;
 
 					return (
 						<Box key={task} gap={1}>
 							{isActive ? (
 								<Text backgroundColor={color} color="white" bold>
-									{task}
+									{isPinned ? '📌 ' : ''}
+									{displayTaskName}
+									<TaskTime
+										startedAt={taskState?.startedAt ?? null}
+										endedAt={taskState?.endedAt ?? null}
+									/>
 								</Text>
 							) : (
-								<Text color={color}>{task}</Text>
+								<Text color={color}>
+									{isPinned ? '📌 ' : ''}
+									{displayTaskName}
+									<TaskTime
+										startedAt={taskState?.startedAt ?? null}
+										endedAt={taskState?.endedAt ?? null}
+									/>
+								</Text>
 							)}
 							{showStderrFlag && <Badge color="red">ERR</Badge>}
+							{taskState?.restartCount && taskState.restartCount > 0 ? (
+								<Badge color="yellow">↻{taskState.restartCount}</Badge>
+							) : null}
 							{taskState?.status === TASK_STATUS.RUNNING ? (
 								<Spinner />
 							) : (

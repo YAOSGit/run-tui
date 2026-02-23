@@ -5,4 +5,7 @@ export type TaskState = {
 	status: TaskStatus;
 	exitCode: number | null;
 	hasUnseenStderr: boolean;
+	restartCount: number;
+	startedAt: number | null;
+	endedAt: number | null;
 };

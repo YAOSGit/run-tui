@@ -19,6 +19,9 @@ describe('TabBar', () => {
 					? 1
 					: null,
 		hasUnseenStderr,
+		restartCount: 0,
+		startedAt: null,
+		endedAt: null,
 	});
 
 	it('renders task names', () => {
@@ -30,7 +33,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('build');
@@ -45,7 +54,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('PENDING');
@@ -58,7 +73,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('SUCCESS');
@@ -71,7 +92,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('ERROR');
@@ -84,7 +111,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('ERR');
@@ -97,7 +130,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+			/>,
 		);
 
 		expect(lastFrame()).not.toContain('ERR');
@@ -111,7 +150,13 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={1} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={1}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('build');
@@ -127,7 +172,14 @@ describe('TabBar', () => {
 		};
 
 		const { lastFrame } = render(
-			<TabBar tasks={tasks} taskStates={taskStates} activeTabIndex={0} />,
+			<TabBar
+				tasks={tasks}
+				taskStates={taskStates}
+				pinnedTasks={[]}
+				tabAliases={{}}
+				activeTabIndex={0}
+				width={120}
+			/>,
 		);
 
 		expect(lastFrame()).toContain('SUCCESS');

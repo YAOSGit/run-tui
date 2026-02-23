@@ -283,5 +283,17 @@ describe('CommandsProvider.utils', () => {
 		it('returns empty string for empty bindings', () => {
 			expect(getDisplayKey([])).toBe('');
 		});
+
+		it('returns modifier combinations with spacing', () => {
+			const ctrlL: KeyBinding[] = [{ textKey: 'l', ctrl: true }];
+			expect(getDisplayKey(ctrlL)).toBe('ctrl\u00A0+\u00A0l');
+
+			const optF: KeyBinding[] = [{ textKey: 'f', meta: true }];
+			const prefix = process.platform === 'darwin' ? 'opt' : 'alt';
+			expect(getDisplayKey(optF)).toBe(`${prefix}\u00A0+\u00A0f`);
+
+			const shiftE: KeyBinding[] = [{ textKey: 'E', shift: true }];
+			expect(getDisplayKey(shiftE)).toBe('shift\u00A0+\u00A0E');
+		});
 	});
 });

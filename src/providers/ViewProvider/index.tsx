@@ -14,13 +14,15 @@ export const ViewProvider: React.FC<ViewProviderProps> = ({
 	children,
 	viewHeight,
 }) => {
-	const { tasks, markStderrSeen } = useTasks();
-	const { getLogCountForTask } = useLogs();
+	const { tasks, pinnedTasks, markStderrSeen } = useTasks();
+	const { getLogsForTask, getLogCountForTask } = useLogs();
 
 	const viewState = useViewState({
 		viewHeight,
 		tasks,
+		pinnedTasks,
 		getLogCountForTask,
+		getLogsForTask,
 		markStderrSeen,
 	});
 
@@ -29,10 +31,22 @@ export const ViewProvider: React.FC<ViewProviderProps> = ({
 			activeTabIndex: viewState.activeTabIndex,
 			activeTask: viewState.activeTask,
 			logFilter: viewState.logFilter,
-			scrollOffset: viewState.scrollOffset,
-			autoScroll: viewState.autoScroll,
+			primaryScrollOffset: viewState.primaryScrollOffset,
+			primaryAutoScroll: viewState.primaryAutoScroll,
+			splitScrollOffset: viewState.splitScrollOffset,
+			splitAutoScroll: viewState.splitAutoScroll,
+			splitTaskName: viewState.splitTaskName,
+			activePane: viewState.activePane,
+			showTimestamps: viewState.showTimestamps,
+			showSearch: viewState.showSearch,
+			searchQuery: viewState.searchQuery,
+			searchMatches: viewState.searchMatches,
+			currentMatchIndex: viewState.currentMatchIndex,
+			showRenameInput: viewState.showRenameInput,
 			viewHeight: viewState.viewHeight,
 			totalLogs: viewState.totalLogs,
+			focusMode: viewState.focusMode,
+			displayMode: viewState.displayMode,
 			navigateLeft: viewState.navigateLeft,
 			navigateRight: viewState.navigateRight,
 			setActiveTabIndex: viewState.setActiveTabIndex,
@@ -40,6 +54,18 @@ export const ViewProvider: React.FC<ViewProviderProps> = ({
 			scrollUp: viewState.scrollUp,
 			scrollDown: viewState.scrollDown,
 			scrollToBottom: viewState.scrollToBottom,
+			toggleTimestamps: viewState.toggleTimestamps,
+			openSearch: viewState.openSearch,
+			closeSearch: viewState.closeSearch,
+			openRenameInput: viewState.openRenameInput,
+			closeRenameInput: viewState.closeRenameInput,
+			setSearchQuery: viewState.setSearchQuery,
+			scrollToIndex: viewState.scrollToIndex,
+			toggleFocusMode: viewState.toggleFocusMode,
+			toggleDisplayMode: viewState.toggleDisplayMode,
+			cyclePaneFocus: viewState.cyclePaneFocus,
+			nextMatch: viewState.nextMatch,
+			prevMatch: viewState.prevMatch,
 		}),
 		[viewState],
 	);

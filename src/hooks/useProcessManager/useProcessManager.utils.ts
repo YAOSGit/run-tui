@@ -4,7 +4,18 @@ import { PACKAGE_MANAGER } from '../../types/PackageManager/index.js';
 
 export const getCommand = (pm: PackageManager): string => {
 	if (process.platform === 'win32') {
-		return pm === PACKAGE_MANAGER.NPM ? 'npm.cmd' : pm;
+		switch (pm) {
+			case PACKAGE_MANAGER.NPM:
+				return 'npm.cmd';
+			case PACKAGE_MANAGER.YARN:
+				return 'yarn.cmd';
+			case PACKAGE_MANAGER.PNPM:
+				return 'pnpm.cmd';
+			case PACKAGE_MANAGER.BUN:
+				return 'bun.exe';
+			default:
+				return pm;
+		}
 	}
 	return pm;
 };

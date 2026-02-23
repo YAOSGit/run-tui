@@ -4,7 +4,7 @@ import { TASK_STATUS, type TaskStatus } from './index.js';
 describe('TaskStatus type tests', () => {
 	it('TaskStatus is a union of literal string types', () => {
 		expectTypeOf<TaskStatus>().toEqualTypeOf<
-			'pending' | 'running' | 'success' | 'error'
+			'pending' | 'running' | 'success' | 'error' | 'restarting'
 		>();
 	});
 
@@ -13,6 +13,7 @@ describe('TaskStatus type tests', () => {
 		assertType<TaskStatus>(TASK_STATUS.RUNNING);
 		assertType<TaskStatus>(TASK_STATUS.SUCCESS);
 		assertType<TaskStatus>(TASK_STATUS.ERROR);
+		assertType<TaskStatus>(TASK_STATUS.RESTARTING);
 	});
 
 	it('TASK_STATUS is readonly', () => {
@@ -21,6 +22,7 @@ describe('TaskStatus type tests', () => {
 			readonly RUNNING: 'running';
 			readonly SUCCESS: 'success';
 			readonly ERROR: 'error';
+			readonly RESTARTING: 'restarting';
 		}>();
 	});
 

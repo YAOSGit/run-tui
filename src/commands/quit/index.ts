@@ -7,6 +7,10 @@ export const quitCommand: Command = {
 		{ specialKey: 'esc', ctrl: false },
 	],
 	displayText: 'quit',
+	footer: 'priority',
+	footerOrder: 2,
+	helpSection: 'General',
+	helpLabel: 'Quit',
 	isEnabled: (p) => !p.ui.showScriptSelector,
 	execute: (p) => {
 		p.tasks.killAllTasks();

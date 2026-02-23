@@ -8,15 +8,19 @@ import type { ViewContextValue } from '../ViewProvider/ViewProvider.types.js';
 
 export interface CommandsProviderProps {
 	children: React.ReactNode;
-	keepAlive: boolean;
-	onQuit: () => void;
+	keepAlive?: boolean;
+	onQuit?: () => void;
+	onNextMatch?: () => void;
+	onPrevMatch?: () => void;
 }
 
 export interface CommandProviders {
 	tasks: TasksContextValue;
 	logs: LogsContextValue;
-	view: ViewContextValue;
 	ui: UIStateContextValue;
+	view: ViewContextValue;
+	onNextMatch?: () => void;
+	onPrevMatch?: () => void;
 	keepAlive: boolean;
 	quit: () => void;
 }
@@ -26,6 +30,15 @@ export interface Command {
 	keys: KeyBinding[];
 	displayKey?: string;
 	displayText: string;
+	/** Controls whether/how this command appears in the footer bar.
+	 *  'priority' — always shown first; 'optional' — shown if space permits; 'hidden' — never shown. */
+	footer?: 'priority' | 'optional' | 'hidden';
+	/** Ascending sort order within the footer (lower = shown first). */
+	footerOrder?: number;
+	/** Section heading in the Help Menu. Omit to hide from Help Menu entirely. */
+	helpSection?: string;
+	/** Label override for the Help Menu row. Falls back to displayText. */
+	helpLabel?: string;
 	isEnabled: (p: CommandProviders) => boolean;
 	execute: (p: CommandProviders) => void;
 	needsConfirmation?: (p: CommandProviders) => boolean;

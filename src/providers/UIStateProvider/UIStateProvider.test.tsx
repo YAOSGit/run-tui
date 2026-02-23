@@ -36,6 +36,10 @@ describe('UIStateProvider', () => {
 			expect(result.current).toHaveProperty('requestConfirmation');
 			expect(result.current).toHaveProperty('confirmPending');
 			expect(result.current).toHaveProperty('cancelPending');
+			expect(result.current).toHaveProperty('showHelp');
+			expect(result.current).toHaveProperty('openHelp');
+			expect(result.current).toHaveProperty('closeHelp');
+			expect(result.current).toHaveProperty('toggleHelp');
 		});
 	});
 

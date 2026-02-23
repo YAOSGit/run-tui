@@ -6,16 +6,19 @@ const createOptions = (
 	overrides: Partial<{
 		viewHeight: number;
 		tasks: string[];
+		pinnedTasks: string[];
 		logCounts: Record<string, number>;
 	}> = {},
 ) => ({
 	viewHeight: overrides.viewHeight ?? 20,
 	tasks: overrides.tasks ?? ['task1', 'task2'],
+	pinnedTasks: overrides.pinnedTasks ?? [],
 	getLogCountForTask: vi
 		.fn()
 		.mockImplementation(
 			(taskName: string) => overrides.logCounts?.[taskName] ?? 0,
 		),
+	getLogsForTask: vi.fn().mockReturnValue([]),
 	markStderrSeen: vi.fn(),
 });
 
@@ -44,13 +47,13 @@ describe('useViewState', () => {
 		it('has scrollOffset 0 initially', () => {
 			const { result } = renderHook(() => useViewState(createOptions()));
 
-			expect(result.current.scrollOffset).toBe(0);
+			expect(result.current.primaryScrollOffset).toBe(0);
 		});
 
 		it('has autoScroll true initially', () => {
 			const { result } = renderHook(() => useViewState(createOptions()));
 
-			expect(result.current.autoScroll).toBe(true);
+			expect(result.current.primaryAutoScroll).toBe(true);
 		});
 
 		it('returns provided viewHeight', () => {
@@ -204,7 +207,7 @@ describe('useViewState', () => {
 				result.current.scrollUp();
 			});
 
-			expect(result.current.scrollOffset).toBe(1);
+			expect(result.current.primaryScrollOffset).toBe(1);
 		});
 
 		it('disables autoScroll', () => {
@@ -218,7 +221,7 @@ describe('useViewState', () => {
 				result.current.scrollUp();
 			});
 
-			expect(result.current.autoScroll).toBe(false);
+			expect(result.current.primaryAutoScroll).toBe(false);
 		});
 
 		it('respects max scroll offset', () => {
@@ -235,7 +238,7 @@ describe('useViewState', () => {
 				});
 			}
 
-			expect(result.current.scrollOffset).toBe(5);
+			expect(result.current.primaryScrollOffset).toBe(5);
 		});
 	});
 
@@ -257,7 +260,7 @@ describe('useViewState', () => {
 				result.current.scrollDown();
 			});
 
-			expect(result.current.scrollOffset).toBe(2);
+			expect(result.current.primaryScrollOffset).toBe(2);
 		});
 
 		it('does not go below 0', () => {
@@ -267,7 +270,7 @@ describe('useViewState', () => {
 				result.current.scrollDown();
 			});
 
-			expect(result.current.scrollOffset).toBe(0);
+			expect(result.current.primaryScrollOffset).toBe(0);
 		});
 
 		it('re-enables autoScroll when reaching bottom', () => {
@@ -281,14 +284,14 @@ describe('useViewState', () => {
 				result.current.scrollUp();
 			});
 
-			expect(result.current.autoScroll).toBe(false);
+			expect(result.current.primaryAutoScroll).toBe(false);
 
 			act(() => {
 				result.current.scrollDown();
 			});
 
-			expect(result.current.scrollOffset).toBe(0);
-			expect(result.current.autoScroll).toBe(true);
+			expect(result.current.primaryScrollOffset).toBe(0);
+			expect(result.current.primaryAutoScroll).toBe(true);
 		});
 	});
 
@@ -310,7 +313,7 @@ describe('useViewState', () => {
 				result.current.scrollToBottom();
 			});
 
-			expect(result.current.scrollOffset).toBe(0);
+			expect(result.current.primaryScrollOffset).toBe(0);
 		});
 
 		it('re-enables autoScroll', () => {
@@ -328,7 +331,7 @@ describe('useViewState', () => {
 				result.current.scrollToBottom();
 			});
 
-			expect(result.current.autoScroll).toBe(true);
+			expect(result.current.primaryAutoScroll).toBe(true);
 		});
 	});
 
@@ -336,6 +339,7 @@ describe('useViewState', () => {
 		it('returns log count for active task', () => {
 			const options = createOptions({
 				tasks: ['task1', 'task2'],
+				pinnedTasks: [],
 				logCounts: { task1: 25, task2: 50 },
 			});
 			const { result } = renderHook(() => useViewState(options));

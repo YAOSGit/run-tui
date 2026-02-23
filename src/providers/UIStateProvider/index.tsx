@@ -18,11 +18,17 @@ export const UIStateProvider: React.FC<UIStateProviderProps> = ({
 		() => ({
 			showScriptSelector: uiState.showScriptSelector,
 			pendingConfirmation: uiState.pendingConfirmation,
+			lineOverflow: uiState.lineOverflow,
 			openScriptSelector: uiState.openScriptSelector,
 			closeScriptSelector: uiState.closeScriptSelector,
 			requestConfirmation: uiState.requestConfirmation,
 			confirmPending: uiState.confirmPending,
 			cancelPending: uiState.cancelPending,
+			cycleLineOverflow: uiState.cycleLineOverflow,
+			showHelp: uiState.showHelp,
+			openHelp: uiState.openHelp,
+			closeHelp: uiState.closeHelp,
+			toggleHelp: uiState.toggleHelp,
 		}),
 		[uiState],
 	);

@@ -10,7 +10,13 @@ export default defineConfig({
 		],
 		coverage: {
 			include: ['src/**/*.{ts,tsx}'],
-			exclude: ['e2e/**', 'src/app/**', 'node_modules/**', '**/*.test.{ts,tsx}', '**/*.test-d.ts'],
+			exclude: [
+				'e2e/**',
+				'src/app/**',
+				'node_modules/**',
+				'**/*.test.{ts,tsx}',
+				'**/*.test-d.ts',
+			],
 		},
 	},
 });

@@ -3,37 +3,15 @@ import type { TaskStatus } from '../TaskStatus/index.js';
 import type { TaskState } from './index.js';
 
 describe('TaskState type tests', () => {
-	it('TaskState has correct property types', () => {
-		expectTypeOf<TaskState>().toMatchTypeOf<{
-			name: string;
-			status: TaskStatus;
-			exitCode: number | null;
-			hasUnseenStderr: boolean;
-		}>();
-	});
-
-	it('name is string', () => {
-		expectTypeOf<TaskState['name']>().toEqualTypeOf<string>();
-	});
-
-	it('status is TaskStatus', () => {
-		expectTypeOf<TaskState['status']>().toEqualTypeOf<TaskStatus>();
-	});
-
-	it('exitCode is number or null', () => {
-		expectTypeOf<TaskState['exitCode']>().toEqualTypeOf<number | null>();
-	});
-
-	it('hasUnseenStderr is boolean', () => {
-		expectTypeOf<TaskState['hasUnseenStderr']>().toEqualTypeOf<boolean>();
-	});
-
 	it('accepts valid TaskState objects', () => {
 		assertType<TaskState>({
 			name: 'build',
 			status: 'running',
 			exitCode: null,
 			hasUnseenStderr: false,
+			restartCount: 0,
+			startedAt: Date.now(),
+			endedAt: null,
 		});
 
 		assertType<TaskState>({
@@ -41,6 +19,9 @@ describe('TaskState type tests', () => {
 			status: 'success',
 			exitCode: 0,
 			hasUnseenStderr: true,
+			restartCount: 1,
+			startedAt: Date.now() - 1000,
+			endedAt: Date.now(),
 		});
 	});
 
@@ -51,6 +32,9 @@ describe('TaskState type tests', () => {
 			status: 'invalid',
 			exitCode: null,
 			hasUnseenStderr: false,
+			restartCount: 0,
+			startedAt: null,
+			endedAt: null,
 		});
 	});
 

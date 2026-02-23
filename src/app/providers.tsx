@@ -6,6 +6,7 @@ import { UIStateProvider } from '../providers/UIStateProvider/index.js';
 import { ViewProvider } from '../providers/ViewProvider/index.js';
 import type { LogEntry } from '../types/LogEntry/index.js';
 import type { PackageManager } from '../types/PackageManager/index.js';
+import type { RestartConfig } from '../types/RestartConfig/index.js';
 
 const LogsConsumer: React.FC<{
 	children: (addLog: (entry: LogEntry) => void) => React.ReactNode;
@@ -19,8 +20,10 @@ export interface AppProvidersProps {
 	initialTasks: string[];
 	packageManager: PackageManager;
 	keepAlive: boolean;
-	viewHeight: number;
+	viewHeight?: number;
 	initialShowScriptSelector: boolean;
+	restartConfig: RestartConfig;
+	scriptArgs: string[];
 	onQuit: () => void;
 }
 
@@ -31,6 +34,8 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
 	keepAlive,
 	viewHeight,
 	initialShowScriptSelector,
+	restartConfig,
+	scriptArgs,
 	onQuit,
 }) => {
 	return (
@@ -40,9 +45,11 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
 					<TasksProvider
 						initialTasks={initialTasks}
 						packageManager={packageManager}
+						restartConfig={restartConfig}
+						scriptArgs={scriptArgs}
 						onLogEntry={addLog}
 					>
-						<ViewProvider viewHeight={viewHeight}>
+						<ViewProvider viewHeight={viewHeight ?? 20}>
 							<UIStateProvider
 								initialShowScriptSelector={initialShowScriptSelector}
 							>

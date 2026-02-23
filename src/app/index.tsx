@@ -1,7 +1,9 @@
 import { useApp, useStdout } from 'ink';
 import type React from 'react';
 import { useCallback, useMemo } from 'react';
+import { ErrorBoundary } from '../components/ErrorBoundary/index.js';
 import type { PackageManager } from '../types/PackageManager/index.js';
+import type { RestartConfig } from '../types/RestartConfig/index.js';
 import { AppContent } from './app.js';
 import { AppProviders } from './providers.js';
 
@@ -10,7 +12,9 @@ interface AppProps {
 	packageManager: PackageManager;
 	availableScripts: string[];
 	keepAlive: boolean;
-	height: number;
+	height?: number;
+	restartConfig: RestartConfig;
+	scriptArgs: string[];
 }
 
 const App: React.FC<AppProps> = ({
@@ -19,6 +23,8 @@ const App: React.FC<AppProps> = ({
 	availableScripts,
 	keepAlive,
 	height,
+	restartConfig,
+	scriptArgs,
 }) => {
 	const { stdout } = useStdout();
 	const width = stdout?.columns ?? 80;
@@ -35,22 +41,26 @@ const App: React.FC<AppProps> = ({
 	);
 
 	return (
-		<AppProviders
-			initialTasks={initialTasks}
-			packageManager={packageManager}
-			keepAlive={keepAlive}
-			viewHeight={height}
-			initialShowScriptSelector={initialShowScriptSelector}
-			onQuit={handleQuit}
-		>
-			<AppContent
-				availableScripts={availableScripts}
+		<ErrorBoundary>
+			<AppProviders
+				initialTasks={initialTasks}
+				packageManager={packageManager}
 				keepAlive={keepAlive}
-				height={height}
-				width={width}
+				viewHeight={height}
+				initialShowScriptSelector={initialShowScriptSelector}
+				restartConfig={restartConfig}
+				scriptArgs={scriptArgs}
 				onQuit={handleQuit}
-			/>
-		</AppProviders>
+			>
+				<AppContent
+					availableScripts={availableScripts}
+					keepAlive={keepAlive}
+					height={height}
+					width={width}
+					onQuit={handleQuit}
+				/>
+			</AppProviders>
+		</ErrorBoundary>
 	);
 };
 

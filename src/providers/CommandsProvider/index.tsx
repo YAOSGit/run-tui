@@ -25,6 +25,8 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 	children,
 	keepAlive,
 	onQuit,
+	onNextMatch,
+	onPrevMatch,
 }) => {
 	const tasks = useTasks();
 	const logs = useLogs();
@@ -41,14 +43,20 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 			logs,
 			view,
 			ui,
-			keepAlive,
-			quit: onQuit,
+			keepAlive: keepAlive ?? false,
+			quit: onQuit ?? (() => { }),
+			onNextMatch,
+			onPrevMatch,
 		}),
-		[tasks, logs, view, ui, keepAlive, onQuit],
+		[tasks, logs, view, ui, keepAlive, onQuit, onNextMatch, onPrevMatch],
 	);
 
 	const handleInput = useCallback(
 		(input: string, key: Key) => {
+			if (view.showSearch) {
+				return;
+			}
+
 			// Handle confirmation mode
 			if (ui.pendingConfirmation) {
 				// Confirm with y, Enter, or the same key that triggered the confirmation
@@ -67,6 +75,15 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 					return;
 				}
 				// Ignore other keys during confirmation
+				return;
+			}
+
+			// Ignore global commands if typing in an input overlay
+			if (
+				providers.ui.showHelp ||
+				providers.view.showSearch ||
+				providers.view.showRenameInput
+			) {
 				return;
 			}
 
@@ -93,31 +110,42 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 				}
 			}
 		},
-		[providers, ui],
+		[providers, ui, providers.ui.showHelp],
 	);
 
 	const getVisibleCommands = useCallback((): VisibleCommand[] => {
 		const seen = new Set<string>();
-		const visible: VisibleCommand[] = [];
+		const priority: VisibleCommand[] = [];
+		const optional: VisibleCommand[] = [];
 
 		for (const command of COMMANDS) {
+			if (command.footer === 'hidden') continue;
+
 			const displayKey = command.displayKey ?? getDisplayKey(command.keys);
+			// Skip duplicates (e.g. LEFT_ARROW / RIGHT_ARROW share the same displayKey)
+			const dedupeKey = `${displayKey}-${command.displayText}`;
+			if (seen.has(dedupeKey)) continue;
+			seen.add(dedupeKey);
 
-			// Skip duplicates (e.g., left/right arrows share same display)
-			const key = `${displayKey}-${command.displayText}`;
-			if (seen.has(key)) continue;
-			seen.add(key);
+			if (!command.isEnabled(providers)) continue;
 
-			// Only show enabled commands
-			if (command.isEnabled(providers)) {
-				visible.push({
-					displayKey,
-					displayText: command.displayText,
-				});
+			const entry: VisibleCommand = {
+				displayKey,
+				displayText: command.displayText,
+				priority: command.footer === 'priority',
+				footerOrder: command.footerOrder,
+			};
+			if (command.footer === 'priority') {
+				priority.push(entry);
+			} else {
+				optional.push(entry);
 			}
 		}
 
-		return visible;
+		return [
+			...priority.sort((a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999)),
+			...optional.sort((a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999)),
+		];
 	}, [providers]);
 
 	const value: CommandsContextValue = useMemo(

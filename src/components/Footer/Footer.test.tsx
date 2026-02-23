@@ -8,7 +8,7 @@ import { Footer } from './index.js';
 const defaultCommands: VisibleCommand[] = [
 	{ displayKey: '←/→', displayText: 'switch' },
 	{ displayKey: 'n', displayText: 'new' },
-	{ displayKey: 'f', displayText: 'filter' },
+	{ displayKey: 'ctrl+f', displayText: 'filter' },
 	{ displayKey: 'k', displayText: 'kill' },
 	{ displayKey: 'q', displayText: 'quit' },
 ];
@@ -119,7 +119,7 @@ describe('Footer', () => {
 		expect(lastFrame()).toContain('run');
 		expect(lastFrame()).toContain('←/→');
 		expect(lastFrame()).toContain('switch');
-		expect(lastFrame()).toContain('f');
+		expect(lastFrame()).toContain('ctrl+f');
 		expect(lastFrame()).toContain('filter');
 		expect(lastFrame()).toContain('k');
 		expect(lastFrame()).toContain('kill');

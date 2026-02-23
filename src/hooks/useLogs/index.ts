@@ -1,17 +1,28 @@
 import { useCallback, useState } from 'react';
 import type { LogEntry } from '../../types/LogEntry/index.js';
 import type { LogType } from '../../types/LogType/index.js';
-import { MAX_LOGS } from './useLogs.consts.js';
+import { MAX_LOGS_PER_TASK } from './useLogs.consts.js';
 
+/**
+ * Stores logs indexed by task name for O(1) task lookup.
+ * Each task's logs are capped at MAX_LOGS_PER_TASK.
+ */
 export const useLogs = () => {
-	const [logs, setLogs] = useState<LogEntry[]>([]);
+	const [logsByTask, setLogsByTask] = useState<Map<string, LogEntry[]>>(
+		new Map(),
+	);
 
 	const addLog = useCallback((entry: LogEntry) => {
-		setLogs((prev) => {
-			const next = [...prev, entry];
-			if (next.length > MAX_LOGS) {
-				return next.slice(next.length - MAX_LOGS);
-			}
+		setLogsByTask((prev) => {
+			const next = new Map(prev);
+			const taskLogs = next.get(entry.task) ?? [];
+			const updated = [...taskLogs, entry];
+			next.set(
+				entry.task,
+				updated.length > MAX_LOGS_PER_TASK
+					? updated.slice(updated.length - MAX_LOGS_PER_TASK)
+					: updated,
+			);
 			return next;
 		});
 	}, []);
@@ -23,7 +34,7 @@ export const useLogs = () => {
 			limit?: number,
 			scrollOffset = 0,
 		) => {
-			let taskLogs = logs.filter((l) => l.task === taskName);
+			let taskLogs = logsByTask.get(taskName) ?? [];
 			if (filter !== null) {
 				taskLogs = taskLogs.filter((l) => l.type === filter);
 			}
@@ -35,22 +46,26 @@ export const useLogs = () => {
 			}
 			return taskLogs;
 		},
-		[logs],
+		[logsByTask],
 	);
 
 	const getLogCountForTask = useCallback(
 		(taskName: string, filter: LogType | null = null) => {
-			let taskLogs = logs.filter((l) => l.task === taskName);
+			const taskLogs = logsByTask.get(taskName) ?? [];
 			if (filter !== null) {
-				taskLogs = taskLogs.filter((l) => l.type === filter);
+				return taskLogs.filter((l) => l.type === filter).length;
 			}
 			return taskLogs.length;
 		},
-		[logs],
+		[logsByTask],
 	);
 
 	const clearLogsForTask = useCallback((taskName: string) => {
-		setLogs((prev) => prev.filter((l) => l.task !== taskName));
+		setLogsByTask((prev) => {
+			const next = new Map(prev);
+			next.delete(taskName);
+			return next;
+		});
 	}, []);
 
 	return {
