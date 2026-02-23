@@ -274,7 +274,7 @@ export const useViewState = ({
 	useEffect(() => {
 		if (searchMatches.length > 0) {
 			setCurrentMatchIndex(0);
-			scrollToIndex(searchMatches[0]!, totalLogs);
+			scrollToIndex(searchMatches[0] ?? 0, totalLogs);
 		} else {
 			setCurrentMatchIndex(null);
 		}
@@ -285,7 +285,7 @@ export const useViewState = ({
 		setCurrentMatchIndex((prev) => {
 			const next =
 				prev === null || prev >= searchMatches.length - 1 ? 0 : prev + 1;
-			scrollToIndex(searchMatches[next]!, totalLogs);
+			scrollToIndex(searchMatches[next] ?? 0, totalLogs);
 			return next;
 		});
 	}, [searchMatches, scrollToIndex, totalLogs]);
@@ -295,7 +295,7 @@ export const useViewState = ({
 		setCurrentMatchIndex((prev) => {
 			const next =
 				prev === null || prev <= 0 ? searchMatches.length - 1 : prev - 1;
-			scrollToIndex(searchMatches[next]!, totalLogs);
+			scrollToIndex(searchMatches[next] ?? 0, totalLogs);
 			return next;
 		});
 	}, [searchMatches, scrollToIndex, totalLogs]);

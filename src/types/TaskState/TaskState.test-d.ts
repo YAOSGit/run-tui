@@ -1,5 +1,4 @@
-import { assertType, describe, expectTypeOf, it } from 'vitest';
-import type { TaskStatus } from '../TaskStatus/index.js';
+import { assertType, describe, it } from 'vitest';
 import type { TaskState } from './index.js';
 
 describe('TaskState type tests', () => {

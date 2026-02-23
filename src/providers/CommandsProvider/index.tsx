@@ -110,7 +110,7 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 				}
 			}
 		},
-		[providers, ui, providers.ui.showHelp],
+		[providers, ui, providers.ui.showHelp, view.showSearch],
 	);
 
 	const getVisibleCommands = useCallback((): VisibleCommand[] => {

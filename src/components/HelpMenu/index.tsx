@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from 'ink';
-import { useMemo } from 'react';
+
 import {
     COMMANDS,
 } from '../../providers/CommandsProvider/CommandsProvider.consts.js';
@@ -32,7 +32,7 @@ const HELP_SECTIONS = (() => {
                 rows: [],
             });
         }
-        sectionMap.get(cmd.helpSection)!.rows.push({
+        sectionMap.get(cmd.helpSection)?.rows.push({
             id: cmd.id,
             label: cmd.helpLabel ?? cmd.displayText,
         });

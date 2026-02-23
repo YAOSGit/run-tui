@@ -97,7 +97,6 @@ export const AppContent: React.FC<AppContentProps> = ({
 			if (tasks.tasks.length === 0 && !keepAlive) {
 				handleQuitWithCleanup();
 			}
-			return;
 			if (tasks.hasRunningTasks || keepAlive) {
 				commands.handleInput('q', {
 					escape: false,
@@ -202,7 +201,6 @@ export const AppContent: React.FC<AppContentProps> = ({
 		view.focusMode,
 		view.splitTaskName,
 		ui.showScriptSelector,
-		ui.showHelp,
 		ui.pendingConfirmation,
 		view.showSearch,
 		view.showRenameInput,
