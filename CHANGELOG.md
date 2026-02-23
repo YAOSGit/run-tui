@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [126.0.0] - 2026-02-23
+
+### Added
+- Platform utility (`utils/platform`) for robust cross-platform modifier key detection (`opt` vs `alt`)
+- `shift`+`k` shortcut to Kill All Processes (`killAllCommand`)
+
+### Changed
+- Centralized command logic: extended the `Command` interface to include `footer`, `helpSection`, and `helpLabel` fields, removing hardcoded command lists from `CommandsProvider`, `Footer`, and `HelpMenu`
+- `HelpMenu` styling: now horizontally centers and stretches to the full terminal width
+- `HelpMenu` layout: dynamically hides the log view when open to allow the menu to consume its natural vertical space without explicit line budgeting
+- Compact mode: dynamically sizes its vertical height to fit task rows naturally instead of expanding to fill the terminal
+- Compact mode: automatically unpins tasks before switching to prevent split-pane UI artifacts from remaining active in the background
+- Focus mode: reclaims vertical space by accurately removing the footer height reservation from the layout calculation
+- Refactored `opt`+`letter`/`alt`+`letter` commands (e.g. `opt`+`m`, `opt`+`p`, `opt`+`f`) to correctly map to `{ meta: true }` on non-macOS environments
+
+### Fixed
+- Replaced compilation-time non-null assertions with runtime optional chaining / nullish coalescing to resolve Biome styling warnings
+- Fixed unreachable code, unused imports, and non-exhaustive React hook dependency warnings across `useView`, `CommandsProvider`, and `app.tsx`
+- Restored non-breaking spaces uniformly across display strings for terminal layout consistency and unit test correctness
 ## [125.2.1] - 2025-12-17
 
 ### Added
