@@ -1,4 +1,4 @@
-import type { Command } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import type { Command } from '../../types/Command/index.js';
 
 export const newScriptCommand: Command = {
 	id: 'NEW_SCRIPT',
@@ -9,5 +9,7 @@ export const newScriptCommand: Command = {
 	helpSection: 'General',
 	helpLabel: 'New script',
 	isEnabled: (p) => !p.ui.showScriptSelector,
-	execute: (p) => { p.ui.openScriptSelector(); },
+	execute: (p) => {
+		p.ui.openScriptSelector();
+	},
 };

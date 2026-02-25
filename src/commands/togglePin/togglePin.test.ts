@@ -1,14 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
-import type { TaskStatus } from '../../types/TaskStatus/index.js';
-import { killCommand } from './index.js';
+import { togglePinCommand } from './index.js';
 
 const createMockProviders = (
 	overrides: Partial<{
 		showScriptSelector: boolean;
 		tasks: string[];
 		activeTask: string | undefined;
-		taskStatus: TaskStatus | undefined;
 	}> = {},
 ): CommandProviders => ({
 	tasks: {
@@ -28,7 +26,7 @@ const createMockProviders = (
 		renameTask: vi.fn(),
 		moveTaskLeft: vi.fn(),
 		moveTaskRight: vi.fn(),
-		getTaskStatus: vi.fn().mockReturnValue(overrides.taskStatus ?? 'running'),
+		getTaskStatus: vi.fn(),
 	},
 	logs: {
 		addLog: vi.fn(),
@@ -95,119 +93,60 @@ const createMockProviders = (
 	quit: vi.fn(),
 });
 
-describe('killCommand', () => {
+describe('togglePinCommand', () => {
 	it('has correct id', () => {
-		expect(killCommand.id).toBe('KILL');
-	});
-
-	it('has correct keys', () => {
-		expect(killCommand.keys).toEqual([
-			{ textKey: 'k', ctrl: false, shift: false },
-		]);
+		expect(togglePinCommand.id).toBe('TOGGLE_PIN');
 	});
 
 	it('has correct displayText', () => {
-		expect(killCommand.displayText).toBe('kill');
+		expect(togglePinCommand.displayText).toBe('Pin Tab');
 	});
 
 	describe('isEnabled', () => {
-		it('returns true when task status is running', () => {
+		it('returns true when tasks exist and selector is hidden', () => {
 			const providers = createMockProviders({
 				showScriptSelector: false,
 				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'running',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(true);
-		});
-
-		it('returns false when task status is success', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'success',
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
-		});
-
-		it('returns false when task status is error', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'error',
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(togglePinCommand.isEnabled(providers)).toBe(true);
 		});
 
 		it('returns false when script selector is shown', () => {
 			const providers = createMockProviders({
 				showScriptSelector: true,
 				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'running',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(togglePinCommand.isEnabled(providers)).toBe(false);
 		});
 
 		it('returns false when no tasks exist', () => {
 			const providers = createMockProviders({
 				showScriptSelector: false,
 				tasks: [],
-				activeTask: undefined,
-				taskStatus: undefined,
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
-		});
-
-		it('returns false when no active task', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: undefined,
-				taskStatus: undefined,
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(togglePinCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('calls killTask with active task', () => {
-			const providers = createMockProviders({
-				activeTask: 'task1',
-			});
-			killCommand.execute(providers);
-			expect(providers.tasks.killTask).toHaveBeenCalledOnce();
-			expect(providers.tasks.killTask).toHaveBeenCalledWith('task1');
+		it('calls toggleTaskPin with active task', () => {
+			const providers = createMockProviders({ activeTask: 'task1' });
+			togglePinCommand.execute(providers);
+			expect(providers.tasks.toggleTaskPin).toHaveBeenCalledOnce();
+			expect(providers.tasks.toggleTaskPin).toHaveBeenCalledWith('task1');
 		});
 
-		it('does not call killTask when no active task', () => {
-			const providers = createMockProviders({
-				activeTask: undefined,
-			});
-			killCommand.execute(providers);
-			expect(providers.tasks.killTask).not.toHaveBeenCalled();
+		it('does not call toggleTaskPin when no active task', () => {
+			const providers = createMockProviders({ activeTask: undefined });
+			togglePinCommand.execute(providers);
+			expect(providers.tasks.toggleTaskPin).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('needsConfirmation', () => {
-		it('always returns true', () => {
+		it('returns false', () => {
 			const providers = createMockProviders();
-			expect(killCommand.needsConfirmation?.(providers)).toBe(true);
-		});
-	});
-
-	describe('confirmMessage', () => {
-		it('returns message with active task name', () => {
-			const providers = createMockProviders({
-				activeTask: 'my-task',
-			});
-			const message =
-				typeof killCommand.confirmMessage === 'function'
-					? killCommand.confirmMessage(providers)
-					: killCommand.confirmMessage;
-			expect(message).toBe('Kill my-task?');
+			expect(togglePinCommand.needsConfirmation?.(providers)).toBe(false);
 		});
 	});
 });

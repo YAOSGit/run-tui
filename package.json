@@ -1,6 +1,6 @@
 {
 	"name": "@yaos-git/run-tui",
-	"version": "126.0.0",
+	"version": "126.0.1",
 	"description": "An interactive terminal UI for running npm scripts concurrently",
 	"main": "dist/cli.js",
 	"bin": {

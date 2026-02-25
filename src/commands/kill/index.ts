@@ -10,7 +10,9 @@ export const killCommand: Command = {
 	helpSection: 'General',
 	helpLabel: 'Kill task',
 	isEnabled: (p) => {
-		const taskStatus = p.view.activeTask ? p.tasks.getTaskStatus(p.view.activeTask) : undefined;
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
 		return (
 			!p.ui.showScriptSelector &&
 			p.tasks.tasks.length > 0 &&

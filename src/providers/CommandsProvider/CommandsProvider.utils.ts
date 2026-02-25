@@ -80,8 +80,7 @@ export const getDisplayKey = (keys: KeyBinding[]): string => {
 		.map((binding) => {
 			let prefix = '';
 			if (binding.ctrl) prefix += 'ctrl + ';
-			if (binding.meta)
-				prefix += `${MOD_KEY}\xA0+\xA0`;
+			if (binding.meta) prefix += `${MOD_KEY}\xA0+\xA0`;
 			// Only show shift+ if it's a visible text key or an explicit special key,
 			// since shift is technically already implied by capitalized ascii (e.g. 'N' instead of 'shift+N')
 			// but for clarity we'll show it for special commands when requested

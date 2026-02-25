@@ -1,4 +1,4 @@
-import type { Command } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import type { Command } from '../../types/Command/index.js';
 
 export const cycleFocusCommand: Command = {
 	id: 'CYCLE_FOCUS',

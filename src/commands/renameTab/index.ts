@@ -1,4 +1,4 @@
-import type { Command } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import type { Command } from '../../types/Command/index.js';
 
 export const renameTabCommand: Command = {
 	id: 'RENAME_TAB',
@@ -9,5 +9,7 @@ export const renameTabCommand: Command = {
 	helpSection: 'General',
 	helpLabel: 'Rename tab',
 	isEnabled: (providers) => providers.view.activeTask !== undefined,
-	execute: (providers) => { providers.view.openRenameInput(); },
+	execute: (providers) => {
+		providers.view.openRenameInput();
+	},
 };

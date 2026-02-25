@@ -1,4 +1,4 @@
-import type { Command } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import type { Command } from '../../types/Command/index.js';
 import { modKey, modKeyBindings } from '../../utils/platform/index.js';
 
 export const focusModeCommand: Command = {

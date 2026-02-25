@@ -10,7 +10,9 @@ export const leftArrowCommand: Command = {
 	helpSection: 'General',
 	helpLabel: 'Switch tab',
 	isEnabled: (p) => !p.ui.showScriptSelector && p.tasks.tasks.length > 0,
-	execute: (p) => { p.view.navigateLeft(); },
+	execute: (p) => {
+		p.view.navigateLeft();
+	},
 };
 
 export const rightArrowCommand: Command = {
@@ -20,5 +22,7 @@ export const rightArrowCommand: Command = {
 	displayText: 'switch',
 	footer: 'hidden', // deduplicated with leftArrowCommand
 	isEnabled: (p) => !p.ui.showScriptSelector && p.tasks.tasks.length > 0,
-	execute: (p) => { p.view.navigateRight(); },
+	execute: (p) => {
+		p.view.navigateRight();
+	},
 };

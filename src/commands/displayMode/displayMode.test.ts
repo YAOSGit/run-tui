@@ -1,19 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
-import type { TaskStatus } from '../../types/TaskStatus/index.js';
-import { killCommand } from './index.js';
+import { displayModeCommand } from './index.js';
 
 const createMockProviders = (
 	overrides: Partial<{
 		showScriptSelector: boolean;
 		tasks: string[];
-		activeTask: string | undefined;
-		taskStatus: TaskStatus | undefined;
+		pinnedTasks: string[];
+		displayMode: 'full' | 'compact';
 	}> = {},
 ): CommandProviders => ({
 	tasks: {
 		tasks: overrides.tasks ?? ['task1'],
-		pinnedTasks: [],
+		pinnedTasks: overrides.pinnedTasks ?? [],
 		tabAliases: {},
 		taskStates: {},
 		hasRunningTasks: false,
@@ -28,7 +27,7 @@ const createMockProviders = (
 		renameTask: vi.fn(),
 		moveTaskLeft: vi.fn(),
 		moveTaskRight: vi.fn(),
-		getTaskStatus: vi.fn().mockReturnValue(overrides.taskStatus ?? 'running'),
+		getTaskStatus: vi.fn(),
 	},
 	logs: {
 		addLog: vi.fn(),
@@ -38,7 +37,7 @@ const createMockProviders = (
 	},
 	view: {
 		activeTabIndex: 0,
-		activeTask: 'activeTask' in overrides ? overrides.activeTask : 'task1',
+		activeTask: 'task1',
 		logFilter: null,
 		primaryScrollOffset: 0,
 		primaryAutoScroll: true,
@@ -55,7 +54,7 @@ const createMockProviders = (
 		viewHeight: 20,
 		totalLogs: 10,
 		focusMode: false,
-		displayMode: 'full' as const,
+		displayMode: overrides.displayMode ?? ('full' as const),
 		navigateLeft: vi.fn(),
 		navigateRight: vi.fn(),
 		setActiveTabIndex: vi.fn(),
@@ -95,119 +94,85 @@ const createMockProviders = (
 	quit: vi.fn(),
 });
 
-describe('killCommand', () => {
+describe('displayModeCommand', () => {
 	it('has correct id', () => {
-		expect(killCommand.id).toBe('KILL');
-	});
-
-	it('has correct keys', () => {
-		expect(killCommand.keys).toEqual([
-			{ textKey: 'k', ctrl: false, shift: false },
-		]);
+		expect(displayModeCommand.id).toBe('DISPLAY_MODE');
 	});
 
 	it('has correct displayText', () => {
-		expect(killCommand.displayText).toBe('kill');
+		expect(displayModeCommand.displayText).toBe('Compact Mode');
 	});
 
 	describe('isEnabled', () => {
-		it('returns true when task status is running', () => {
+		it('returns true when tasks exist and selector is hidden', () => {
 			const providers = createMockProviders({
 				showScriptSelector: false,
 				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'running',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(true);
-		});
-
-		it('returns false when task status is success', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'success',
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
-		});
-
-		it('returns false when task status is error', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'error',
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(displayModeCommand.isEnabled(providers)).toBe(true);
 		});
 
 		it('returns false when script selector is shown', () => {
 			const providers = createMockProviders({
 				showScriptSelector: true,
 				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'running',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(displayModeCommand.isEnabled(providers)).toBe(false);
 		});
 
 		it('returns false when no tasks exist', () => {
 			const providers = createMockProviders({
 				showScriptSelector: false,
 				tasks: [],
-				activeTask: undefined,
-				taskStatus: undefined,
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
-		});
-
-		it('returns false when no active task', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: undefined,
-				taskStatus: undefined,
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(displayModeCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('calls killTask with active task', () => {
-			const providers = createMockProviders({
-				activeTask: 'task1',
-			});
-			killCommand.execute(providers);
-			expect(providers.tasks.killTask).toHaveBeenCalledOnce();
-			expect(providers.tasks.killTask).toHaveBeenCalledWith('task1');
+		it('calls toggleDisplayMode', () => {
+			const providers = createMockProviders();
+			displayModeCommand.execute(providers);
+			expect(providers.view.toggleDisplayMode).toHaveBeenCalledOnce();
 		});
 
-		it('does not call killTask when no active task', () => {
+		it('unpins all pinned tasks when switching from full to compact', () => {
 			const providers = createMockProviders({
-				activeTask: undefined,
+				displayMode: 'full',
+				pinnedTasks: ['task1', 'task2'],
 			});
-			killCommand.execute(providers);
-			expect(providers.tasks.killTask).not.toHaveBeenCalled();
+			displayModeCommand.execute(providers);
+			expect(providers.tasks.toggleTaskPin).toHaveBeenCalledTimes(2);
+			expect(providers.tasks.toggleTaskPin).toHaveBeenCalledWith('task1');
+			expect(providers.tasks.toggleTaskPin).toHaveBeenCalledWith('task2');
+			expect(providers.view.toggleDisplayMode).toHaveBeenCalledOnce();
+		});
+
+		it('does not unpin tasks when switching from compact to full', () => {
+			const providers = createMockProviders({
+				displayMode: 'compact',
+				pinnedTasks: ['task1'],
+			});
+			displayModeCommand.execute(providers);
+			expect(providers.tasks.toggleTaskPin).not.toHaveBeenCalled();
+			expect(providers.view.toggleDisplayMode).toHaveBeenCalledOnce();
+		});
+
+		it('does not unpin tasks when in full mode with no pinned tasks', () => {
+			const providers = createMockProviders({
+				displayMode: 'full',
+				pinnedTasks: [],
+			});
+			displayModeCommand.execute(providers);
+			expect(providers.tasks.toggleTaskPin).not.toHaveBeenCalled();
+			expect(providers.view.toggleDisplayMode).toHaveBeenCalledOnce();
 		});
 	});
 
 	describe('needsConfirmation', () => {
-		it('always returns true', () => {
+		it('returns false', () => {
 			const providers = createMockProviders();
-			expect(killCommand.needsConfirmation?.(providers)).toBe(true);
-		});
-	});
-
-	describe('confirmMessage', () => {
-		it('returns message with active task name', () => {
-			const providers = createMockProviders({
-				activeTask: 'my-task',
-			});
-			const message =
-				typeof killCommand.confirmMessage === 'function'
-					? killCommand.confirmMessage(providers)
-					: killCommand.confirmMessage;
-			expect(message).toBe('Kill my-task?');
+			expect(displayModeCommand.needsConfirmation?.(providers)).toBe(false);
 		});
 	});
 });

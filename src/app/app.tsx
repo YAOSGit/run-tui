@@ -88,8 +88,6 @@ export const AppContent: React.FC<AppContentProps> = ({
 		}
 	}, [tasks.tasks.length, keepAlive, handleQuitWithCleanup, ui]);
 
-
-
 	// Handle SIGINT
 	useEffect(() => {
 		const handleSigint = () => {
@@ -138,8 +136,6 @@ export const AppContent: React.FC<AppContentProps> = ({
 			return;
 		}
 
-
-
 		commands.handleInput(input, key);
 	});
 
@@ -148,7 +144,10 @@ export const AppContent: React.FC<AppContentProps> = ({
 		let usedHeight = 2;
 
 		if (ui.showScriptSelector || tasks.tasks.length === 0) {
-			return { logHeight: Math.max(1, effectiveHeight - usedHeight), splitLogHeight: 0 };
+			return {
+				logHeight: Math.max(1, effectiveHeight - usedHeight),
+				splitLogHeight: 0,
+			};
 		}
 
 		// TabBar takes 1 line text + 1 paddingBottom + 1 borderBottom = 3
@@ -210,24 +209,24 @@ export const AppContent: React.FC<AppContentProps> = ({
 	// Get logs for primary task
 	const activeLogs = view.activeTask
 		? logs.getLogsForTask(
-			view.activeTask,
-			view.logFilter,
-			logHeight,
-			view.primaryScrollOffset,
-		)
+				view.activeTask,
+				view.logFilter,
+				logHeight,
+				view.primaryScrollOffset,
+			)
 		: [];
 
 	// Calculate scroll info for footer indicator (uses primary pane stats)
 	const scrollInfo = view.activeTask
 		? {
-			startLine: Math.max(
-				1,
-				view.totalLogs - view.primaryScrollOffset - logHeight + 1,
-			),
-			endLine: Math.max(0, view.totalLogs - view.primaryScrollOffset),
-			totalLogs: view.totalLogs,
-			autoScroll: view.primaryAutoScroll,
-		}
+				startLine: Math.max(
+					1,
+					view.totalLogs - view.primaryScrollOffset - logHeight + 1,
+				),
+				endLine: Math.max(0, view.totalLogs - view.primaryScrollOffset),
+				totalLogs: view.totalLogs,
+				autoScroll: view.primaryAutoScroll,
+			}
 		: undefined;
 
 	// Show script selector overlay
@@ -327,63 +326,64 @@ export const AppContent: React.FC<AppContentProps> = ({
 					<Text dimColor>[Focus Mode - press {MOD_KEY}+f to exit]</Text>
 				</Box>
 			) : null}
-			{!ui.showHelp && (view.displayMode === 'compact' ? (
-				<CompactView
-					tasks={tasks.tasks}
-					taskStates={tasks.taskStates}
-					pinnedTasks={tasks.pinnedTasks}
-					tabAliases={tasks.tabAliases ?? {}}
-					activeTabIndex={view.activeTabIndex}
-					width={effectiveWidth}
-					height={Math.min(tasks.tasks.length, logHeight)}
-				/>
-			) : (
-				<Box flexDirection="column" gap={0} flexGrow={1}>
-					{/* Primary Pane */}
-					<Box
-						flexDirection="column"
-						flexGrow={1}
-						borderStyle="single"
-						borderColor={view.activePane === 'primary' ? 'cyan' : 'gray'}
-					>
-						<LogView
-							logs={activeLogs}
-							isRunning={activeTaskStatus === 'running'}
-							height={logHeight}
-							width={effectiveWidth - 2}
-							lineOverflow={ui.lineOverflow}
-							showTimestamps={view.showTimestamps}
-							searchQuery={view.searchQuery}
-						/>
-					</Box>
-
-					{/* Secondary Split Pane */}
-					{view.splitTaskName && (
+			{!ui.showHelp &&
+				(view.displayMode === 'compact' ? (
+					<CompactView
+						tasks={tasks.tasks}
+						taskStates={tasks.taskStates}
+						pinnedTasks={tasks.pinnedTasks}
+						tabAliases={tasks.tabAliases ?? {}}
+						activeTabIndex={view.activeTabIndex}
+						width={effectiveWidth}
+						height={Math.min(tasks.tasks.length, logHeight)}
+					/>
+				) : (
+					<Box flexDirection="column" gap={0} flexGrow={1}>
+						{/* Primary Pane */}
 						<Box
 							flexDirection="column"
 							flexGrow={1}
 							borderStyle="single"
-							borderColor={view.activePane === 'split' ? 'cyan' : 'gray'}
-							marginTop={1} // Gap between panes
+							borderColor={view.activePane === 'primary' ? 'cyan' : 'gray'}
 						>
-							<Box backgroundColor="gray" paddingX={1} marginBottom={1}>
-								<Text color="black" bold>
-									{displaySplitTaskName}
-								</Text>
-							</Box>
 							<LogView
-								logs={splitLogs}
-								isRunning={splitTaskStatus === 'running'}
-								height={splitLogHeight}
+								logs={activeLogs}
+								isRunning={activeTaskStatus === 'running'}
+								height={logHeight}
 								width={effectiveWidth - 2}
 								lineOverflow={ui.lineOverflow}
 								showTimestamps={view.showTimestamps}
 								searchQuery={view.searchQuery}
 							/>
 						</Box>
-					)}
-				</Box>
-			))}
+
+						{/* Secondary Split Pane */}
+						{view.splitTaskName && (
+							<Box
+								flexDirection="column"
+								flexGrow={1}
+								borderStyle="single"
+								borderColor={view.activePane === 'split' ? 'cyan' : 'gray'}
+								marginTop={1} // Gap between panes
+							>
+								<Box backgroundColor="gray" paddingX={1} marginBottom={1}>
+									<Text color="black" bold>
+										{displaySplitTaskName}
+									</Text>
+								</Box>
+								<LogView
+									logs={splitLogs}
+									isRunning={splitTaskStatus === 'running'}
+									height={splitLogHeight}
+									width={effectiveWidth - 2}
+									lineOverflow={ui.lineOverflow}
+									showTimestamps={view.showTimestamps}
+									searchQuery={view.searchQuery}
+								/>
+							</Box>
+						)}
+					</Box>
+				))}
 
 			{ui.showHelp ? (
 				<HelpMenu width={effectiveWidth - 4} />

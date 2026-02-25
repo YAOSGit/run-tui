@@ -23,7 +23,7 @@ export const exportCurrentLogsCommand: Command = {
 		if (!task) return;
 		const logs = p.logs.getLogsForTask(task, null);
 		const text = formatLogsAsText(logs);
-		saveLogsToFile(task, text).catch(() => { });
+		saveLogsToFile(task, text).catch(() => {});
 	},
 };
 
@@ -40,7 +40,7 @@ export const exportAllLogsCommand: Command = {
 		for (const task of p.tasks.tasks) {
 			const logs = p.logs.getLogsForTask(task, null);
 			const text = formatLogsAsText(logs);
-			saveLogsToFile(task, text).catch(() => { });
+			saveLogsToFile(task, text).catch(() => {});
 		}
 	},
 };
@@ -60,6 +60,6 @@ export const copyCurrentLogsCommand: Command = {
 		if (!task) return;
 		const logs = p.logs.getLogsForTask(task, null);
 		const text = formatLogsAsText(logs);
-		copyToClipboard(text).catch(() => { });
+		copyToClipboard(text).catch(() => {});
 	},
 };

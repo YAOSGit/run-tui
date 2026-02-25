@@ -9,16 +9,22 @@ export const closeTabCommand: Command = {
 	helpSection: 'General',
 	helpLabel: 'Close tab',
 	isEnabled: (p) => {
-		const taskStatus = p.view.activeTask ? p.tasks.getTaskStatus(p.view.activeTask) : undefined;
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
 		return (
 			!p.ui.showScriptSelector &&
 			p.tasks.tasks.length > 0 &&
-			(taskStatus === 'success' || taskStatus === 'error' || taskStatus === 'running')
+			(taskStatus === 'success' ||
+				taskStatus === 'error' ||
+				taskStatus === 'running')
 		);
 	},
 	needsConfirmation: () => true,
 	confirmMessage: (p) => {
-		const taskStatus = p.view.activeTask ? p.tasks.getTaskStatus(p.view.activeTask) : undefined;
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
 		return taskStatus === 'running'
 			? `Kill & close ${p.view.activeTask}?`
 			: `Close ${p.view.activeTask}?`;

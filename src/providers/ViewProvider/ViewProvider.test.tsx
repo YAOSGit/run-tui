@@ -25,21 +25,21 @@ vi.mock('../../hooks/useProcessManager/index.js', () => ({
 
 const createWrapper =
 	(props: { initialTasks?: string[]; viewHeight?: number } = {}) =>
-		({ children }: { children: React.ReactNode }) => (
-			<LogsProvider>
-				<TasksProvider
-					initialTasks={props.initialTasks ?? ['task1', 'task2']}
-					packageManager="npm"
-					onLogEntry={vi.fn()}
-					restartConfig={{ enabled: true, delayMs: 1000, maxAttempts: 5 }}
-					scriptArgs={[]}
-				>
-					<ViewProvider viewHeight={props.viewHeight ?? 20}>
-						{children}
-					</ViewProvider>
-				</TasksProvider>
-			</LogsProvider>
-		);
+	({ children }: { children: React.ReactNode }) => (
+		<LogsProvider>
+			<TasksProvider
+				initialTasks={props.initialTasks ?? ['task1', 'task2']}
+				packageManager="npm"
+				onLogEntry={vi.fn()}
+				restartConfig={{ enabled: true, delayMs: 1000, maxAttempts: 5 }}
+				scriptArgs={[]}
+			>
+				<ViewProvider viewHeight={props.viewHeight ?? 20}>
+					{children}
+				</ViewProvider>
+			</TasksProvider>
+		</LogsProvider>
+	);
 
 describe('ViewProvider', () => {
 	describe('useView hook', () => {

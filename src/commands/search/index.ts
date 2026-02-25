@@ -9,6 +9,9 @@ export const searchCommand: Command = {
 	footerOrder: 60,
 	helpSection: 'Logs (Ctrl)',
 	helpLabel: 'Search logs',
-	isEnabled: (p) => !p.ui.showScriptSelector && p.tasks.tasks.length > 0 && !p.view.showSearch,
-	execute: (p) => { p.view.openSearch(); },
+	isEnabled: (p) =>
+		!p.ui.showScriptSelector && p.tasks.tasks.length > 0 && !p.view.showSearch,
+	execute: (p) => {
+		p.view.openSearch();
+	},
 };

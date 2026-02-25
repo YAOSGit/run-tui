@@ -16,9 +16,9 @@ export const modKey = (key: string): string => `${MOD_KEY}\xA0+\xA0${key}`;
  * Map of letter → macOS composed character.
  */
 const DARWIN_OPT_CHARS: Record<string, string> = {
-    f: 'ƒ',
-    m: 'µ',
-    p: 'π',
+	f: 'ƒ',
+	m: 'µ',
+	p: 'π',
 };
 
 /**
@@ -27,11 +27,11 @@ const DARWIN_OPT_CHARS: Record<string, string> = {
  * On other platforms, alt+letter is reported as meta=true + the plain letter.
  */
 export const modKeyBindings = (
-    letter: string,
+	letter: string,
 ): Array<{ textKey: string; meta: boolean }> => {
-    if (process.platform === 'darwin') {
-        const composed = DARWIN_OPT_CHARS[letter] ?? letter;
-        return [{ textKey: composed, meta: false }];
-    }
-    return [{ textKey: letter, meta: true }];
+	if (process.platform === 'darwin') {
+		const composed = DARWIN_OPT_CHARS[letter] ?? letter;
+		return [{ textKey: composed, meta: false }];
+	}
+	return [{ textKey: letter, meta: true }];
 };

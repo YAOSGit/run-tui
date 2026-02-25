@@ -32,14 +32,16 @@ export function Footer({
 
 	// Add priority commands
 	for (const cmd of priorityCommands) {
-		const cmdWidth = 3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
+		const cmdWidth =
+			3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
 		truncatedCommands.push(cmd);
 		currentWidth += cmdWidth;
 	}
 
 	// Fill remainder of space with optional commands
 	for (const cmd of optionalCommands) {
-		const cmdWidth = 3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
+		const cmdWidth =
+			3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
 		if (currentWidth + cmdWidth <= availableWidth) {
 			truncatedCommands.push(cmd);
 			currentWidth += cmdWidth;
@@ -49,7 +51,9 @@ export function Footer({
 	}
 
 	// Re-sort back to original chronological order
-	const finalCommands = commands.filter((cmd) => truncatedCommands.includes(cmd));
+	const finalCommands = commands.filter((cmd) =>
+		truncatedCommands.includes(cmd),
+	);
 
 	return (
 		<Box marginTop={1} flexDirection="column" gap={1}>

@@ -13,7 +13,7 @@ import {
 import { filterCommand } from '../../commands/filter/index.js';
 import { focusModeCommand } from '../../commands/focusMode/index.js';
 import { helpCommand } from '../../commands/help/index.js';
-import { killCommand, killAllCommand } from '../../commands/kill/index.js';
+import { killAllCommand, killCommand } from '../../commands/kill/index.js';
 import { lineOverflowCommand } from '../../commands/lineOverflow/index.js';
 import {
 	leftArrowCommand,
@@ -26,7 +26,10 @@ import { quitCommand } from '../../commands/quit/index.js';
 import { renameTabCommand } from '../../commands/renameTab/index.js';
 import { reorderTabLeftCommand } from '../../commands/reorderTabLeft/index.js';
 import { reorderTabRightCommand } from '../../commands/reorderTabRight/index.js';
-import { restartCommand, restartAllCommand } from '../../commands/restart/index.js';
+import {
+	restartAllCommand,
+	restartCommand,
+} from '../../commands/restart/index.js';
 import {
 	scrollDownCommand,
 	scrollToBottomCommand,

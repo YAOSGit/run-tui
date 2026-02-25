@@ -1,18 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
-import type { TaskStatus } from '../../types/TaskStatus/index.js';
-import { killCommand } from './index.js';
+import { reorderTabRightCommand } from './index.js';
 
 const createMockProviders = (
 	overrides: Partial<{
 		showScriptSelector: boolean;
 		tasks: string[];
 		activeTask: string | undefined;
-		taskStatus: TaskStatus | undefined;
 	}> = {},
 ): CommandProviders => ({
 	tasks: {
-		tasks: overrides.tasks ?? ['task1'],
+		tasks: overrides.tasks ?? ['task1', 'task2', 'task3'],
 		pinnedTasks: [],
 		tabAliases: {},
 		taskStates: {},
@@ -28,7 +26,7 @@ const createMockProviders = (
 		renameTask: vi.fn(),
 		moveTaskLeft: vi.fn(),
 		moveTaskRight: vi.fn(),
-		getTaskStatus: vi.fn().mockReturnValue(overrides.taskStatus ?? 'running'),
+		getTaskStatus: vi.fn(),
 	},
 	logs: {
 		addLog: vi.fn(),
@@ -38,7 +36,7 @@ const createMockProviders = (
 	},
 	view: {
 		activeTabIndex: 0,
-		activeTask: 'activeTask' in overrides ? overrides.activeTask : 'task1',
+		activeTask: 'activeTask' in overrides ? overrides.activeTask : 'task2',
 		logFilter: null,
 		primaryScrollOffset: 0,
 		primaryAutoScroll: true,
@@ -95,119 +93,89 @@ const createMockProviders = (
 	quit: vi.fn(),
 });
 
-describe('killCommand', () => {
+describe('reorderTabRightCommand', () => {
 	it('has correct id', () => {
-		expect(killCommand.id).toBe('KILL');
-	});
-
-	it('has correct keys', () => {
-		expect(killCommand.keys).toEqual([
-			{ textKey: 'k', ctrl: false, shift: false },
-		]);
+		expect(reorderTabRightCommand.id).toBe('REORDER_TAB_RIGHT');
 	});
 
 	it('has correct displayText', () => {
-		expect(killCommand.displayText).toBe('kill');
+		expect(reorderTabRightCommand.displayText).toBe('Move tab right');
+	});
+
+	it('has correct keys', () => {
+		expect(reorderTabRightCommand.keys).toEqual([
+			{ textKey: 'f', meta: true },
+			{ rightArrow: true, meta: true, shift: false, ctrl: false },
+		]);
 	});
 
 	describe('isEnabled', () => {
-		it('returns true when task status is running', () => {
+		it('returns true when active task is not at the last position', () => {
 			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'running',
+				tasks: ['task1', 'task2', 'task3'],
+				activeTask: 'task2',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(true);
+			expect(reorderTabRightCommand.isEnabled(providers)).toBe(true);
 		});
 
-		it('returns false when task status is success', () => {
+		it('returns false when active task is at the last position', () => {
 			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'success',
+				tasks: ['task1', 'task2', 'task3'],
+				activeTask: 'task3',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
-		});
-
-		it('returns false when task status is error', () => {
-			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
-				activeTask: 'task1',
-				taskStatus: 'error',
-			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(reorderTabRightCommand.isEnabled(providers)).toBe(false);
 		});
 
 		it('returns false when script selector is shown', () => {
 			const providers = createMockProviders({
 				showScriptSelector: true,
-				tasks: ['task1'],
+				tasks: ['task1', 'task2'],
 				activeTask: 'task1',
-				taskStatus: 'running',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(reorderTabRightCommand.isEnabled(providers)).toBe(false);
 		});
 
-		it('returns false when no tasks exist', () => {
+		it('returns false when only one task exists', () => {
 			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: [],
-				activeTask: undefined,
-				taskStatus: undefined,
+				tasks: ['task1'],
+				activeTask: 'task1',
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(reorderTabRightCommand.isEnabled(providers)).toBe(false);
 		});
 
 		it('returns false when no active task', () => {
 			const providers = createMockProviders({
-				showScriptSelector: false,
-				tasks: ['task1'],
+				tasks: ['task1', 'task2'],
 				activeTask: undefined,
-				taskStatus: undefined,
 			});
-			expect(killCommand.isEnabled(providers)).toBe(false);
+			expect(reorderTabRightCommand.isEnabled(providers)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('calls killTask with active task', () => {
+		it('calls moveTaskRight with active task', () => {
 			const providers = createMockProviders({
+				tasks: ['task1', 'task2'],
 				activeTask: 'task1',
 			});
-			killCommand.execute(providers);
-			expect(providers.tasks.killTask).toHaveBeenCalledOnce();
-			expect(providers.tasks.killTask).toHaveBeenCalledWith('task1');
+			reorderTabRightCommand.execute(providers);
+			expect(providers.tasks.moveTaskRight).toHaveBeenCalledOnce();
+			expect(providers.tasks.moveTaskRight).toHaveBeenCalledWith('task1');
 		});
 
-		it('does not call killTask when no active task', () => {
+		it('does not call moveTaskRight when no active task', () => {
 			const providers = createMockProviders({
 				activeTask: undefined,
 			});
-			killCommand.execute(providers);
-			expect(providers.tasks.killTask).not.toHaveBeenCalled();
+			reorderTabRightCommand.execute(providers);
+			expect(providers.tasks.moveTaskRight).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('needsConfirmation', () => {
-		it('always returns true', () => {
+		it('returns false', () => {
 			const providers = createMockProviders();
-			expect(killCommand.needsConfirmation?.(providers)).toBe(true);
-		});
-	});
-
-	describe('confirmMessage', () => {
-		it('returns message with active task name', () => {
-			const providers = createMockProviders({
-				activeTask: 'my-task',
-			});
-			const message =
-				typeof killCommand.confirmMessage === 'function'
-					? killCommand.confirmMessage(providers)
-					: killCommand.confirmMessage;
-			expect(message).toBe('Kill my-task?');
+			expect(reorderTabRightCommand.needsConfirmation?.(providers)).toBe(false);
 		});
 	});
 });

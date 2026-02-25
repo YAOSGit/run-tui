@@ -261,14 +261,14 @@ export const useViewState = ({
 		if (!searchQuery) return [];
 		return activeLogs
 			.map((log: LogEntry, index: number) =>
-				log.text.toLowerCase().includes(searchQuery.toLowerCase())
-					? index
-					: -1,
+				log.text.toLowerCase().includes(searchQuery.toLowerCase()) ? index : -1,
 			)
 			.filter((index: number) => index !== -1);
 	}, [activeLogs, searchQuery]);
 
-	const [currentMatchIndex, setCurrentMatchIndex] = useState<number | null>(null);
+	const [currentMatchIndex, setCurrentMatchIndex] = useState<number | null>(
+		null,
+	);
 
 	// Auto reset match index on query change
 	useEffect(() => {

@@ -1,11 +1,8 @@
 import { exec } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { promisify } from 'node:util';
 import type { LogEntry } from '../../types/LogEntry/index.js';
 import { LOG_TYPE } from '../../types/LogType/index.js';
-
-const _execAsync = promisify(exec);
 
 /**
  * Formats log entries as plain text.

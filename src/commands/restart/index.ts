@@ -9,15 +9,22 @@ export const restartCommand: Command = {
 	helpSection: 'General',
 	helpLabel: 'Restart task',
 	isEnabled: (p) => {
-		const taskStatus = p.view.activeTask ? p.tasks.getTaskStatus(p.view.activeTask) : undefined;
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
 		return (
 			!p.ui.showScriptSelector &&
 			p.tasks.tasks.length > 0 &&
-			(taskStatus === 'success' || taskStatus === 'error' || taskStatus === 'restarting' || taskStatus === 'running')
+			(taskStatus === 'success' ||
+				taskStatus === 'error' ||
+				taskStatus === 'restarting' ||
+				taskStatus === 'running')
 		);
 	},
 	needsConfirmation: (p) => {
-		const taskStatus = p.view.activeTask ? p.tasks.getTaskStatus(p.view.activeTask) : undefined;
+		const taskStatus = p.view.activeTask
+			? p.tasks.getTaskStatus(p.view.activeTask)
+			: undefined;
 		return taskStatus === 'running';
 	},
 	confirmMessage: (p) => `Restart ${p.view.activeTask}?`,
@@ -42,7 +49,12 @@ export const restartAllCommand: Command = {
 		if (p.ui.showScriptSelector || p.tasks.tasks.length === 0) return false;
 		return p.tasks.tasks.some((task) => {
 			const status = p.tasks.getTaskStatus(task);
-			return status === 'success' || status === 'error' || status === 'running' || status === 'restarting';
+			return (
+				status === 'success' ||
+				status === 'error' ||
+				status === 'running' ||
+				status === 'restarting'
+			);
 		});
 	},
 	needsConfirmation: (p) => {

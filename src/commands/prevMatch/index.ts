@@ -10,6 +10,6 @@ export const prevMatchCommand: Command = {
 		!p.view.showSearch &&
 		p.view.searchQuery.length > 0,
 	execute: (p) => {
-		p.onPrevMatch?.();
+		p.view.prevMatch();
 	},
 };

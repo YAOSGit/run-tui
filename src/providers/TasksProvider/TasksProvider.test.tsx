@@ -31,17 +31,17 @@ const createWrapper =
 			packageManager?: 'npm' | 'yarn' | 'pnpm' | 'bun';
 		} = {},
 	) =>
-		({ children }: { children: React.ReactNode }) => (
-			<TasksProvider
-				initialTasks={props.initialTasks ?? ['task1']}
-				packageManager={props.packageManager ?? 'npm'}
-				restartConfig={{ enabled: false, delayMs: 100, maxAttempts: 1 }}
-				scriptArgs={[]}
-				onLogEntry={vi.fn()}
-			>
-				{children}
-			</TasksProvider>
-		);
+	({ children }: { children: React.ReactNode }) => (
+		<TasksProvider
+			initialTasks={props.initialTasks ?? ['task1']}
+			packageManager={props.packageManager ?? 'npm'}
+			restartConfig={{ enabled: false, delayMs: 100, maxAttempts: 1 }}
+			scriptArgs={[]}
+			onLogEntry={vi.fn()}
+		>
+			{children}
+		</TasksProvider>
+	);
 
 describe('TasksProvider', () => {
 	describe('useTasks hook', () => {

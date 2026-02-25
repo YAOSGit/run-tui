@@ -3,7 +3,7 @@ import chalk from 'chalk';
 // Quick check if a string contains ANSI escape codes
 const ANSI_REGEX =
 	// biome-ignore lint/suspicious/noControlCharactersInRegex: checking ansi escapes natively requires control chars
-	/[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[-a-zA-Z\d\\/#&.:=?%@~_]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PR-TZcf-ntqry=><~]))/g;
+	/[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[-a-zA-Z\d\\/#&.:=?%@~_]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PR-TZcf-ntqry=><~]))/;
 
 export const hasAnsiCodes = (text: string): boolean => {
 	return ANSI_REGEX.test(text);

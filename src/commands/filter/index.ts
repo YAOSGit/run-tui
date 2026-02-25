@@ -10,5 +10,7 @@ export const filterCommand: Command = {
 	helpSection: 'Logs (Ctrl)',
 	helpLabel: 'Toggle output filter',
 	isEnabled: (p) => !p.ui.showScriptSelector && p.tasks.tasks.length > 0,
-	execute: (p) => { p.view.cycleLogFilter(); },
+	execute: (p) => {
+		p.view.cycleLogFilter();
+	},
 };

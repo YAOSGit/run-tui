@@ -168,7 +168,7 @@ export class PTYRunner extends EventEmitter {
 	async cleanup(): Promise<void> {
 		if (this.pty) {
 			this.kill();
-			await this.waitForExit().catch(() => { });
+			await this.waitForExit().catch(() => {});
 			this.pty = null;
 		}
 		this.output = '';

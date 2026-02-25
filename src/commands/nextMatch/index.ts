@@ -10,6 +10,6 @@ export const nextMatchCommand: Command = {
 		!p.view.showSearch &&
 		p.view.searchQuery.length > 0,
 	execute: (p) => {
-		p.onNextMatch?.();
+		p.view.nextMatch();
 	},
 };

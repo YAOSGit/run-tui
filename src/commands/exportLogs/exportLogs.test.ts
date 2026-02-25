@@ -216,9 +216,7 @@ describe('copyCurrentLogsCommand', () => {
 	});
 
 	it('has correct key (y with ctrl)', () => {
-		expect(copyCurrentLogsCommand.keys).toEqual([
-			{ textKey: 'y', ctrl: true },
-		]);
+		expect(copyCurrentLogsCommand.keys).toEqual([{ textKey: 'y', ctrl: true }]);
 	});
 
 	it('has correct displayText', () => {

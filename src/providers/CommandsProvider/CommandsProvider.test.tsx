@@ -44,28 +44,28 @@ const createDefaultKey = (): Key => ({
 
 const createWrapper =
 	(props: { initialTasks?: string[]; keepAlive?: boolean } = {}) =>
-		({ children }: { children: React.ReactNode }) => (
-			<LogsProvider>
-				<TasksProvider
-					initialTasks={props.initialTasks ?? ['task1', 'task2']}
-					packageManager="npm"
-					onLogEntry={vi.fn()}
-					restartConfig={{ enabled: false, delayMs: 0, maxAttempts: 0 }}
-					scriptArgs={[]}
-				>
-					<UIStateProvider>
-						<ViewProvider viewHeight={20}>
-							<CommandsProvider
-								keepAlive={props.keepAlive ?? false}
-								onQuit={vi.fn()}
-							>
-								{children}
-							</CommandsProvider>
-						</ViewProvider>
-					</UIStateProvider>
-				</TasksProvider>
-			</LogsProvider>
-		);
+	({ children }: { children: React.ReactNode }) => (
+		<LogsProvider>
+			<TasksProvider
+				initialTasks={props.initialTasks ?? ['task1', 'task2']}
+				packageManager="npm"
+				onLogEntry={vi.fn()}
+				restartConfig={{ enabled: false, delayMs: 0, maxAttempts: 0 }}
+				scriptArgs={[]}
+			>
+				<UIStateProvider>
+					<ViewProvider viewHeight={20}>
+						<CommandsProvider
+							keepAlive={props.keepAlive ?? false}
+							onQuit={vi.fn()}
+						>
+							{children}
+						</CommandsProvider>
+					</ViewProvider>
+				</UIStateProvider>
+			</TasksProvider>
+		</LogsProvider>
+	);
 
 describe('CommandsProvider', () => {
 	describe('useCommands hook', () => {

@@ -1,6 +1,7 @@
 import type { Key } from 'ink';
 import type React from 'react';
 import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
+import type { Command } from '../../types/Command/index.js';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { useLogs } from '../LogsProvider/index.js';
 import { useTasks } from '../TasksProvider/index.js';
@@ -12,7 +13,6 @@ import {
 	CONFIRM_YES_KEYS,
 } from './CommandsProvider.consts.js';
 import type {
-	Command,
 	CommandProviders,
 	CommandsContextValue,
 	CommandsProviderProps,
@@ -25,8 +25,6 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 	children,
 	keepAlive,
 	onQuit,
-	onNextMatch,
-	onPrevMatch,
 }) => {
 	const tasks = useTasks();
 	const logs = useLogs();
@@ -44,11 +42,9 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 			view,
 			ui,
 			keepAlive: keepAlive ?? false,
-			quit: onQuit ?? (() => { }),
-			onNextMatch,
-			onPrevMatch,
+			quit: onQuit ?? (() => {}),
 		}),
-		[tasks, logs, view, ui, keepAlive, onQuit, onNextMatch, onPrevMatch],
+		[tasks, logs, view, ui, keepAlive, onQuit],
 	);
 
 	const handleInput = useCallback(
@@ -143,8 +139,12 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 		}
 
 		return [
-			...priority.sort((a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999)),
-			...optional.sort((a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999)),
+			...priority.sort(
+				(a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999),
+			),
+			...optional.sort(
+				(a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999),
+			),
 		];
 	}, [providers]);
 
