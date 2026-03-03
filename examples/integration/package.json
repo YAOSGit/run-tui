@@ -1,0 +1,18 @@
+{
+	"name": "run-tui-integration-example",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Integration example demonstrating full run-tui capabilities",
+	"scripts": {
+		"dev:server": "node scripts/dev-server.js",
+		"dev:worker": "node scripts/dev-worker.js",
+		"build": "node scripts/build.js",
+		"test:unit": "node scripts/test-unit.js",
+		"test:e2e": "node scripts/test-e2e.js",
+		"lint": "node scripts/lint.js",
+		"typecheck": "node scripts/typecheck.js",
+		"storybook": "node scripts/storybook.js",
+		"codegen": "node scripts/codegen.js",
+		"db:migrate": "node scripts/db-migrate.js"
+	}
+}

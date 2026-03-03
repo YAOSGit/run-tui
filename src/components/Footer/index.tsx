@@ -61,7 +61,7 @@ export function Footer({
 				<Box justifyContent="space-between">
 					<StatusMessage variant={STATUS_VARIANTS[status]}>
 						<Text bold>{activeTask}</Text>
-						<Text dimColor> - {status}</Text>
+						<Text dimColor> - {status.toUpperCase()}</Text>
 						<Text dimColor> [{logFilter ?? 'all'}]</Text>
 					</StatusMessage>
 					{scrollIndicator}

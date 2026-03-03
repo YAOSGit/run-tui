@@ -59,7 +59,7 @@ export const CompactView: React.FC<CompactViewProps> = ({
 						</Text>
 						<Box width={15} flexShrink={0}>
 							<Text color={statusColor} wrap="truncate">
-								[{state?.status ?? TASK_STATUS.PENDING}]
+								[{(state?.status ?? TASK_STATUS.PENDING).toUpperCase()}]
 							</Text>
 						</Box>
 						<Box width={30} flexShrink={0}>

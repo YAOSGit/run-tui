@@ -19,7 +19,7 @@ const PACKAGE_MANAGERS: PackageManager[] = ['npm', 'yarn', 'pnpm', 'bun'];
 const cwd = process.cwd();
 const packageJsonPath = path.join(cwd, 'package.json');
 
-let packageJson: { scripts?: Record<string, string> };
+let packageJson: { scripts?: Record<string, string> } = {};
 
 if (!fs.existsSync(packageJsonPath)) {
 	console.error('Error: No package.json found in current directory.');
@@ -27,7 +27,7 @@ if (!fs.existsSync(packageJsonPath)) {
 	console.error(
 		'\nMake sure you run this command from a directory with a package.json file.',
 	);
-	process.exit(2);
+	process.exitCode = 2;
 }
 
 try {
@@ -36,19 +36,24 @@ try {
 		packageJson = JSON.parse(data) as { scripts?: Record<string, string> };
 	} catch (parseError) {
 		console.error('Error: package.json contains invalid JSON.');
-		console.error(`Parse error: ${(parseError as Error).message}`);
-		process.exit(3);
+		console.error(
+			`Parse error: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+		);
+		process.exitCode = 3;
 	}
 } catch (readError) {
-	if ((readError as NodeJS.ErrnoException).code === 'EACCES') {
+	if (
+		readError instanceof Error &&
+		(readError as NodeJS.ErrnoException).code === 'EACCES'
+	) {
 		console.error('Error: Permission denied reading package.json.');
 		console.error('Check file permissions and try again.');
 	} else {
 		console.error(
-			`Error reading package.json: ${(readError as Error).message}`,
+			`Error reading package.json: ${readError instanceof Error ? readError.message : String(readError)}`,
 		);
 	}
-	process.exit(4);
+	process.exitCode = 4;
 }
 
 const availableScripts = Object.keys(packageJson.scripts ?? {});
@@ -125,7 +130,8 @@ program
 				console.error(
 					`Error: Invalid package manager "${options.packageManager}". Must be one of: ${PACKAGE_MANAGERS.join(', ')}`,
 				);
-				process.exit(1);
+				process.exitCode = 1;
+				return;
 			}
 
 			let requestedScripts: string[];
@@ -150,7 +156,8 @@ program
 					console.error(
 						`Error: Invalid regex pattern(s): ${invalidPatterns.join(', ')}`,
 					);
-					process.exit(1);
+					process.exitCode = 1;
+					return;
 				}
 
 				requestedScripts = Array.from(matchedScripts);
@@ -161,7 +168,8 @@ program
 					for (const s of availableScripts) {
 						console.log(`  - ${s}`);
 					}
-					process.exit(1);
+					process.exitCode = 1;
+					return;
 				}
 			} else {
 				const missingScripts = scripts.filter(
@@ -171,7 +179,8 @@ program
 					console.error(
 						`Error: The following scripts are missing from package.json: ${missingScripts.join(', ')}`,
 					);
-					process.exit(1);
+					process.exitCode = 1;
+					return;
 				}
 
 				// Support duplicate tabs intentionally by not using `Set` reductions

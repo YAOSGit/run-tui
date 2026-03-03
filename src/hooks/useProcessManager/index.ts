@@ -193,6 +193,8 @@ export const useProcessManager = ({
 				}
 
 				if (code === 0) {
+					spawnedTasks.current.delete(taskName);
+					childProcesses.current.delete(taskName);
 					onTaskStateChange(taskName, {
 						status: TASK_STATUS.SUCCESS,
 						exitCode: code,

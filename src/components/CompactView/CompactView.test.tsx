@@ -76,8 +76,8 @@ describe('CompactView', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('running');
-		expect(lastFrame()).toContain('success');
+		expect(lastFrame()).toContain('RUNNING');
+		expect(lastFrame()).toContain('SUCCESS');
 	});
 
 	it('shows pending status for tasks without state', () => {
@@ -96,7 +96,7 @@ describe('CompactView', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('pending');
+		expect(lastFrame()).toContain('PENDING');
 	});
 
 	it('shows error status', () => {
@@ -117,7 +117,7 @@ describe('CompactView', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('error');
+		expect(lastFrame()).toContain('ERROR');
 	});
 
 	it('highlights the active task with cursor indicator', () => {
@@ -202,6 +202,6 @@ describe('CompactView', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('restarting');
+		expect(lastFrame()).toContain('RESTARTING');
 	});
 });

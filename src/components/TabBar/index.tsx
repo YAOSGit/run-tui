@@ -193,7 +193,7 @@ export function TabBar({
 								<Spinner />
 							) : (
 								<Badge color={TAB_BAR_STATUS_COLORS[taskState?.status]}>
-									{taskState?.status}
+									{taskState?.status.toUpperCase()}
 								</Badge>
 							)}
 						</Box>

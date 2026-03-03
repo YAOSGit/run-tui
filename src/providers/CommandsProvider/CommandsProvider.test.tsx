@@ -1,5 +1,5 @@
 /**
- * @vitest-environment happy-dom
+ * @vitest-environment jsdom
  */
 import { act, renderHook } from '@testing-library/react';
 import type { Key } from 'ink';

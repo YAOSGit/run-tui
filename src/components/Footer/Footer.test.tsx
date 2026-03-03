@@ -37,7 +37,7 @@ describe('Footer', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('success');
+		expect(lastFrame()).toContain('SUCCESS');
 	});
 
 	it('displays pending status', () => {
@@ -50,7 +50,7 @@ describe('Footer', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('pending');
+		expect(lastFrame()).toContain('PENDING');
 	});
 
 	it('displays error status', () => {
@@ -63,7 +63,7 @@ describe('Footer', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('error');
+		expect(lastFrame()).toContain('ERROR');
 	});
 
 	it('displays "all" when log filter is null', () => {
