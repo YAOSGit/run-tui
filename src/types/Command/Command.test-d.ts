@@ -1,7 +1,8 @@
 import { assertType, describe, expectTypeOf, it } from 'vitest';
 import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import { getDisplayKey } from '../../providers/CommandsProvider/CommandsProvider.utils.js';
 import type { KeyBinding } from '../KeyBinding/index.js';
-import { type Command, getDisplayKey } from './index.js';
+import type { Command } from './index.js';
 
 describe('Command type tests', () => {
 	it('Command has correct required property types', () => {

@@ -6,7 +6,7 @@ import { Command } from 'commander';
 import { render } from 'ink';
 import type { PackageManager } from '../types/PackageManager/index.js';
 import type { RestartConfig } from '../types/RestartConfig/index.js';
-import App from './index.js';
+import { App } from './index.js';
 
 // Version is injected at build time by esbuild
 declare const __CLI_VERSION__: string;

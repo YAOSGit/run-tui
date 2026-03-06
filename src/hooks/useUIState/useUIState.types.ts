@@ -1,4 +1,1 @@
-export interface PendingConfirmation {
-	message: string;
-	onConfirm: () => void;
-}
+export type { PendingConfirmation } from '../../providers/UIStateProvider/UIStateProvider.types.js';

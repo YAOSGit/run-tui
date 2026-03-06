@@ -3,16 +3,16 @@ import type { RestartConfig } from '../../types/RestartConfig/index.js';
 import type { TaskState } from '../../types/TaskState/index.js';
 import type { TaskStatus } from '../../types/TaskStatus/index.js';
 
-export interface TasksProviderProps {
+export type TasksProviderProps = {
 	children: React.ReactNode;
 	initialTasks: string[];
 	packageManager: PackageManager;
 	restartConfig: RestartConfig;
 	scriptArgs: string[];
 	onLogEntry: (entry: import('../../types/LogEntry/index.js').LogEntry) => void;
-}
+};
 
-export interface TasksContextValue {
+export type TasksContextValue = {
 	// State
 	tasks: string[];
 	pinnedTasks: string[];
@@ -35,4 +35,4 @@ export interface TasksContextValue {
 
 	// Query
 	getTaskStatus: (taskName: string) => TaskStatus | undefined;
-}
+};

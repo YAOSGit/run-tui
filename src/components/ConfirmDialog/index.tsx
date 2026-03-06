@@ -3,11 +3,11 @@ import { Box, Text } from 'ink';
 import type { TaskStatus } from '../../types/TaskStatus/index.js';
 import { STATUS_VARIANTS } from '../Footer/Footer.consts.js';
 
-export interface ConfirmDialogProps {
+export type ConfirmDialogProps = {
 	message: string;
 	activeTask?: string;
 	status?: TaskStatus;
-}
+};
 
 export function ConfirmDialog({
 	message,

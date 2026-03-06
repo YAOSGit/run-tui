@@ -1,11 +1,11 @@
 import type { LogType } from '../../types/LogType/index.js';
 
-export interface ViewProviderProps {
+export type ViewProviderProps = {
 	children: React.ReactNode;
 	viewHeight: number;
-}
+};
 
-export interface ViewContextValue {
+export type ViewContextValue = {
 	// State
 	activeTabIndex: number;
 	activeTask: string | undefined;
@@ -51,4 +51,4 @@ export interface ViewContextValue {
 	cyclePaneFocus: () => void;
 	nextMatch: () => void;
 	prevMatch: () => void;
-}
+};

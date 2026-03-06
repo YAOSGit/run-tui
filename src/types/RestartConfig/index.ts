@@ -1,9 +1,9 @@
-export interface RestartConfig {
+export type RestartConfig = {
 	enabled: boolean;
 	delayMs: number;
 	maxAttempts: number;
 	exitCodes?: number[];
-}
+};
 
 export const DEFAULT_RESTART_CONFIG: RestartConfig = {
 	enabled: false,

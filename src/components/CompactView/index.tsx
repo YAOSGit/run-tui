@@ -1,12 +1,11 @@
 import { Box, Text } from 'ink';
-import type React from 'react';
 import { useLogs } from '../../providers/LogsProvider/index.js';
 import type { TaskState } from '../../types/TaskState/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 import { TAB_BAR_STATUS_COLORS } from '../TabBar/TabBar.consts.js';
 import { TaskTime } from '../TaskTime/index.js';
 
-interface CompactViewProps {
+type CompactViewProps = {
 	tasks: string[];
 	taskStates: Record<string, TaskState>;
 	pinnedTasks: string[];
@@ -14,9 +13,9 @@ interface CompactViewProps {
 	activeTabIndex: number;
 	width: number;
 	height: number;
-}
+};
 
-export const CompactView: React.FC<CompactViewProps> = ({
+export function CompactView({
 	tasks,
 	taskStates,
 	pinnedTasks,
@@ -24,7 +23,7 @@ export const CompactView: React.FC<CompactViewProps> = ({
 	activeTabIndex,
 	width,
 	height,
-}) => {
+}: CompactViewProps) {
 	const { getLogsForTask } = useLogs();
 
 	let startIndex = 0;
@@ -82,4 +81,4 @@ export const CompactView: React.FC<CompactViewProps> = ({
 			})}
 		</Box>
 	);
-};
+}

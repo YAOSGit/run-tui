@@ -1,7 +1,7 @@
 import type { LineOverflow } from '../../types/LineOverflow/index.js';
 import type { LogEntry } from '../../types/LogEntry/index.js';
 
-export interface LogViewProps {
+export type LogViewProps = {
 	logs: LogEntry[];
 	height?: number;
 	width?: number;
@@ -9,4 +9,4 @@ export interface LogViewProps {
 	lineOverflow?: LineOverflow;
 	showTimestamps?: boolean;
 	searchQuery?: string;
-}
+};

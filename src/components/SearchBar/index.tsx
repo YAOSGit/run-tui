@@ -2,7 +2,7 @@ import { Box, Text, useInput } from 'ink';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { Footer } from '../Footer/index.js';
 
-export interface SearchBarProps {
+export type SearchBarProps = {
 	query: string;
 	onQueryChange: (query: string) => void;
 	matchesCount: number;
@@ -10,7 +10,7 @@ export interface SearchBarProps {
 	onClose: () => void;
 	onNextMatch: () => void;
 	onPrevMatch: () => void;
-}
+};
 
 const SEARCH_COMMANDS: VisibleCommand[] = [
 	{ displayKey: 'Enter', displayText: 'confirm' },

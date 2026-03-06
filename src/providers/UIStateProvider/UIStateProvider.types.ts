@@ -1,17 +1,17 @@
 import type React from 'react';
 import type { LineOverflow } from '../../types/LineOverflow/index.js';
 
-export interface UIStateProviderProps {
+export type UIStateProviderProps = {
 	children: React.ReactNode;
 	initialShowScriptSelector?: boolean;
-}
+};
 
-export interface PendingConfirmation {
+export type PendingConfirmation = {
 	message: string;
 	onConfirm: () => void;
-}
+};
 
-export interface UIStateContextValue {
+export type UIStateContextValue = {
 	// State
 	showScriptSelector: boolean;
 	showHelp: boolean;
@@ -28,4 +28,4 @@ export interface UIStateContextValue {
 	openHelp: () => void;
 	closeHelp: () => void;
 	toggleHelp: () => void;
-}
+};

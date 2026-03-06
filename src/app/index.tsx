@@ -7,7 +7,7 @@ import type { RestartConfig } from '../types/RestartConfig/index.js';
 import { AppContent } from './app.js';
 import { AppProviders } from './providers.js';
 
-interface AppProps {
+type AppProps = {
 	tasks: string[];
 	packageManager: PackageManager;
 	availableScripts: string[];
@@ -15,9 +15,9 @@ interface AppProps {
 	height?: number;
 	restartConfig: RestartConfig;
 	scriptArgs: string[];
-}
+};
 
-const App: React.FC<AppProps> = ({
+export const App: React.FC<AppProps> = ({
 	tasks: initialTasks,
 	packageManager,
 	availableScripts,
@@ -64,4 +64,4 @@ const App: React.FC<AppProps> = ({
 	);
 };
 
-export default App;
+export type { AppProps };

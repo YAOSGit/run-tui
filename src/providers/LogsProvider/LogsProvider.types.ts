@@ -1,11 +1,11 @@
 import type { LogEntry } from '../../types/LogEntry/index.js';
 import type { LogType } from '../../types/LogType/index.js';
 
-export interface LogsProviderProps {
+export type LogsProviderProps = {
 	children: React.ReactNode;
-}
+};
 
-export interface LogsContextValue {
+export type LogsContextValue = {
 	addLog: (entry: LogEntry) => void;
 	getLogsForTask: (
 		taskName: string,
@@ -15,4 +15,4 @@ export interface LogsContextValue {
 	) => LogEntry[];
 	getLogCountForTask: (taskName: string, filter: LogType | null) => number;
 	clearLogsForTask: (taskName: string) => void;
-}
+};

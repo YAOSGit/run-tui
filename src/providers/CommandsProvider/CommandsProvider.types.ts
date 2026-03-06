@@ -5,22 +5,22 @@ import type { TasksContextValue } from '../TasksProvider/TasksProvider.types.js'
 import type { UIStateContextValue } from '../UIStateProvider/UIStateProvider.types.js';
 import type { ViewContextValue } from '../ViewProvider/ViewProvider.types.js';
 
-export interface CommandsProviderProps {
+export type CommandsProviderProps = {
 	children: React.ReactNode;
 	keepAlive?: boolean;
 	onQuit?: () => void;
-}
+};
 
-export interface CommandProviders {
+export type CommandProviders = {
 	tasks: TasksContextValue;
 	logs: LogsContextValue;
 	ui: UIStateContextValue;
 	view: ViewContextValue;
 	keepAlive: boolean;
 	quit: () => void;
-}
+};
 
-export interface CommandsContextValue {
+export type CommandsContextValue = {
 	handleInput: (input: string, key: Key) => void;
 	getVisibleCommands: () => VisibleCommand[];
-}
+};

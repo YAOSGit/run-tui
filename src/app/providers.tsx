@@ -15,7 +15,7 @@ const LogsConsumer: React.FC<{
 	return <>{children(addLog)}</>;
 };
 
-export interface AppProvidersProps {
+export type AppProvidersProps = {
 	children: React.ReactNode;
 	initialTasks: string[];
 	packageManager: PackageManager;
@@ -25,7 +25,7 @@ export interface AppProvidersProps {
 	restartConfig: RestartConfig;
 	scriptArgs: string[];
 	onQuit: () => void;
-}
+};
 
 export const AppProviders: React.FC<AppProvidersProps> = ({
 	children,

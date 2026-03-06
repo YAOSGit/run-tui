@@ -9,6 +9,7 @@ export function Footer({
 	status,
 	logFilter,
 	scrollInfo,
+	width,
 }: FooterProps) {
 	const scrollIndicator = scrollInfo && scrollInfo.totalLogs > 0 && (
 		<Text dimColor>
@@ -21,7 +22,7 @@ export function Footer({
 		</Text>
 	);
 
-	const terminalWidth = process.stdout.columns || 80;
+	const terminalWidth = width ?? process.stdout.columns ?? 80;
 	const availableWidth = terminalWidth - 8; // border left/right (2) + paddingX=1 left/right (2) + 4 for the first/last separator
 	let currentWidth = 13; // "YAOSGit : run"
 

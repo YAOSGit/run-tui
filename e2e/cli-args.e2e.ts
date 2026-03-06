@@ -4,10 +4,7 @@ import { PTYRunner } from './utils';
 
 describe('CLI Argument Parsing', () => {
 	let runner: PTYRunner;
-	const fixturesPath = path.resolve(
-		import.meta.dirname,
-		'../examples/basic-project',
-	);
+	const fixturesPath = path.resolve(import.meta.dirname, '../examples/basic');
 
 	beforeEach(() => {
 		runner = new PTYRunner({ cwd: fixturesPath });

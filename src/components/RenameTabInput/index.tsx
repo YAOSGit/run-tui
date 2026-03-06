@@ -3,11 +3,11 @@ import { useState } from 'react';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { Footer } from '../Footer/index.js';
 
-export interface RenameTabInputProps {
+export type RenameTabInputProps = {
 	initialName: string;
 	onRename: (newName: string) => void;
 	onClose: () => void;
-}
+};
 
 const RENAME_COMMANDS: VisibleCommand[] = [
 	{ displayKey: 'Enter', displayText: 'confirm' },

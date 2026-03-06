@@ -1,15 +1,15 @@
 import { Box, Text } from 'ink';
 import { Component, type ReactNode } from 'react';
 
-interface ErrorBoundaryProps {
+type ErrorBoundaryProps = {
 	children: ReactNode;
 	fallback?: ReactNode;
-}
+};
 
-interface ErrorBoundaryState {
+type ErrorBoundaryState = {
 	hasError: boolean;
 	error?: Error;
-}
+};
 
 export class ErrorBoundary extends Component<
 	ErrorBoundaryProps,

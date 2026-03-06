@@ -1,7 +1,7 @@
-export interface ScriptSelectorProps {
+export type ScriptSelectorProps = {
 	availableScripts: string[];
 	runningScripts: string[];
 	onSelect: (script: string) => void;
 	onCancel: () => void;
 	height: number;
-}
+};

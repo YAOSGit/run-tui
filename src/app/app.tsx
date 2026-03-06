@@ -17,13 +17,13 @@ import { useUIState } from '../providers/UIStateProvider/index.js';
 import { useView } from '../providers/ViewProvider/index.js';
 import { MOD_KEY } from '../utils/platform/index.js';
 
-export interface AppContentProps {
+export type AppContentProps = {
 	availableScripts: string[];
 	keepAlive: boolean;
 	height?: number;
 	width: number;
 	onQuit: () => void;
-}
+};
 
 export const AppContent: React.FC<AppContentProps> = ({
 	availableScripts,
@@ -278,6 +278,7 @@ export const AppContent: React.FC<AppContentProps> = ({
 						activeTask={undefined}
 						status={undefined}
 						logFilter={view.logFilter}
+						width={effectiveWidth}
 					/>
 				)}
 			</Box>
@@ -420,6 +421,7 @@ export const AppContent: React.FC<AppContentProps> = ({
 					status={activeTaskStatus}
 					logFilter={view.logFilter}
 					scrollInfo={scrollInfo}
+					width={effectiveWidth}
 				/>
 			) : null}
 		</Box>

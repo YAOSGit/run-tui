@@ -61,10 +61,10 @@ export function fuzzyScore(query: string, target: string): number | null {
 	return score;
 }
 
-export interface FuzzyResult<T> {
+export type FuzzyResult<T> = {
 	item: T;
 	score: number;
-}
+};
 
 /**
  * Filter and rank an array of items using fuzzy matching.
