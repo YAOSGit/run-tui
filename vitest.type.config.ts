@@ -7,6 +7,7 @@ export default defineConfig({
 		globals: true,
 		typecheck: {
 			enabled: true,
+			checker: "tsgo",
 			tsconfig: './tsconfig.vitest.json',
 			include: ['**/*.test-d.ts'],
 		},

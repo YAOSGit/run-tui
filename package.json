@@ -85,7 +85,6 @@
 		"react": "^19.2.3",
 		"size-limit": "^11.2.0",
 		"strip-ansi": "^7.1.2",
-		"typescript": "^5.9.3",
 		"vitest": "^4.0.15"
 	}
 }

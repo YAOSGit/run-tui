@@ -1,4 +1,12 @@
-<h1 align="center">Yet another Open Source run-tui</h1>
+<p align="center">
+  <a href="https://github.com/YAOSGit/run-tui">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/run-tui.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/run-tui-light.svg">
+      <img src="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/run-tui.svg" width="100%" alt="run-tui" />
+    </picture>
+  </a>
+</p>
 
 <p align="center">
   <strong>An interactive terminal UI for running npm scripts concurrently with real-time log viewing</strong>
