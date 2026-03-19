@@ -11,7 +11,6 @@ import {
 	exportCurrentLogsCommand,
 } from '../../commands/exportLogs/index.js';
 import { filterCommand } from '../../commands/filter/index.js';
-import { focusModeCommand } from '../../commands/focusMode/index.js';
 import { helpCommand } from '../../commands/help/index.js';
 import { killAllCommand, killCommand } from '../../commands/kill/index.js';
 import { lineOverflowCommand } from '../../commands/lineOverflow/index.js';
@@ -38,7 +37,7 @@ import {
 import { searchCommand } from '../../commands/search/index.js';
 import { togglePinCommand } from '../../commands/togglePin/index.js';
 import { toggleTimestampsCommand } from '../../commands/toggleTimestamps/index.js';
-import type { Command } from '../../types/Command/index.js';
+import type { RunTuiCommand } from './CommandsProvider.types.js';
 import type { KeyBinding } from '../../types/KeyBinding/index.js';
 
 export const CONFIRM_YES_KEYS: KeyBinding[] = [
@@ -51,7 +50,13 @@ export const CONFIRM_NO_KEYS: KeyBinding[] = [
 	{ specialKey: 'esc', ctrl: false },
 ];
 
-export const COMMANDS: Command[] = [
+/**
+ * Project-specific commands passed to createCommandsProvider().
+ * The toolkit appends shared help, quit, scroll, and cycleFocus commands
+ * automatically; project commands listed first take priority over toolkit
+ * defaults when key bindings overlap.
+ */
+export const PROJECT_COMMANDS: RunTuiCommand[] = [
 	// 1. Navigation (always visible/core)
 	leftArrowCommand,
 	rightArrowCommand,
@@ -73,7 +78,6 @@ export const COMMANDS: Command[] = [
 	filterCommand,
 	lineOverflowCommand,
 	toggleTimestampsCommand,
-	focusModeCommand,
 	displayModeCommand,
 	cycleFocusCommand,
 
@@ -90,7 +94,7 @@ export const COMMANDS: Command[] = [
 	killCommand,
 	killAllCommand,
 
-	// 7. General/Quit
+	// 7. General (project-specific overrides that shadow toolkit defaults)
 	helpCommand,
 	quitCommand,
 
@@ -99,3 +103,13 @@ export const COMMANDS: Command[] = [
 	scrollDownCommand,
 	scrollToBottomCommand,
 ];
+
+/**
+ * Section colors for the help menu.
+ */
+export const SECTION_COLORS: Record<string, string> = {
+	General: 'yellow',
+	'View & Modes': 'blue',
+	'Logs (Ctrl)': 'green',
+	'Mass Actions (Shift)': 'red',
+};

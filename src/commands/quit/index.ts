@@ -6,19 +6,20 @@ export const quitCommand: Command = {
 		{ textKey: 'q', ctrl: false },
 		{ specialKey: 'esc', ctrl: false },
 	],
+	displayKey: 'q / ESC',
 	displayText: 'quit',
 	footer: 'priority',
 	footerOrder: 2,
 	helpSection: 'General',
 	helpLabel: 'Quit',
-	isEnabled: (p) => !p.ui.showScriptSelector,
-	execute: (p) => {
-		p.tasks.killAllTasks();
-		p.quit();
+	isEnabled: (deps) => !deps.ui.showScriptSelector,
+	execute: (deps) => {
+		deps.tasks.killAllTasks();
+		deps.onQuit();
 	},
-	needsConfirmation: (p) => p.tasks.hasRunningTasks || p.keepAlive,
-	confirmMessage: (p) => {
-		const runningCount = Object.values(p.tasks.taskStates).filter(
+	needsConfirmation: (deps) => deps.tasks.hasRunningTasks || deps.keepAlive,
+	confirmMessage: (deps) => {
+		const runningCount = Object.values(deps.tasks.taskStates).filter(
 			(t) => t.status === 'running',
 		).length;
 		if (runningCount > 0) {

@@ -1,6 +1,6 @@
 import type { Key } from 'ink';
 import type { KeyBinding } from '../../types/KeyBinding/index.js';
-import { MOD_KEY } from '../../utils/platform/index.js';
+import { MOD_KEY } from '@yaos-git/toolkit/tui/commands';
 
 export const isKeyMatch = (
 	key: Key,

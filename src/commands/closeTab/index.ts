@@ -3,6 +3,7 @@ import type { Command } from '../../types/Command/index.js';
 export const closeTabCommand: Command = {
 	id: 'CLOSE_TAB',
 	keys: [{ textKey: 'x', ctrl: false }],
+	displayKey: 'x',
 	displayText: 'close',
 	footer: 'optional',
 	footerOrder: 20,

@@ -3,6 +3,7 @@ import type { Command } from '../../types/Command/index.js';
 export const restartCommand: Command = {
 	id: 'RESTART',
 	keys: [{ textKey: 'r', ctrl: false }],
+	displayKey: 'r',
 	displayText: 'restart',
 	footer: 'optional',
 	footerOrder: 30,

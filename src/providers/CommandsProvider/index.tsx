@@ -1,23 +1,39 @@
 import type { Key } from 'ink';
 import type React from 'react';
 import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
-import type { Command } from '../../types/Command/index.js';
+import { createCommandsProvider } from '@yaos-git/toolkit/tui/commands';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { useLogs } from '../LogsProvider/index.js';
 import { useTasks } from '../TasksProvider/index.js';
 import { useUIState } from '../UIStateProvider/index.js';
 import { useView } from '../ViewProvider/index.js';
 import {
-	COMMANDS,
 	CONFIRM_NO_KEYS,
 	CONFIRM_YES_KEYS,
+	PROJECT_COMMANDS,
 } from './CommandsProvider.consts.js';
 import type {
-	CommandProviders,
 	CommandsContextValue,
 	CommandsProviderProps,
+	RunTuiCommand,
+	RunTuiDeps,
+	RunTuiUI,
 } from './CommandsProvider.types.js';
 import { getDisplayKey, isKeyMatch } from './CommandsProvider.utils.js';
+
+/**
+ * Use createCommandsProvider to merge project commands with toolkit
+ * shared commands (help, quit, scroll, cycleFocus).
+ */
+const { COMMANDS: TOOLKIT_COMMANDS } = createCommandsProvider<RunTuiDeps>(
+	PROJECT_COMMANDS,
+);
+
+/**
+ * Full merged COMMANDS array including toolkit shared commands.
+ * Exported so that the HelpMenu and other consumers can reference it.
+ */
+export const COMMANDS = TOOLKIT_COMMANDS as RunTuiCommand[];
 
 const CommandsContext = createContext<CommandsContextValue | null>(null);
 
@@ -29,23 +45,86 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 	const tasks = useTasks();
 	const logs = useLogs();
 	const view = useView();
-	const ui = useUIState();
+	const uiState = useUIState();
 
 	// Track the command that requested confirmation (for matching repeat key)
-	const pendingCommandRef = useRef<Command | null>(null);
+	const pendingCommandRef = useRef<RunTuiCommand | null>(null);
 
-	// Build the providers object that commands receive
-	const providers: CommandProviders = useMemo(
-		() => ({
+	/**
+	 * Build the RunTuiDeps object that commands receive.
+	 * The `ui` field is an adapter that bridges UIStateContextValue
+	 * booleans to the toolkit's OverlayState interface.
+	 */
+	const deps: RunTuiDeps = useMemo(() => {
+		const ui: RunTuiUI = {
+			// --- UIStateContextValue fields ---
+			showScriptSelector: uiState.showScriptSelector,
+			showHelp: uiState.showHelp,
+			pendingConfirmation: uiState.pendingConfirmation,
+			lineOverflow: uiState.lineOverflow,
+			openScriptSelector: uiState.openScriptSelector,
+			closeScriptSelector: uiState.closeScriptSelector,
+			requestConfirmation: uiState.requestConfirmation,
+			confirmPending: uiState.confirmPending,
+			cancelPending: uiState.cancelPending,
+			cycleLineOverflow: uiState.cycleLineOverflow,
+			openHelp: uiState.openHelp,
+			closeHelp: uiState.closeHelp,
+			toggleHelp: uiState.toggleHelp,
+
+			// --- OverlayState adapter ---
+			activeOverlay: uiState.showHelp
+				? 'help'
+				: uiState.showScriptSelector
+					? 'selector'
+					: view.showSearch
+						? 'search'
+						: view.showRenameInput
+							? 'rename'
+							: uiState.pendingConfirmation
+								? 'confirmation'
+								: 'none',
+			setActiveOverlay: (overlay: string | 'none') => {
+				// Map toolkit overlay names back to UIState boolean setters
+				switch (overlay) {
+					case 'help':
+						uiState.openHelp();
+						break;
+					case 'selector':
+						uiState.openScriptSelector();
+						break;
+					case 'search':
+						view.openSearch();
+						break;
+					case 'rename':
+						view.openRenameInput();
+						break;
+					case 'none':
+						uiState.closeHelp();
+						uiState.closeScriptSelector();
+						view.closeSearch();
+						view.closeRenameInput();
+						break;
+				}
+			},
+			confirmation: uiState.pendingConfirmation,
+			clearConfirmation: () => {
+				uiState.cancelPending();
+			},
+
+			// --- cycleFocus (BaseDeps requirement) ---
+			cycleFocus: view.cyclePaneFocus,
+		};
+
+		return {
+			ui,
 			tasks,
 			logs,
 			view,
-			ui,
 			keepAlive: keepAlive ?? false,
-			quit: onQuit ?? (() => {}),
-		}),
-		[tasks, logs, view, ui, keepAlive, onQuit],
-	);
+			onQuit: onQuit ?? (() => {}),
+		};
+	}, [tasks, logs, view, uiState, keepAlive, onQuit]);
 
 	const handleInput = useCallback(
 		(input: string, key: Key) => {
@@ -54,19 +133,19 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 			}
 
 			// Handle confirmation mode
-			if (ui.pendingConfirmation) {
+			if (uiState.pendingConfirmation) {
 				// Confirm with y, Enter, or the same key that triggered the confirmation
 				if (
 					isKeyMatch(key, input, CONFIRM_YES_KEYS) ||
 					(pendingCommandRef.current &&
 						isKeyMatch(key, input, pendingCommandRef.current.keys))
 				) {
-					ui.confirmPending();
+					uiState.confirmPending();
 					pendingCommandRef.current = null;
 					return;
 				}
 				if (isKeyMatch(key, input, CONFIRM_NO_KEYS)) {
-					ui.cancelPending();
+					uiState.cancelPending();
 					pendingCommandRef.current = null;
 					return;
 				}
@@ -76,9 +155,9 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 
 			// Ignore global commands if typing in an input overlay
 			if (
-				providers.ui.showHelp ||
-				providers.view.showSearch ||
-				providers.view.showRenameInput
+				deps.ui.showHelp ||
+				deps.view.showSearch ||
+				deps.view.showRenameInput
 			) {
 				return;
 			}
@@ -87,29 +166,32 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 			for (const command of COMMANDS) {
 				if (
 					isKeyMatch(key, input, command.keys) &&
-					command.isEnabled(providers)
+					command.isEnabled(deps)
 				) {
 					// Check if command needs confirmation
-					if (command.needsConfirmation?.(providers)) {
+					if (command.needsConfirmation?.(deps)) {
 						const message =
 							typeof command.confirmMessage === 'function'
-								? command.confirmMessage(providers)
+								? command.confirmMessage(deps)
 								: (command.confirmMessage ?? 'Are you sure?');
 						pendingCommandRef.current = command;
-						ui.requestConfirmation(message, () => command.execute(providers));
+						uiState.requestConfirmation(message, () =>
+							command.execute(deps),
+						);
 						return;
 					}
 
 					// Execute directly
-					command.execute(providers);
+					command.execute(deps);
 					return;
 				}
 			}
 		},
-		[providers, ui, providers.ui.showHelp, view.showSearch],
+		[deps, uiState, deps.ui.showHelp, view.showSearch],
 	);
 
 	const getVisibleCommands = useCallback((): VisibleCommand[] => {
+		const seenIds = new Set<string>();
 		const seen = new Set<string>();
 		const priority: VisibleCommand[] = [];
 		const optional: VisibleCommand[] = [];
@@ -117,13 +199,17 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 		for (const command of COMMANDS) {
 			if (command.footer === 'hidden') continue;
 
+			// Deduplicate by command id (project commands shadow toolkit defaults)
+			if (seenIds.has(command.id)) continue;
+			seenIds.add(command.id);
+
 			const displayKey = command.displayKey ?? getDisplayKey(command.keys);
 			// Skip duplicates (e.g. LEFT_ARROW / RIGHT_ARROW share the same displayKey)
 			const dedupeKey = `${displayKey}-${command.displayText}`;
 			if (seen.has(dedupeKey)) continue;
 			seen.add(dedupeKey);
 
-			if (!command.isEnabled(providers)) continue;
+			if (!command.isEnabled(deps)) continue;
 
 			const entry: VisibleCommand = {
 				displayKey,
@@ -146,14 +232,15 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 				(a, b) => (a.footerOrder ?? 999) - (b.footerOrder ?? 999),
 			),
 		];
-	}, [providers]);
+	}, [deps]);
 
 	const value: CommandsContextValue = useMemo(
 		() => ({
 			handleInput,
 			getVisibleCommands,
+			deps,
 		}),
-		[handleInput, getVisibleCommands],
+		[handleInput, getVisibleCommands, deps],
 	);
 
 	return (

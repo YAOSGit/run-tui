@@ -1,5 +1,5 @@
 import type { Command } from '../../types/Command/index.js';
-import { modKey, modKeyBindings } from '../../utils/platform/index.js';
+import { modKey, modKeyBindings } from '@yaos-git/toolkit/tui/commands';
 
 export const displayModeCommand: Command = {
 	id: 'DISPLAY_MODE',

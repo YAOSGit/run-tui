@@ -11,6 +11,14 @@ import {
 	stripControlSequences,
 } from './useProcessManager.utils.js';
 
+export type UseProcessManagerReturn = {
+	clearRestartTimer: (taskName: string) => void;
+	resetRestartCount: (taskName: string) => void;
+	spawnProcess: (taskName: string) => void;
+	killProcess: (taskName: string, addDivider?: boolean) => void;
+	killAllProcesses: () => void;
+};
+
 export const useProcessManager = ({
 	initialTasks,
 	packageManager,
@@ -18,12 +26,13 @@ export const useProcessManager = ({
 	scriptArgs,
 	onLogEntry,
 	onTaskStateChange,
-}: UseProcessManagerOptions) => {
+}: UseProcessManagerOptions): UseProcessManagerReturn => {
 	// Process management refs
 	const childProcesses = useRef<Map<string, ChildProcess>>(new Map());
 	const spawnedTasks = useRef<Set<string>>(new Set());
 	const killedTasks = useRef<Set<string>>(new Set());
 	const taskTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
+	const escalationTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 	const restartCounts = useRef<Map<string, number>>(new Map());
 	// Capture initialTasks in a ref so the startup effect has exhaustive deps
 	const initialTasksRef = useRef(initialTasks);
@@ -257,6 +266,7 @@ export const useProcessManager = ({
 
 					// Escalate to SIGKILL if the process hasn't exited in time
 					const escalation = setTimeout(() => {
+						escalationTimers.current.delete(taskName);
 						if (!child.killed) {
 							try {
 								process.kill(-pid, SIGNALS.SIGKILL);
@@ -279,8 +289,16 @@ export const useProcessManager = ({
 						}
 					}, KILL_TIMEOUT_MS);
 
-					// Cancel escalation if process exits gracefully before timeout
-					child.once('exit', () => clearTimeout(escalation));
+					escalationTimers.current.set(taskName, escalation);
+
+					const clearEscalation = () => {
+						clearTimeout(escalation);
+						escalationTimers.current.delete(taskName);
+					};
+
+					// Cancel escalation if process exits or errors before timeout
+					child.once('exit', clearEscalation);
+					child.once('error', clearEscalation);
 				}
 			}
 			if (addDivider) {
@@ -305,6 +323,10 @@ export const useProcessManager = ({
 			clearTimeout(timer);
 		}
 		taskTimers.current.clear();
+		for (const timer of escalationTimers.current.values()) {
+			clearTimeout(timer);
+		}
+		escalationTimers.current.clear();
 		childProcesses.current.forEach((child, taskName) => {
 			killedTasks.current.add(taskName);
 			if (!child.killed && child.pid) {

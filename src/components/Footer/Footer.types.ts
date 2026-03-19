@@ -16,4 +16,5 @@ export type FooterProps = {
 	logFilter: LogType | null;
 	scrollInfo?: ScrollInfo;
 	width?: number;
+	confirmation?: { message: string } | null;
 };

@@ -42,12 +42,13 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('build');
-		expect(lastFrame()).toContain('test');
-		expect(lastFrame()).toContain('lint');
+		const frame = lastFrame() ?? '';
+		expect(frame).toContain('build');
+		expect(frame).toContain('test');
+		expect(frame).toContain('lint');
 	});
 
-	it('shows pending status badge', () => {
+	it('shows idle icon for pending status', () => {
 		const tasks = ['build'];
 		const taskStates: Record<string, TaskState> = {
 			build: createTaskState('build', TASK_STATUS.PENDING),
@@ -63,10 +64,10 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('PENDING');
+		expect(lastFrame() ?? '').toContain('○');
 	});
 
-	it('shows success status badge', () => {
+	it('shows success icon for completed tasks', () => {
 		const tasks = ['build'];
 		const taskStates: Record<string, TaskState> = {
 			build: createTaskState('build', TASK_STATUS.SUCCESS),
@@ -82,10 +83,10 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('SUCCESS');
+		expect(lastFrame() ?? '').toContain('✓');
 	});
 
-	it('shows error status badge', () => {
+	it('shows error icon for failed tasks', () => {
 		const tasks = ['build'];
 		const taskStates: Record<string, TaskState> = {
 			build: createTaskState('build', TASK_STATUS.ERROR),
@@ -101,10 +102,10 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('ERROR');
+		expect(lastFrame() ?? '').toContain('✗');
 	});
 
-	it('shows ERR badge when task has unseen stderr', () => {
+	it('shows ERR flag when task has unseen stderr', () => {
 		const tasks = ['build'];
 		const taskStates: Record<string, TaskState> = {
 			build: createTaskState('build', TASK_STATUS.RUNNING, true),
@@ -120,10 +121,10 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('ERR');
+		expect(lastFrame() ?? '').toContain('ERR');
 	});
 
-	it('does not show ERR badge when no unseen stderr', () => {
+	it('does not show ERR flag when no unseen stderr', () => {
 		const tasks = ['build'];
 		const taskStates: Record<string, TaskState> = {
 			build: createTaskState('build', TASK_STATUS.RUNNING, false),
@@ -139,7 +140,7 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).not.toContain('ERR');
+		expect(lastFrame() ?? '').not.toContain('ERR');
 	});
 
 	it('highlights the active tab', () => {
@@ -159,11 +160,12 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('build');
-		expect(lastFrame()).toContain('test');
+		const frame = lastFrame() ?? '';
+		expect(frame).toContain('build');
+		expect(frame).toContain('test');
 	});
 
-	it('renders multiple tasks with different states', () => {
+	it('renders multiple tasks with different status icons', () => {
 		const tasks = ['build', 'test', 'lint'];
 		const taskStates: Record<string, TaskState> = {
 			build: createTaskState('build', TASK_STATUS.SUCCESS),
@@ -182,7 +184,8 @@ describe('TabBar', () => {
 			/>,
 		);
 
-		expect(lastFrame()).toContain('SUCCESS');
-		expect(lastFrame()).toContain('ERROR');
+		const frame = lastFrame() ?? '';
+		expect(frame).toContain('✓');
+		expect(frame).toContain('✗');
 	});
 });

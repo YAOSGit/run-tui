@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'vitest';
-import { PTYRunner } from './utils';
+import { PTYRunner, canSpawnPTY } from './utils';
 
-describe('State Transitions', () => {
+describe.skipIf(!canSpawnPTY())('State Transitions', () => {
 	let runner: PTYRunner;
 	const fixturesPath = path.resolve(import.meta.dirname, '../examples/basic');
 

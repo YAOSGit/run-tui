@@ -3,11 +3,18 @@ import type { LogEntry } from '../../types/LogEntry/index.js';
 import type { LogType } from '../../types/LogType/index.js';
 import { MAX_LOGS_PER_TASK } from './useLogs.consts.js';
 
+export type UseLogsReturn = {
+	addLog: (entry: LogEntry) => void;
+	getLogsForTask: (taskName: string, filter?: LogType | null, limit?: number, scrollOffset?: number) => LogEntry[];
+	getLogCountForTask: (taskName: string, filter?: LogType | null) => number;
+	clearLogsForTask: (taskName: string) => void;
+};
+
 /**
  * Stores logs indexed by task name for O(1) task lookup.
  * Each task's logs are capped at MAX_LOGS_PER_TASK.
  */
-export const useLogs = () => {
+export const useLogs = (): UseLogsReturn => {
 	const [logsByTask, setLogsByTask] = useState<Map<string, LogEntry[]>>(
 		new Map(),
 	);

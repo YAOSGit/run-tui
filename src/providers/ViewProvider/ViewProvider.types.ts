@@ -28,7 +28,6 @@ export type ViewContextValue = {
 	showRenameInput: boolean;
 	viewHeight: number;
 	totalLogs: number;
-	focusMode: boolean;
 	displayMode: 'full' | 'compact';
 
 	// High-level Actions
@@ -46,7 +45,6 @@ export type ViewContextValue = {
 	closeRenameInput: () => void;
 	setSearchQuery: (query: string) => void;
 	scrollToIndex: (index: number, total: number) => void;
-	toggleFocusMode: () => void;
 	toggleDisplayMode: () => void;
 	cyclePaneFocus: () => void;
 	nextMatch: () => void;

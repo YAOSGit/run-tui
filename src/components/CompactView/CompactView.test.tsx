@@ -47,8 +47,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -71,8 +70,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -91,8 +89,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -112,8 +109,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -134,8 +130,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -155,8 +150,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{ build: 'my-build' }}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -176,8 +170,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 
@@ -197,8 +190,7 @@ describe('CompactView', () => {
 				pinnedTasks={[]}
 				tabAliases={{}}
 				activeTabIndex={0}
-				width={120}
-				height={10}
+				maxVisible={10}
 			/>,
 		);
 

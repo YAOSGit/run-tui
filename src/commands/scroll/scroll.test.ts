@@ -1,104 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import { createMockDeps } from '../../test-utils/mockDeps.js';
 import {
 	scrollDownCommand,
 	scrollToBottomCommand,
 	scrollUpCommand,
 } from './index.js';
-
-const createMockProviders = (
-	overrides: Partial<{
-		showScriptSelector: boolean;
-		tasks: string[];
-		totalLogs: number;
-		viewHeight: number;
-		scrollOffset: number;
-		autoScroll: boolean;
-	}> = {},
-): CommandProviders => ({
-	tasks: {
-		tasks: overrides.tasks ?? ['task1'],
-		pinnedTasks: [],
-		taskStates: {},
-		tabAliases: {},
-		hasRunningTasks: false,
-		addTask: vi.fn(),
-		closeTask: vi.fn(),
-		restartTask: vi.fn(),
-		killTask: vi.fn(),
-		killAllTasks: vi.fn(),
-		cancelRestart: vi.fn(),
-		markStderrSeen: vi.fn(),
-		toggleTaskPin: vi.fn(),
-		renameTask: vi.fn(),
-		moveTaskLeft: vi.fn(),
-		moveTaskRight: vi.fn(),
-		getTaskStatus: vi.fn(),
-	},
-	logs: {
-		addLog: vi.fn(),
-		getLogsForTask: vi.fn().mockReturnValue([]),
-		getLogCountForTask: vi.fn().mockReturnValue(0),
-		clearLogsForTask: vi.fn(),
-	},
-	view: {
-		activeTabIndex: 0,
-		activeTask: 'task1',
-		logFilter: null,
-		primaryScrollOffset: overrides.scrollOffset ?? 0,
-		primaryAutoScroll: overrides.autoScroll ?? true,
-		splitScrollOffset: Math.floor((overrides.scrollOffset ?? 0) / 2),
-		splitAutoScroll: overrides.autoScroll ?? true,
-		splitTaskName: null,
-		activePane: 'primary',
-		viewHeight: overrides.viewHeight ?? 20,
-		totalLogs: overrides.totalLogs ?? 10,
-		showTimestamps: false,
-		showSearch: false,
-		searchQuery: '',
-		searchMatches: [],
-		currentMatchIndex: -1,
-		showRenameInput: false,
-		focusMode: false,
-		displayMode: 'full' as const,
-		navigateLeft: vi.fn(),
-		navigateRight: vi.fn(),
-		setActiveTabIndex: vi.fn(),
-		cycleLogFilter: vi.fn(),
-		scrollUp: vi.fn(),
-		scrollDown: vi.fn(),
-		scrollToBottom: vi.fn(),
-		nextMatch: vi.fn(),
-		prevMatch: vi.fn(),
-		toggleTimestamps: vi.fn(),
-		openSearch: vi.fn(),
-		closeSearch: vi.fn(),
-		openRenameInput: vi.fn(),
-		closeRenameInput: vi.fn(),
-		setSearchQuery: vi.fn(),
-		scrollToIndex: vi.fn(),
-		toggleFocusMode: vi.fn(),
-		toggleDisplayMode: vi.fn(),
-		cyclePaneFocus: vi.fn(),
-	},
-	ui: {
-		showScriptSelector: overrides.showScriptSelector ?? false,
-		showHelp: false,
-		pendingConfirmation: null,
-		lineOverflow: 'wrap' as const,
-		openScriptSelector: vi.fn(),
-		closeScriptSelector: vi.fn(),
-		requestConfirmation: vi.fn(),
-		confirmPending: vi.fn(),
-		cancelPending: vi.fn(),
-		cycleLineOverflow: vi.fn(),
-		openHelp: vi.fn(),
-		closeHelp: vi.fn(),
-		toggleHelp: vi.fn(),
-	},
-	keepAlive: false,
-	quit: vi.fn(),
-});
 
 describe('scrollUpCommand', () => {
 	it('has correct id', () => {
@@ -119,7 +24,7 @@ describe('scrollUpCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when can scroll up', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				totalLogs: 50,
@@ -130,7 +35,7 @@ describe('scrollUpCommand', () => {
 		});
 
 		it('returns false when script selector is shown', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: true,
 				tasks: ['task1'],
 				totalLogs: 50,
@@ -141,7 +46,7 @@ describe('scrollUpCommand', () => {
 		});
 
 		it('returns false when no tasks exist', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: [],
 				totalLogs: 50,
@@ -152,7 +57,7 @@ describe('scrollUpCommand', () => {
 		});
 
 		it('returns false when content fits in view', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				totalLogs: 10,
@@ -163,7 +68,7 @@ describe('scrollUpCommand', () => {
 		});
 
 		it('returns false when already at top', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				totalLogs: 50,
@@ -176,7 +81,7 @@ describe('scrollUpCommand', () => {
 
 	describe('execute', () => {
 		it('calls scrollUp', () => {
-			const providers = createMockProviders();
+			const providers = createMockDeps();
 			scrollUpCommand.execute(providers);
 			expect(providers.view.scrollUp).toHaveBeenCalledOnce();
 		});
@@ -202,7 +107,7 @@ describe('scrollDownCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when can scroll down', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				totalLogs: 50,
@@ -213,7 +118,7 @@ describe('scrollDownCommand', () => {
 		});
 
 		it('returns false when script selector is shown', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: true,
 				tasks: ['task1'],
 				totalLogs: 50,
@@ -224,7 +129,7 @@ describe('scrollDownCommand', () => {
 		});
 
 		it('returns false when no tasks exist', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: [],
 				totalLogs: 50,
@@ -235,7 +140,7 @@ describe('scrollDownCommand', () => {
 		});
 
 		it('returns false when content fits in view', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				totalLogs: 10,
@@ -246,7 +151,7 @@ describe('scrollDownCommand', () => {
 		});
 
 		it('returns false when already at bottom', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				totalLogs: 50,
@@ -259,7 +164,7 @@ describe('scrollDownCommand', () => {
 
 	describe('execute', () => {
 		it('calls scrollDown', () => {
-			const providers = createMockProviders();
+			const providers = createMockDeps();
 			scrollDownCommand.execute(providers);
 			expect(providers.view.scrollDown).toHaveBeenCalledOnce();
 		});
@@ -281,7 +186,7 @@ describe('scrollToBottomCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when not at bottom (autoScroll false)', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				autoScroll: false,
@@ -290,7 +195,7 @@ describe('scrollToBottomCommand', () => {
 		});
 
 		it('returns false when script selector is shown', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: true,
 				tasks: ['task1'],
 				autoScroll: false,
@@ -299,7 +204,7 @@ describe('scrollToBottomCommand', () => {
 		});
 
 		it('returns false when no tasks exist', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: [],
 				autoScroll: false,
@@ -308,7 +213,7 @@ describe('scrollToBottomCommand', () => {
 		});
 
 		it('returns false when already at bottom (autoScroll true)', () => {
-			const providers = createMockProviders({
+			const providers = createMockDeps({
 				showScriptSelector: false,
 				tasks: ['task1'],
 				autoScroll: true,
@@ -319,7 +224,7 @@ describe('scrollToBottomCommand', () => {
 
 	describe('execute', () => {
 		it('calls scrollToBottom', () => {
-			const providers = createMockProviders();
+			const providers = createMockDeps();
 			scrollToBottomCommand.execute(providers);
 			expect(providers.view.scrollToBottom).toHaveBeenCalledOnce();
 		});

@@ -11,8 +11,7 @@ type CompactViewProps = {
 	pinnedTasks: string[];
 	tabAliases: Record<string, string>;
 	activeTabIndex: number;
-	width: number;
-	height: number;
+	maxVisible: number;
 };
 
 export function CompactView({
@@ -21,23 +20,23 @@ export function CompactView({
 	pinnedTasks,
 	tabAliases,
 	activeTabIndex,
-	width,
-	height,
+	maxVisible,
 }: CompactViewProps) {
 	const { getLogsForTask } = useLogs();
 
+	const viewportSize = Math.min(tasks.length, maxVisible);
 	let startIndex = 0;
-	if (tasks.length > height) {
-		startIndex = Math.max(0, activeTabIndex - Math.floor(height / 2));
-		if (startIndex + height > tasks.length) {
-			startIndex = tasks.length - height;
+	if (tasks.length > viewportSize) {
+		startIndex = Math.max(0, activeTabIndex - Math.floor(viewportSize / 2));
+		if (startIndex + viewportSize > tasks.length) {
+			startIndex = tasks.length - viewportSize;
 		}
 	}
 
-	const visibleTasks = tasks.slice(startIndex, startIndex + height);
+	const visibleTasks = tasks.slice(startIndex, startIndex + viewportSize);
 
 	return (
-		<Box flexDirection="column" width={width} height={height}>
+		<Box flexDirection="column" flexGrow={1}>
 			{visibleTasks.map((taskName, index) => {
 				const state = taskStates[taskName];
 				const isActive = activeTabIndex === startIndex + index;
@@ -52,7 +51,7 @@ export function CompactView({
 					: 'gray';
 
 				return (
-					<Box key={taskName} width={width} overflowX="hidden">
+					<Box key={taskName} overflowX="hidden">
 						<Text color={isActive ? 'cyan' : undefined} bold={isActive}>
 							{isActive ? '> ' : '  '}
 						</Text>

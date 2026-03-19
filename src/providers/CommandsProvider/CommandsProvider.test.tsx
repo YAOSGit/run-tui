@@ -32,6 +32,8 @@ const createDefaultKey = (): Key => ({
 	rightArrow: false,
 	pageDown: false,
 	pageUp: false,
+	home: false,
+	end: false,
 	return: false,
 	escape: false,
 	ctrl: false,
@@ -40,6 +42,10 @@ const createDefaultKey = (): Key => ({
 	backspace: false,
 	delete: false,
 	meta: false,
+	super: false,
+	hyper: false,
+	capsLock: false,
+	numLock: false,
 });
 
 const createWrapper =

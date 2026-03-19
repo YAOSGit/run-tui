@@ -2,6 +2,7 @@ import { Box, Text, useInput } from 'ink';
 import { useState } from 'react';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { Footer } from '../Footer/index.js';
+import { INPUT_COLOR } from './RenameTabInput.consts.js';
 
 export type RenameTabInputProps = {
 	initialName: string;
@@ -47,9 +48,9 @@ export function RenameTabInput({
 	return (
 		<Box flexDirection="column" gap={0}>
 			<Box>
-				<Text color="yellow">rename: </Text>
+				<Text color={INPUT_COLOR}>rename: </Text>
 				<Text>{value}</Text>
-				<Text color="yellow">{'_'}</Text>
+				<Text color={INPUT_COLOR}>{'_'}</Text>
 			</Box>
 			<Footer
 				commands={RENAME_COMMANDS}

@@ -5,6 +5,7 @@
 		"moduleResolution": "NodeNext",
 		"lib": ["esnext", "dom"],
 		"jsx": "react-jsx",
+		"types": ["node", "react"],
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,

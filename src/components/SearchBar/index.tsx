@@ -1,6 +1,7 @@
 import { Box, Text, useInput } from 'ink';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { Footer } from '../Footer/index.js';
+import { SEARCH_PROMPT_COLOR } from './SearchBar.consts.js';
 
 export type SearchBarProps = {
 	query: string;
@@ -69,9 +70,9 @@ export function SearchBar({
 	return (
 		<Box flexDirection="column" gap={0}>
 			<Box>
-				<Text color="yellow">{'/'}</Text>
+				<Text color={SEARCH_PROMPT_COLOR}>{'/'}</Text>
 				<Text>{query}</Text>
-				<Text color="yellow">{'_'}</Text>
+				<Text color={SEARCH_PROMPT_COLOR}>{'_'}</Text>
 				<Box flexGrow={1} />
 				{displayMatchCount && <Text dimColor>{displayMatchCount}</Text>}
 			</Box>

@@ -1,5 +1,5 @@
 import { assertType, describe, expectTypeOf, it } from 'vitest';
-import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import type { RunTuiDeps } from '../../providers/CommandsProvider/CommandsProvider.types.js';
 import { getDisplayKey } from '../../providers/CommandsProvider/CommandsProvider.utils.js';
 import type { KeyBinding } from '../KeyBinding/index.js';
 import type { Command } from './index.js';
@@ -11,42 +11,58 @@ describe('Command type tests', () => {
 		expectTypeOf<Command['displayText']>().toEqualTypeOf<string>();
 	});
 
-	it('displayKey is optional string', () => {
-		expectTypeOf<Command['displayKey']>().toEqualTypeOf<string | undefined>();
+	it('displayKey is a string (required by toolkit Command)', () => {
+		expectTypeOf<Command['displayKey']>().toEqualTypeOf<string>();
 	});
 
-	it('isEnabled is a function taking CommandProviders returning boolean', () => {
+	it('isEnabled is a function taking RunTuiDeps returning boolean', () => {
 		expectTypeOf<Command['isEnabled']>().toBeFunction();
 		expectTypeOf<Command['isEnabled']>().parameters.toEqualTypeOf<
-			[CommandProviders]
+			[RunTuiDeps]
 		>();
 		expectTypeOf<Command['isEnabled']>().returns.toEqualTypeOf<boolean>();
 	});
 
-	it('execute is a function taking CommandProviders returning void', () => {
+	it('execute is a function taking RunTuiDeps returning void', () => {
 		expectTypeOf<Command['execute']>().toBeFunction();
 		expectTypeOf<Command['execute']>().parameters.toEqualTypeOf<
-			[CommandProviders]
+			[RunTuiDeps]
 		>();
 		expectTypeOf<Command['execute']>().returns.toEqualTypeOf<void>();
 	});
 
 	it('needsConfirmation is optional function', () => {
 		expectTypeOf<Command['needsConfirmation']>().toEqualTypeOf<
-			((p: CommandProviders) => boolean) | undefined
+			((deps: RunTuiDeps) => boolean) | undefined
 		>();
 	});
 
 	it('confirmMessage can be string or function', () => {
-		expectTypeOf<Command['confirmMessage']>().toEqualTypeOf<
-			string | ((p: CommandProviders) => string) | undefined
-		>();
+		assertType<Command>({
+			id: 'TEST',
+			keys: [],
+			displayKey: '',
+			displayText: 'test',
+			isEnabled: () => true,
+			execute: () => {},
+			confirmMessage: 'Are you sure?',
+		});
+		assertType<Command>({
+			id: 'TEST',
+			keys: [],
+			displayKey: '',
+			displayText: 'test',
+			isEnabled: () => true,
+			execute: () => {},
+			confirmMessage: (_deps: RunTuiDeps) => 'Are you sure?',
+		});
 	});
 
 	it('accepts valid Command with required fields only', () => {
 		assertType<Command>({
 			id: 'TEST',
 			keys: [{ textKey: 'q' }],
+			displayKey: 'q',
 			displayText: 'test',
 			isEnabled: () => true,
 			execute: () => {},
@@ -59,10 +75,10 @@ describe('Command type tests', () => {
 			keys: [{ textKey: 'q' }, { specialKey: 'esc' }],
 			displayKey: 'q / ESC',
 			displayText: 'quit',
-			isEnabled: (p) => !p.ui.showScriptSelector,
-			execute: (p) => p.quit(),
-			needsConfirmation: (p) => p.tasks.hasRunningTasks,
-			confirmMessage: (p) => `Quit with ${p.tasks.tasks.length} tasks?`,
+			isEnabled: (deps) => deps.ui.activeOverlay === 'none',
+			execute: (deps) => deps.onQuit(),
+			needsConfirmation: (deps) => deps.tasks.hasRunningTasks,
+			confirmMessage: (deps) => `Quit with ${deps.tasks.tasks.length} tasks?`,
 		});
 	});
 
@@ -70,6 +86,7 @@ describe('Command type tests', () => {
 		assertType<Command>({
 			id: 'TEST',
 			keys: [],
+			displayKey: '',
 			displayText: 'test',
 			isEnabled: () => true,
 			execute: () => {},
@@ -82,6 +99,7 @@ describe('Command type tests', () => {
 		// @ts-expect-error - missing id
 		assertType<Command>({
 			keys: [],
+			displayKey: '',
 			displayText: 'test',
 			isEnabled: () => true,
 			execute: () => {},
@@ -90,6 +108,7 @@ describe('Command type tests', () => {
 		// @ts-expect-error - missing keys
 		assertType<Command>({
 			id: 'TEST',
+			displayKey: '',
 			displayText: 'test',
 			isEnabled: () => true,
 			execute: () => {},
@@ -99,6 +118,7 @@ describe('Command type tests', () => {
 		assertType<Command>({
 			id: 'TEST',
 			keys: [],
+			displayKey: '',
 			displayText: 'test',
 			isEnabled: () => true,
 		});

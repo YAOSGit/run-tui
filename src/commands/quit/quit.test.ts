@@ -1,99 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
-import type { TaskState } from '../../types/TaskState/index.js';
+import { describe, expect, it } from 'vitest';
+import { createMockDeps } from '../../test-utils/mockDeps.js';
 import { quitCommand } from './index.js';
-
-const createMockProviders = (
-	overrides: Partial<{
-		showScriptSelector: boolean;
-		hasRunningTasks: boolean;
-		keepAlive: boolean;
-		taskStates: Record<string, TaskState>;
-	}> = {},
-): CommandProviders => ({
-	tasks: {
-		tasks: ['task1'],
-		pinnedTasks: [],
-		tabAliases: {},
-		taskStates: overrides.taskStates ?? {},
-		hasRunningTasks: overrides.hasRunningTasks ?? false,
-		addTask: vi.fn(),
-		closeTask: vi.fn(),
-		restartTask: vi.fn(),
-		killTask: vi.fn(),
-		killAllTasks: vi.fn(),
-		cancelRestart: vi.fn(),
-		markStderrSeen: vi.fn(),
-		toggleTaskPin: vi.fn(),
-		renameTask: vi.fn(),
-		moveTaskLeft: vi.fn(),
-		moveTaskRight: vi.fn(),
-		getTaskStatus: vi.fn(),
-	},
-	logs: {
-		addLog: vi.fn(),
-		getLogsForTask: vi.fn().mockReturnValue([]),
-		getLogCountForTask: vi.fn().mockReturnValue(0),
-		clearLogsForTask: vi.fn(),
-	},
-	view: {
-		activeTabIndex: 0,
-		activeTask: 'task1',
-		logFilter: null,
-		primaryScrollOffset: 0,
-		primaryAutoScroll: true,
-		splitScrollOffset: 0,
-		splitAutoScroll: true,
-		splitTaskName: null,
-		activePane: 'primary',
-		showTimestamps: false,
-		showSearch: false,
-		searchQuery: '',
-		searchMatches: [],
-		currentMatchIndex: -1,
-		showRenameInput: false,
-		viewHeight: 20,
-		totalLogs: 10,
-		focusMode: false,
-		displayMode: 'full' as const,
-		navigateLeft: vi.fn(),
-		navigateRight: vi.fn(),
-		setActiveTabIndex: vi.fn(),
-		cycleLogFilter: vi.fn(),
-		scrollUp: vi.fn(),
-		scrollDown: vi.fn(),
-		scrollToBottom: vi.fn(),
-		nextMatch: vi.fn(),
-		prevMatch: vi.fn(),
-		toggleTimestamps: vi.fn(),
-		openSearch: vi.fn(),
-		closeSearch: vi.fn(),
-		openRenameInput: vi.fn(),
-		closeRenameInput: vi.fn(),
-		setSearchQuery: vi.fn(),
-		scrollToIndex: vi.fn(),
-		toggleFocusMode: vi.fn(),
-		toggleDisplayMode: vi.fn(),
-		cyclePaneFocus: vi.fn(),
-	},
-	ui: {
-		showScriptSelector: overrides.showScriptSelector ?? false,
-		showHelp: false,
-		pendingConfirmation: null,
-		lineOverflow: 'wrap' as const,
-		openScriptSelector: vi.fn(),
-		closeScriptSelector: vi.fn(),
-		requestConfirmation: vi.fn(),
-		confirmPending: vi.fn(),
-		cancelPending: vi.fn(),
-		cycleLineOverflow: vi.fn(),
-		openHelp: vi.fn(),
-		closeHelp: vi.fn(),
-		toggleHelp: vi.fn(),
-	},
-	keepAlive: overrides.keepAlive ?? false,
-	quit: vi.fn(),
-});
 
 describe('quitCommand', () => {
 	it('has correct id', () => {
@@ -113,58 +20,58 @@ describe('quitCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when script selector is hidden', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				showScriptSelector: false,
 			});
-			expect(quitCommand.isEnabled(providers)).toBe(true);
+			expect(quitCommand.isEnabled(deps)).toBe(true);
 		});
 
 		it('returns false when script selector is shown', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				showScriptSelector: true,
 			});
-			expect(quitCommand.isEnabled(providers)).toBe(false);
+			expect(quitCommand.isEnabled(deps)).toBe(false);
 		});
 	});
 
 	describe('execute', () => {
-		it('calls killAllTasks and quit', () => {
-			const providers = createMockProviders();
-			quitCommand.execute(providers);
-			expect(providers.tasks.killAllTasks).toHaveBeenCalledOnce();
-			expect(providers.quit).toHaveBeenCalledOnce();
+		it('calls killAllTasks and onQuit', () => {
+			const deps = createMockDeps();
+			quitCommand.execute(deps);
+			expect(deps.tasks.killAllTasks).toHaveBeenCalledOnce();
+			expect(deps.onQuit).toHaveBeenCalledOnce();
 		});
 	});
 
 	describe('needsConfirmation', () => {
 		it('returns true when hasRunningTasks is true', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				hasRunningTasks: true,
 				keepAlive: false,
 			});
-			expect(quitCommand.needsConfirmation?.(providers)).toBe(true);
+			expect(quitCommand.needsConfirmation?.(deps)).toBe(true);
 		});
 
 		it('returns true when keepAlive is true', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				hasRunningTasks: false,
 				keepAlive: true,
 			});
-			expect(quitCommand.needsConfirmation?.(providers)).toBe(true);
+			expect(quitCommand.needsConfirmation?.(deps)).toBe(true);
 		});
 
 		it('returns false when no running tasks and keepAlive is false', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				hasRunningTasks: false,
 				keepAlive: false,
 			});
-			expect(quitCommand.needsConfirmation?.(providers)).toBe(false);
+			expect(quitCommand.needsConfirmation?.(deps)).toBe(false);
 		});
 	});
 
 	describe('confirmMessage', () => {
 		it('returns message with running task count when tasks are running', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				taskStates: {
 					task1: {
 						name: 'task1',
@@ -188,13 +95,13 @@ describe('quitCommand', () => {
 			});
 			const message =
 				typeof quitCommand.confirmMessage === 'function'
-					? quitCommand.confirmMessage(providers)
+					? quitCommand.confirmMessage(deps)
 					: quitCommand.confirmMessage;
 			expect(message).toBe('Quit with 2 running tasks?');
 		});
 
 		it('returns message with singular form for one running task', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				taskStates: {
 					task1: {
 						name: 'task1',
@@ -209,13 +116,13 @@ describe('quitCommand', () => {
 			});
 			const message =
 				typeof quitCommand.confirmMessage === 'function'
-					? quitCommand.confirmMessage(providers)
+					? quitCommand.confirmMessage(deps)
 					: quitCommand.confirmMessage;
 			expect(message).toBe('Quit with 1 running task?');
 		});
 
 		it('returns simple quit message when no running tasks', () => {
-			const providers = createMockProviders({
+			const deps = createMockDeps({
 				taskStates: {
 					task1: {
 						name: 'task1',
@@ -230,7 +137,7 @@ describe('quitCommand', () => {
 			});
 			const message =
 				typeof quitCommand.confirmMessage === 'function'
-					? quitCommand.confirmMessage(providers)
+					? quitCommand.confirmMessage(deps)
 					: quitCommand.confirmMessage;
 			expect(message).toBe('Quit?');
 		});

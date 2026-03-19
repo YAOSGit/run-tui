@@ -1,8 +1,26 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { TaskState } from '../../types/TaskState/index.js';
+import type { TaskStatus } from '../../types/TaskStatus/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 
-export const useTasksState = (initialTasks: string[]) => {
+export type UseTasksStateReturn = {
+	tasks: string[];
+	pinnedTasks: string[];
+	tabAliases: Record<string, string>;
+	taskStates: Record<string, TaskState>;
+	hasRunningTasks: boolean;
+	updateTaskState: (taskName: string, updates: Partial<TaskState>) => void;
+	addTaskState: (taskName: string) => string;
+	removeTaskState: (taskName: string) => void;
+	markStderrSeen: (taskName: string) => void;
+	toggleTaskPin: (taskName: string) => void;
+	renameTask: (taskName: string, newName: string) => void;
+	getTaskStatus: (taskName: string) => TaskStatus | undefined;
+	moveTaskLeft: (taskName: string) => void;
+	moveTaskRight: (taskName: string) => void;
+};
+
+export const useTasksState = (initialTasks: string[]): UseTasksStateReturn => {
 	// Task list state
 	const [baseTasks, setBaseTasks] = useState<string[]>(initialTasks);
 	const [pinnedTasks, setPinnedTasks] = useState<string[]>([]);

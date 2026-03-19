@@ -1,8 +1,10 @@
 import { Box, Text, useInput } from 'ink';
 import { useCallback, useMemo, useState } from 'react';
+import { theme } from '../../theme.js';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { fuzzyFilter } from '../../utils/fuzzyMatch/index.js';
 import { Footer } from '../Footer/index.js';
+import { HEADER_COLOR, INPUT_COLOR } from './ScriptSelector.consts.js';
 import type { ScriptSelectorProps } from './ScriptSelector.types.js';
 
 const SCRIPT_SELECTOR_COMMANDS: VisibleCommand[] = [
@@ -90,16 +92,16 @@ export function ScriptSelector({
 		<Box flexDirection="column" gap={1}>
 			{/* Header */}
 			<Box>
-				<Text bold color="magenta">
+				<Text bold color={HEADER_COLOR}>
 					Select a script to run:
 				</Text>
 			</Box>
 
 			{/* Search input */}
 			<Box>
-				<Text color="cyan">{'> '}</Text>
+				<Text color={INPUT_COLOR}>{'> '}</Text>
 				<Text>{query}</Text>
-				<Text color="cyan">{'_'}</Text>
+				<Text color={INPUT_COLOR}>{'_'}</Text>
 			</Box>
 
 			{/* Results list */}
@@ -117,10 +119,10 @@ export function ScriptSelector({
 						const isSelected = absoluteIndex === clampedIndex;
 						return (
 							<Box key={script}>
-								<Text color={isSelected ? 'cyan' : undefined}>
-									{isSelected ? '● ' : '  '}
+								<Text color={isSelected ? theme.brand : undefined}>
+									{isSelected ? '▸ ' : '  '}
 								</Text>
-								<Text bold={isSelected} color={isSelected ? 'cyan' : undefined}>
+								<Text bold={isSelected} color={isSelected ? theme.brand : undefined}>
 									{script}
 								</Text>
 							</Box>

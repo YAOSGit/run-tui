@@ -3,6 +3,20 @@ import path from 'node:path';
 import * as pty from 'node-pty';
 import stripAnsi from 'strip-ansi';
 
+/**
+ * Tests whether node-pty can spawn processes on this system.
+ * Returns false when PTY allocation fails (e.g. sandboxed CI, macOS missing pty devices).
+ */
+export function canSpawnPTY(): boolean {
+	try {
+		const p = pty.spawn('echo', ['ok'], { cols: 10, rows: 1 });
+		p.kill();
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 export interface PTYRunnerOptions {
 	cwd?: string;
 	env?: Record<string, string>;

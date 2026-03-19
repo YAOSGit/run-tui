@@ -69,8 +69,7 @@
 - **Tabbed Interface**: Each script runs in its own tab with status indicators
 - **Live Log Streaming**: Real-time output from all running processes
 - **Split View Mode**: Press `s` to split the terminal viewport horizontally, monitoring two tasks simultaneously
-- **Compact View**: Press `m` to toggle a dense, single-line overview of all configured tasks
-- **Focus Mode**: Press `F` to maximize log viewing area by dynamically hiding the UI chrome
+- **Compact View**: Press `m` to toggle a dense, single-line overview of all configured tasks with a header bar showing task count and active task
 - **Tab Pinning**: Press `p` to pin high-priority tasks to the left side of the tab bar
 - **Log Type Filtering**: Filter logs by stdout, stderr, or show all
 - **Search in Logs**: Press `/` to interactively search log outputs using highlighting and `n`/`N` navigation
@@ -155,7 +154,6 @@ run-tui -p bun dev test
 | `Tab` | Switch active pane focus (when in Split View) |
 | `p` | Toggle Tab Pinning |
 | `m` | Toggle Compact View mode |
-| `F` | Toggle Focus Mode (hides top/bottom bars) |
 | `/` | Search logs (`n`/`N` to navigate matches) |
 | `t` | Toggle log timestamps |
 | `c` | Clear the active tab's logs |

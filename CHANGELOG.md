@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [126.1.0] - 2026-03-19
+
+### Added
+- Compact mode header showing "Compact › N tasks › active-task"
+- Platform utilities moved to toolkit (`modKey`, `modKeyBindings`)
+
+### Changed
+- Layout uses pure flex (`flexGrow`) instead of manual height calculations — 60-line useMemo replaced with 3-line constant
+- `LogView` and `CompactView` use `flexGrow={1}` instead of fixed `height` prop
+- `TabBar` uses `width="100%"` for full-width rendering
+- Hardcoded colors extracted to `.consts.ts` files (ScriptSelector, RenameTabInput, TabBar, ConfirmDialog)
+- All hooks have explicit return type annotations
+- Barrel `index.ts` files added for all directories
+- Toolkit bumped to 0.0.26-3-19a
+
+### Removed
+- Focus mode (broke TUI patterns — hid TabBar/Footer with custom exit hint)
+- Local `src/utils/platform/` (moved to toolkit)
+
+### Fixed
+- Off-by-one bug: new script added via selector now correctly activates (`tasks.length - 1` instead of `tasks.length`)
+- Option+p and Option+m now work in both terminal modes (composed character and Esc+ mode)
+
 ## [126.0.0] - 2026-02-23
 
 ### Added

@@ -63,9 +63,9 @@ describe('LogView', () => {
 		expect(lastFrame()).toContain('more output');
 	});
 
-	it('respects custom height prop', () => {
+	it('renders logs correctly', () => {
 		const logs = [createLog('1', 'test')];
-		const { lastFrame } = render(<LogView logs={logs} height={10} />);
+		const { lastFrame } = render(<LogView logs={logs} />);
 
 		expect(lastFrame()).toContain('test');
 	});

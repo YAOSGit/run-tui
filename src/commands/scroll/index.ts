@@ -33,6 +33,7 @@ export const scrollDownCommand: Command = {
 export const scrollToBottomCommand: Command = {
 	id: 'SCROLL_TO_BOTTOM',
 	keys: [{ textKey: 'b' }],
+	displayKey: 'b',
 	displayText: 'bottom',
 	isEnabled: (p) =>
 		!p.ui.showScriptSelector &&

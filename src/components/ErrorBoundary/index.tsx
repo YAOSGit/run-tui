@@ -1,5 +1,6 @@
 import { Box, Text } from 'ink';
 import { Component, type ReactNode } from 'react';
+import { theme } from '../../theme.js';
 
 type ErrorBoundaryProps = {
 	children: ReactNode;
@@ -26,7 +27,7 @@ export class ErrorBoundary extends Component<
 			return (
 				this.props.fallback ?? (
 					<Box flexDirection="column" padding={1}>
-						<Text bold color="red">
+						<Text bold color={theme.error}>
 							Something went wrong
 						</Text>
 						<Text dimColor>{this.state.error?.message}</Text>

@@ -1,21 +1,31 @@
+import { TUILayout, SplitPane } from '@yaos-git/toolkit/tui/components';
 import { Box, type Key, Text, useInput, useStdout } from 'ink';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CompactView } from '../components/CompactView/index.js';
-import { ConfirmDialog } from '../components/ConfirmDialog/index.js';
-import { Footer } from '../components/Footer/index.js';
-import { HelpMenu } from '../components/HelpMenu/index.js';
 import { LogView } from '../components/LogView/index.js';
 import { RenameTabInput } from '../components/RenameTabInput/index.js';
 import { ScriptSelector } from '../components/ScriptSelector/index.js';
 import { SearchBar } from '../components/SearchBar/index.js';
 import { TabBar } from '../components/TabBar/index.js';
-import { useCommands } from '../providers/CommandsProvider/index.js';
+import {
+	COMMANDS,
+	useCommands,
+} from '../providers/CommandsProvider/index.js';
+import {
+	SECTION_COLORS,
+} from '../providers/CommandsProvider/CommandsProvider.consts.js';
+import type { RunTuiDeps } from '../providers/CommandsProvider/CommandsProvider.types.js';
 import { useLogs } from '../providers/LogsProvider/index.js';
 import { useTasks } from '../providers/TasksProvider/index.js';
 import { useUIState } from '../providers/UIStateProvider/index.js';
 import { useView } from '../providers/ViewProvider/index.js';
-import { MOD_KEY } from '../utils/platform/index.js';
+import { theme } from '../theme.js';
+import {
+	SCROLL_AUTOSCROLL_COLOR,
+	SCROLL_PAUSED_COLOR,
+	SPLIT_PANE_TITLE_COLOR,
+} from './app.consts.js';
 
 export type AppContentProps = {
 	availableScripts: string[];
@@ -73,7 +83,7 @@ export const AppContent: React.FC<AppContentProps> = ({
 		(script: string) => {
 			tasks.addTask(script);
 			// Set active tab to the new task
-			view.setActiveTabIndex(tasks.tasks.length);
+			view.setActiveTabIndex(tasks.tasks.length - 1);
 			ui.closeScriptSelector();
 		},
 		[tasks, view, ui],
@@ -139,79 +149,20 @@ export const AppContent: React.FC<AppContentProps> = ({
 		commands.handleInput(input, key);
 	});
 
-	const { logHeight, splitLogHeight } = useMemo(() => {
-		// Root box has top and bottom borders (2 lines)
-		let usedHeight = 2;
-
-		if (ui.showScriptSelector || tasks.tasks.length === 0) {
-			return {
-				logHeight: Math.max(1, effectiveHeight - usedHeight),
-				splitLogHeight: 0,
-			};
-		}
-
-		// TabBar takes 1 line text + 1 paddingBottom + 1 borderBottom = 3
-		// Focus mode hides the tab bar entirely (no extra height reserved)
-		if (view.displayMode !== 'compact' && !view.focusMode) {
-			usedHeight += 3;
-		}
-
-		// Calculate bottom Footer/Overlay bounds
-		if (ui.pendingConfirmation) {
-			// ConfirmDialog footprint: Input(1) + StatusMessage(1) + gap(1) + margin(1) + Footer Box(2) = 6
-			usedHeight += 6;
-		} else if (view.showSearch) {
-			// SearchBar footprint: Input text(1) + gap(1) + Footer Box(2) + padding(1) = 5
-			usedHeight += 5;
-		} else if (view.showRenameInput) {
-			// RenameTabInput footprint: Input text(1) + gap(1) + Footer Box(2) + padding(1) = 5
-			usedHeight += 5;
-		} else if (!view.focusMode) {
-			// Footer standard: marginTop(1) + Status(1) + gap(1) + Border(2) + Text(1) = 6
-			// Not rendered in focus mode, so don't reserve the space
-			usedHeight += 6;
-		} else {
-			// Focus mode: no footer, but the "press opt+f to exit" hint text takes 1 line
-			usedHeight += 1;
-		}
-
-		// Primary Pane log box has borders — not present in compact mode
-		if (view.displayMode !== 'compact') {
-			usedHeight += 2;
-		}
-
-		if (view.splitTaskName && view.displayMode !== 'compact') {
-			// Split pane: borders (2) + marginTop (1) + title box text (1) + title marginBottom (1) = 5
-			usedHeight += 5;
-		}
-
-		const remaining = Math.max(1, effectiveHeight - usedHeight);
-
-		if (view.splitTaskName && view.displayMode !== 'compact') {
-			const top = Math.floor(remaining / 2);
-			const bottom = remaining - top;
-			return { logHeight: top, splitLogHeight: bottom };
-		}
-
-		return { logHeight: remaining, splitLogHeight: 0 };
-	}, [
-		effectiveHeight,
-		view.displayMode,
-		view.focusMode,
-		view.splitTaskName,
-		ui.showScriptSelector,
-		ui.pendingConfirmation,
-		view.showSearch,
-		view.showRenameInput,
-		tasks.tasks.length,
-	]);
+	// Estimate max lines for log data fetching (not layout — flex handles that).
+	// AppShell border(2) + header(3) + footer(3) + statusBar(2) + borders/padding(2)
+	const CHROME_LINES = 12;
+	const maxLines = Math.max(1, effectiveHeight - CHROME_LINES);
+	const _splitMaxLines = view.splitTaskName
+		? Math.max(1, Math.floor(maxLines / 2) - 2)
+		: 0;
 
 	// Get logs for primary task
 	const activeLogs = view.activeTask
 		? logs.getLogsForTask(
 				view.activeTask,
 				view.logFilter,
-				logHeight,
+				maxLines,
 				view.primaryScrollOffset,
 			)
 		: [];
@@ -221,69 +172,13 @@ export const AppContent: React.FC<AppContentProps> = ({
 		? {
 				startLine: Math.max(
 					1,
-					view.totalLogs - view.primaryScrollOffset - logHeight + 1,
+					view.totalLogs - view.primaryScrollOffset - maxLines + 1,
 				),
 				endLine: Math.max(0, view.totalLogs - view.primaryScrollOffset),
 				totalLogs: view.totalLogs,
 				autoScroll: view.primaryAutoScroll,
 			}
 		: undefined;
-
-	// Show script selector overlay
-	if (ui.showScriptSelector) {
-		return (
-			<Box
-				flexDirection="column"
-				borderStyle="round"
-				borderColor="cyan"
-				width={effectiveWidth}
-			>
-				<ScriptSelector
-					availableScripts={availableScripts}
-					runningScripts={tasks.tasks}
-					onSelect={handleSelectScript}
-					onCancel={handleCancelSelector}
-					height={Math.max(1, effectiveHeight - 2)}
-				/>
-			</Box>
-		);
-	}
-
-	// Show empty state when no tasks
-	if (tasks.tasks.length === 0) {
-		return (
-			<Box
-				flexDirection="column"
-				padding={1}
-				borderStyle="round"
-				borderColor="blue"
-				width={effectiveWidth}
-			>
-				<Box
-					flexDirection="column"
-					height={Math.max(1, effectiveHeight - 6)}
-					justifyContent="center"
-					alignItems="center"
-				>
-					<Text dimColor>No scripts running.</Text>
-					<Text dimColor>
-						Press <Text bold>n</Text> to add a script.
-					</Text>
-				</Box>
-				{ui.pendingConfirmation ? (
-					<ConfirmDialog message={ui.pendingConfirmation.message} />
-				) : (
-					<Footer
-						commands={commands.getVisibleCommands()}
-						activeTask={undefined}
-						status={undefined}
-						logFilter={view.logFilter}
-						width={effectiveWidth}
-					/>
-				)}
-			</Box>
-		);
-	}
 
 	const activeTaskStatus = view.activeTask
 		? tasks.getTaskStatus(view.activeTask)
@@ -305,15 +200,53 @@ export const AppContent: React.FC<AppContentProps> = ({
 		? logs.getLogsForTask(view.splitTaskName, view.logFilter)
 		: [];
 
-	return (
-		<Box
-			flexDirection="column"
-			paddingX={1}
-			borderStyle="round"
-			borderColor="blue"
-			width={effectiveWidth}
-		>
-			{!view.focusMode && view.displayMode !== 'compact' ? (
+	// Build scroll indicator for status bar
+	const scrollIndicator = scrollInfo && scrollInfo.totalLogs > 0 && (
+		<Text dimColor>
+			{scrollInfo.startLine}-{scrollInfo.endLine}/{scrollInfo.totalLogs}
+			{scrollInfo.autoScroll ? (
+				<Text color={SCROLL_AUTOSCROLL_COLOR}> ▶</Text>
+			) : (
+				<Text color={SCROLL_PAUSED_COLOR}> ⏸</Text>
+			)}
+		</Text>
+	);
+
+	// Build status bar (task name + status + filter + scroll)
+	const statusBar =
+		displayActiveTaskName && activeTaskStatus ? (
+			<Box justifyContent="space-between">
+				<Box>
+					<Text bold>{displayActiveTaskName}</Text>
+					<Text dimColor> - {activeTaskStatus.toUpperCase()}</Text>
+					<Text dimColor> [{view.logFilter ?? 'all'}]</Text>
+				</Box>
+				{scrollIndicator}
+			</Box>
+		) : undefined;
+
+	// Build header (TabBar or compact summary)
+	const displayActiveTask = view.activeTask
+		? (tasks.tabAliases?.[view.activeTask] ?? view.activeTask)
+		: null;
+
+	const header =
+		tasks.tasks.length > 0 ? (
+			view.displayMode === 'compact' ? (
+				<Box width="100%" borderStyle="round" borderColor="gray" paddingX={1}>
+					<Text wrap="truncate">
+						<Text bold color={theme.brand}>Compact</Text>
+						<Text dimColor> › </Text>
+						<Text>{tasks.tasks.length} tasks</Text>
+						{displayActiveTask && (
+							<>
+								<Text dimColor> › </Text>
+								<Text bold>{displayActiveTask}</Text>
+							</>
+						)}
+					</Text>
+				</Box>
+			) : (
 				<TabBar
 					tasks={tasks.tasks}
 					taskStates={tasks.taskStates}
@@ -322,79 +255,22 @@ export const AppContent: React.FC<AppContentProps> = ({
 					activeTabIndex={view.activeTabIndex}
 					width={effectiveWidth}
 				/>
-			) : view.focusMode ? (
-				<Box justifyContent="flex-end" width={effectiveWidth - 4}>
-					<Text dimColor>[Focus Mode - press {MOD_KEY}+f to exit]</Text>
-				</Box>
-			) : null}
-			{!ui.showHelp &&
-				(view.displayMode === 'compact' ? (
-					<CompactView
-						tasks={tasks.tasks}
-						taskStates={tasks.taskStates}
-						pinnedTasks={tasks.pinnedTasks}
-						tabAliases={tasks.tabAliases ?? {}}
-						activeTabIndex={view.activeTabIndex}
-						width={effectiveWidth}
-						height={Math.min(tasks.tasks.length, logHeight)}
-					/>
-				) : (
-					<Box flexDirection="column" gap={0} flexGrow={1}>
-						{/* Primary Pane */}
-						<Box
-							flexDirection="column"
-							flexGrow={1}
-							borderStyle="single"
-							borderColor={view.activePane === 'primary' ? 'cyan' : 'gray'}
-						>
-							<LogView
-								logs={activeLogs}
-								isRunning={activeTaskStatus === 'running'}
-								height={logHeight}
-								width={effectiveWidth - 2}
-								lineOverflow={ui.lineOverflow}
-								showTimestamps={view.showTimestamps}
-								searchQuery={view.searchQuery}
-							/>
-						</Box>
+			)
+		) : null;
 
-						{/* Secondary Split Pane */}
-						{view.splitTaskName && (
-							<Box
-								flexDirection="column"
-								flexGrow={1}
-								borderStyle="single"
-								borderColor={view.activePane === 'split' ? 'cyan' : 'gray'}
-								marginTop={1} // Gap between panes
-							>
-								<Box backgroundColor="gray" paddingX={1} marginBottom={1}>
-									<Text color="black" bold>
-										{displaySplitTaskName}
-									</Text>
-								</Box>
-								<LogView
-									logs={splitLogs}
-									isRunning={splitTaskStatus === 'running'}
-									height={splitLogHeight}
-									width={effectiveWidth - 2}
-									lineOverflow={ui.lineOverflow}
-									showTimestamps={view.showTimestamps}
-									searchQuery={view.searchQuery}
-								/>
-							</Box>
-						)}
-					</Box>
-				))}
-
-			{ui.showHelp ? (
-				<HelpMenu width={effectiveWidth - 4} />
-			) : ui.pendingConfirmation ? (
-				<ConfirmDialog
-					message={ui.pendingConfirmation.message}
-					activeTask={displayActiveTaskName}
-					status={activeTaskStatus}
+	// Build overlays map for TUILayout
+	const overlays: Record<string, () => React.ReactNode> = useMemo(
+		() => ({
+			selector: () => (
+				<ScriptSelector
+					availableScripts={availableScripts}
+					runningScripts={tasks.tasks}
+					onSelect={handleSelectScript}
+					onCancel={handleCancelSelector}
+					height={Math.max(1, effectiveHeight - 2)}
 				/>
-			) : view.showSearch ? (
+			),
+			search: () => (
 				<SearchBar
 					query={view.searchQuery}
 					onQueryChange={view.setSearchQuery}
@@ -404,7 +280,8 @@ export const AppContent: React.FC<AppContentProps> = ({
 					onNextMatch={view.nextMatch}
 					onPrevMatch={view.prevMatch}
 				/>
-			) : view.showRenameInput ? (
+			),
+			rename: () => (
 				<RenameTabInput
 					initialName={displayActiveTaskName ?? view.activeTask ?? ''}
 					onRename={(newName) => {
@@ -414,16 +291,152 @@ export const AppContent: React.FC<AppContentProps> = ({
 					}}
 					onClose={view.closeRenameInput}
 				/>
-			) : !view.focusMode ? (
-				<Footer
-					commands={commands.getVisibleCommands()}
-					activeTask={displayActiveTaskName}
-					status={activeTaskStatus}
-					logFilter={view.logFilter}
-					scrollInfo={scrollInfo}
-					width={effectiveWidth}
+			),
+		}),
+		[
+			availableScripts,
+			tasks.tasks,
+			handleSelectScript,
+			handleCancelSelector,
+			effectiveHeight,
+			view.searchQuery,
+			view.setSearchQuery,
+			view.searchMatches.length,
+			view.currentMatchIndex,
+			view.closeSearch,
+			view.nextMatch,
+			view.prevMatch,
+			displayActiveTaskName,
+			view.activeTask,
+			tasks.renameTask,
+			view.closeRenameInput,
+		],
+	);
+
+	// Build main content
+	const mainContent = useMemo(() => {
+		// Empty state when no tasks and no overlay active
+		if (tasks.tasks.length === 0) {
+			return (
+				<Box
+					flexDirection="column"
+					flexGrow={1}
+					justifyContent="center"
+					alignItems="center"
+				>
+					<Text dimColor>No scripts running.</Text>
+					<Text dimColor>
+						Press <Text bold>n</Text> to add a script.
+					</Text>
+				</Box>
+			);
+		}
+
+		// Compact view mode
+		if (view.displayMode === 'compact') {
+			return (
+				<CompactView
+					tasks={tasks.tasks}
+					taskStates={tasks.taskStates}
+					pinnedTasks={tasks.pinnedTasks}
+					tabAliases={tasks.tabAliases ?? {}}
+					activeTabIndex={view.activeTabIndex}
+					maxVisible={Math.min(tasks.tasks.length, maxLines)}
 				/>
-			) : null}
-		</Box>
+			);
+		}
+
+		// Normal/split view with SplitPane
+		if (view.splitTaskName) {
+			return (
+				<SplitPane
+					direction="vertical"
+					ratio={[50, 50]}
+					focusedIndex={view.activePane === 'primary' ? 0 : 1}
+					theme={theme}
+					borders={[true, true]}
+				>
+					<LogView
+						logs={activeLogs}
+						isRunning={activeTaskStatus === 'running'}
+						width={effectiveWidth - 2}
+						lineOverflow={ui.lineOverflow}
+						showTimestamps={view.showTimestamps}
+						searchQuery={view.searchQuery}
+					/>
+					<Box flexDirection="column" flexGrow={1}>
+						<Box backgroundColor="gray" paddingX={1} marginBottom={1}>
+							<Text color={SPLIT_PANE_TITLE_COLOR} bold>
+								{displaySplitTaskName}
+							</Text>
+						</Box>
+						<LogView
+							logs={splitLogs}
+							isRunning={splitTaskStatus === 'running'}
+							width={effectiveWidth - 2}
+							lineOverflow={ui.lineOverflow}
+							showTimestamps={view.showTimestamps}
+							searchQuery={view.searchQuery}
+						/>
+					</Box>
+				</SplitPane>
+			);
+		}
+
+		// Single pane
+		return (
+			<SplitPane
+				direction="vertical"
+				ratio={[100, 0]}
+				focusedIndex={0}
+				theme={theme}
+				borders={[true, false]}
+			>
+				<LogView
+					logs={activeLogs}
+					isRunning={activeTaskStatus === 'running'}
+					width={effectiveWidth - 2}
+					lineOverflow={ui.lineOverflow}
+					showTimestamps={view.showTimestamps}
+					searchQuery={view.searchQuery}
+				/>
+			</SplitPane>
+		);
+	}, [
+		tasks.tasks,
+		tasks.taskStates,
+		tasks.pinnedTasks,
+		tasks.tabAliases,
+		view.displayMode,
+		view.splitTaskName,
+		view.activePane,
+		view.activeTabIndex,
+		view.showTimestamps,
+		view.searchQuery,
+		activeLogs,
+		splitLogs,
+		activeTaskStatus,
+		splitTaskStatus,
+		effectiveWidth,
+		ui.lineOverflow,
+		displaySplitTaskName,
+		maxLines,
+	]);
+
+	return (
+		<TUILayout<RunTuiDeps>
+			brand="run"
+			theme={theme}
+			commands={COMMANDS}
+			deps={commands.deps}
+			helpTitle="YAOSGit run - Keyboard Shortcuts"
+			helpSectionColors={SECTION_COLORS}
+			overlays={overlays}
+			header={header}
+			statusBar={statusBar}
+			footerChildren={null}
+		>
+			{mainContent}
+		</TUILayout>
 	);
 };

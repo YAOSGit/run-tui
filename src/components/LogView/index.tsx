@@ -1,14 +1,14 @@
-import { Spinner } from '@inkjs/ui';
+import { StatusIcon } from '@yaos-git/toolkit/tui/components';
 import { Box, Text } from 'ink';
 import { COLOR } from '../../types/Color/index.js';
 import { LINE_OVERFLOW } from '../../types/LineOverflow/index.js';
 import { LOG_TYPE } from '../../types/LogType/index.js';
 import { highlightLog } from '../../utils/syntaxHighlight/index.js';
+import { SEARCH_HIGHLIGHT } from './LogView.consts.js';
 import type { LogViewProps } from './LogView.types.js';
 
 export function LogView({
 	logs,
-	height = 20,
 	width = 80,
 	isRunning = false,
 	lineOverflow = LINE_OVERFLOW.WRAP,
@@ -25,10 +25,10 @@ export function LogView({
 	};
 
 	return (
-		<Box flexDirection="column" height={height}>
+		<Box flexDirection="column" flexGrow={1}>
 			{logs.length === 0 ? (
 				<Box gap={1}>
-					{isRunning && <Spinner />}
+					{isRunning && <StatusIcon status="running" />}
 					<Text dimColor>Waiting for output...</Text>
 				</Box>
 			) : (
@@ -76,8 +76,8 @@ export function LogView({
 												parts.push(
 													<Text
 														key={`${log.id}-match-${index}`}
-														backgroundColor="yellow"
-														color="black"
+														backgroundColor={SEARCH_HIGHLIGHT.backgroundColor}
+														color={SEARCH_HIGHLIGHT.color}
 													>
 														{log.text.slice(index, index + searchQuery.length)}
 													</Text>,

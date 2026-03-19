@@ -2,6 +2,7 @@ import { StatusMessage } from '@inkjs/ui';
 import { Box, Text } from 'ink';
 import type { TaskStatus } from '../../types/TaskStatus/index.js';
 import { STATUS_VARIANTS } from '../Footer/Footer.consts.js';
+import { BRAND_COLOR, MESSAGE_COLOR } from './ConfirmDialog.consts.js';
 
 export type ConfirmDialogProps = {
 	message: string;
@@ -21,7 +22,7 @@ export function ConfirmDialog({
 					<StatusMessage variant={STATUS_VARIANTS[status]}>
 						<Text bold>{activeTask}</Text>
 						<Text dimColor> - </Text>
-						<Text color="yellow">{message}</Text>
+						<Text color={MESSAGE_COLOR}>{message}</Text>
 					</StatusMessage>
 				</Box>
 			) : (
@@ -31,7 +32,7 @@ export function ConfirmDialog({
 			)}
 			<Box borderStyle="round" borderColor="gray" paddingX={1}>
 				<Text wrap="end">
-					<Text bold color="magenta">
+					<Text bold color={BRAND_COLOR}>
 						YAOSGit
 						<Text dimColor> : </Text>
 						run

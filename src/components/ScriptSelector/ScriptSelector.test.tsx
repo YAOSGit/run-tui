@@ -59,13 +59,14 @@ describe('ScriptSelector', () => {
 		expect(lastFrame()).toContain('Press ESC or q to go back');
 	});
 
-	it('calls onCancel when escape is pressed', () => {
+	it('calls onCancel when escape is pressed', async () => {
 		const onCancel = vi.fn();
 		const { stdin } = render(
 			<ScriptSelector {...defaultProps} onCancel={onCancel} />,
 		);
 
 		stdin.write('\x1B'); // Escape key
+		await new Promise((r) => setImmediate(r));
 		expect(onCancel).toHaveBeenCalled();
 	});
 

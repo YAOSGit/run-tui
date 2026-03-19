@@ -3,6 +3,8 @@ import { COLOR } from '../../types/Color/index.js';
 import type { TaskStatus } from '../../types/TaskStatus/index.js';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 
+export const ACTIVE_TAB_TEXT_COLOR = 'white' as const;
+
 export const TAB_BAR_STATUS_COLORS: Record<TaskStatus, Color> = {
 	[TASK_STATUS.PENDING]: COLOR.GRAY,
 	[TASK_STATUS.RUNNING]: COLOR.BLUE,

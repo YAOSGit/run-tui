@@ -1,25 +1,29 @@
-import { Badge, Spinner } from '@inkjs/ui';
+import { StatusIcon } from '@yaos-git/toolkit/tui/components';
 import { Box, Text } from 'ink';
 import { useMemo } from 'react';
 import { TASK_STATUS } from '../../types/TaskStatus/index.js';
+import { theme } from '../../theme.js';
 import { TaskTime } from '../TaskTime/index.js';
-import {
-	TAB_BAR_INDEX_COLORS,
-	TAB_BAR_STATUS_COLORS,
-} from './TabBar.consts.js';
+import { ACTIVE_TAB_TEXT_COLOR, TAB_BAR_INDEX_COLORS } from './TabBar.consts.js';
 import type { TabBarProps } from './TabBar.types.js';
 
-// Estimate tab width: task name + space + badge brackets and text + gap
+const STATUS_ICON_MAP: Record<string, string> = {
+	[TASK_STATUS.PENDING]: 'idle',
+	[TASK_STATUS.RUNNING]: 'running',
+	[TASK_STATUS.SUCCESS]: 'success',
+	[TASK_STATUS.ERROR]: 'error',
+	[TASK_STATUS.RESTARTING]: 'running',
+};
+
+// Estimate tab width: task name + space + icon + gap
 const estimateTabWidth = (
 	taskName: string,
 	status: string,
 	hasStderrBadge: boolean,
 	isPinned: boolean,
 ): number => {
-	// Badge format: " STATUS " with brackets adds ~3 chars
-	// Spinner is ~1 char
-	// Gap between elements is 1
-	const badgeWidth = status === 'running' ? 1 : status.length + 3;
+	// StatusIcon is 1 char wide for all states
+	const badgeWidth = 1;
 	const stderrBadgeWidth = hasStderrBadge ? 5 : 0; // " ERR " + gap
 	const pinWidth = isPinned ? 3 : 0; // "📌 "
 	const timeWidth = status !== 'pending' ? 8 : 0; // e.g. " (2m 1s)" overhead
@@ -146,7 +150,7 @@ export function TabBar({
 	}
 
 	return (
-		<Box borderStyle="round" borderColor="gray" paddingX={1}>
+		<Box width="100%" borderStyle="round" borderColor="gray" paddingX={1}>
 			{/* Left arrow - fixed position */}
 			<Box width={ARROW_WIDTH}>
 				{showLeftArrow && <Text dimColor>◀ {startIndex}</Text>}
@@ -167,7 +171,7 @@ export function TabBar({
 					return (
 						<Box key={task} gap={1}>
 							{isActive ? (
-								<Text backgroundColor={color} color="white" bold>
+								<Text backgroundColor={color} color={ACTIVE_TAB_TEXT_COLOR} bold>
 									{isPinned ? '📌 ' : ''}
 									{displayTaskName}
 									<TaskTime
@@ -185,17 +189,11 @@ export function TabBar({
 									/>
 								</Text>
 							)}
-							{showStderrFlag && <Badge color="red">ERR</Badge>}
+							{showStderrFlag && <Text color={theme.error} bold>ERR</Text>}
 							{taskState?.restartCount && taskState.restartCount > 0 ? (
-								<Badge color="yellow">↻{taskState.restartCount}</Badge>
+								<Text color={theme.warning}>↻{taskState.restartCount}</Text>
 							) : null}
-							{taskState?.status === TASK_STATUS.RUNNING ? (
-								<Spinner />
-							) : (
-								<Badge color={TAB_BAR_STATUS_COLORS[taskState?.status]}>
-									{taskState?.status.toUpperCase()}
-								</Badge>
-							)}
+							<StatusIcon status={STATUS_ICON_MAP[taskState?.status ?? 'pending'] ?? 'idle'} />
 						</Box>
 					);
 				})}

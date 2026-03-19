@@ -4,6 +4,45 @@ import type { LogType } from '../../types/LogType/index.js';
 import { LOG_FILTERS } from './useViewState.consts.js';
 import type { UseViewStateOptions } from './useViewState.types.js';
 
+export type UseViewStateReturn = {
+	activeTabIndex: number;
+	activeTask: string | undefined;
+	logFilter: LogType | null;
+	primaryScrollOffset: number;
+	primaryAutoScroll: boolean;
+	activePane: 'primary' | 'split';
+	splitTaskName: string | null;
+	splitScrollOffset: number;
+	splitAutoScroll: boolean;
+	viewHeight: number;
+	totalLogs: number;
+	navigateLeft: () => void;
+	navigateRight: () => void;
+	setActiveTabIndex: (index: number) => void;
+	cycleLogFilter: () => void;
+	scrollUp: () => void;
+	scrollDown: () => void;
+	scrollToBottom: () => void;
+	showTimestamps: boolean;
+	toggleTimestamps: () => void;
+	showSearch: boolean;
+	searchQuery: string;
+	searchMatches: number[];
+	currentMatchIndex: number | null;
+	showRenameInput: boolean;
+	displayMode: 'full' | 'compact';
+	openSearch: () => void;
+	closeSearch: () => void;
+	openRenameInput: () => void;
+	closeRenameInput: () => void;
+	setSearchQuery: (query: string) => void;
+	scrollToIndex: (index: number, total: number) => void;
+	toggleDisplayMode: () => void;
+	cyclePaneFocus: () => void;
+	nextMatch: () => void;
+	prevMatch: () => void;
+};
+
 export const useViewState = ({
 	viewHeight,
 	tasks,
@@ -11,7 +50,7 @@ export const useViewState = ({
 	getLogCountForTask,
 	getLogsForTask,
 	markStderrSeen,
-}: UseViewStateOptions) => {
+}: UseViewStateOptions): UseViewStateReturn => {
 	const [activeTaskName, setActiveTaskName] = useState<string | null>(
 		tasks[0] ?? null,
 	);
@@ -28,7 +67,6 @@ export const useViewState = ({
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [showRenameInput, setShowRenameInput] = useState(false);
-	const [focusMode, setFocusMode] = useState(false);
 	const [displayMode, setDisplayMode] = useState<'full' | 'compact'>('full');
 
 	// Derived: tasks logic
@@ -237,10 +275,6 @@ export const useViewState = ({
 	);
 
 	// View mode toggles
-	const toggleFocusMode = useCallback(() => {
-		setFocusMode((prev) => !prev);
-	}, []);
-
 	const toggleDisplayMode = useCallback(() => {
 		setDisplayMode((prev) => (prev === 'full' ? 'compact' : 'full'));
 	}, []);
@@ -347,7 +381,6 @@ export const useViewState = ({
 		searchMatches,
 		currentMatchIndex,
 		showRenameInput,
-		focusMode,
 		displayMode,
 		openSearch,
 		closeSearch,
@@ -355,7 +388,6 @@ export const useViewState = ({
 		closeRenameInput,
 		setSearchQuery,
 		scrollToIndex,
-		toggleFocusMode,
 		toggleDisplayMode,
 		cyclePaneFocus,
 		nextMatch,

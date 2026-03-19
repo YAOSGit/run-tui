@@ -1,5 +1,5 @@
 import type { Command } from '../../types/Command/index.js';
-import { modKey } from '../../utils/platform/index.js';
+import { modKey } from '@yaos-git/toolkit/tui/commands';
 
 export const reorderTabRightCommand: Command = {
 	id: 'REORDER_TAB_RIGHT',

@@ -1,6 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { CommandProviders } from '../../providers/CommandsProvider/CommandsProvider.types.js';
-import { LINE_OVERFLOW } from '../../types/LineOverflow/index.js';
+import { createMockDeps } from '../../test-utils/mockDeps.js';
 import { LOG_TYPE } from '../../types/LogType/index.js';
 import * as exportUtils from '../../utils/exportLogs/index.js';
 import {
@@ -9,111 +7,18 @@ import {
 	exportCurrentLogsCommand,
 } from './index.js';
 
+const logsForTask = vi.fn().mockReturnValue([
+	{
+		id: '1',
+		task: 'task1',
+		text: 'hello',
+		type: LOG_TYPE.STDOUT,
+		timestamp: '10:00:00',
+	},
+]);
+
 afterEach(() => {
 	vi.restoreAllMocks();
-});
-
-const createMockProviders = (
-	overrides: Partial<{
-		showScriptSelector: boolean;
-		tasks: string[];
-		activeTask: string | undefined;
-		noActiveTask: boolean;
-	}> = {},
-): CommandProviders => ({
-	tasks: {
-		tasks: overrides.tasks ?? ['task1'],
-		taskStates: {},
-		pinnedTasks: [],
-		tabAliases: {},
-		hasRunningTasks: false,
-		addTask: vi.fn(),
-		closeTask: vi.fn(),
-		restartTask: vi.fn(),
-		killTask: vi.fn(),
-		killAllTasks: vi.fn(),
-		cancelRestart: vi.fn(),
-		markStderrSeen: vi.fn(),
-		toggleTaskPin: vi.fn(),
-		renameTask: vi.fn(),
-		moveTaskLeft: vi.fn(),
-		moveTaskRight: vi.fn(),
-		getTaskStatus: vi.fn(),
-	},
-	logs: {
-		addLog: vi.fn(),
-		getLogsForTask: vi.fn().mockReturnValue([
-			{
-				id: '1',
-				task: 'task1',
-				text: 'hello',
-				type: LOG_TYPE.STDOUT,
-				timestamp: '10:00:00',
-			},
-		]),
-		getLogCountForTask: vi.fn().mockReturnValue(1),
-		clearLogsForTask: vi.fn(),
-	},
-	view: {
-		activeTabIndex: 0,
-		// Use null-safe ternary so we can pass explicit undefined
-		activeTask: overrides.noActiveTask
-			? undefined
-			: (overrides.activeTask ?? 'task1'),
-		logFilter: null,
-		primaryScrollOffset: 0,
-		primaryAutoScroll: true,
-		splitScrollOffset: 0,
-		splitAutoScroll: true,
-		splitTaskName: null,
-		activePane: 'primary',
-		showTimestamps: false,
-		showSearch: false,
-		searchQuery: '',
-		searchMatches: [],
-		currentMatchIndex: -1,
-		showRenameInput: false,
-		viewHeight: 20,
-		totalLogs: 1,
-		focusMode: false,
-		displayMode: 'full' as const,
-		navigateLeft: vi.fn(),
-		navigateRight: vi.fn(),
-		setActiveTabIndex: vi.fn(),
-		cycleLogFilter: vi.fn(),
-		scrollUp: vi.fn(),
-		scrollDown: vi.fn(),
-		scrollToBottom: vi.fn(),
-		nextMatch: vi.fn(),
-		prevMatch: vi.fn(),
-		toggleTimestamps: vi.fn(),
-		openSearch: vi.fn(),
-		closeSearch: vi.fn(),
-		openRenameInput: vi.fn(),
-		closeRenameInput: vi.fn(),
-		setSearchQuery: vi.fn(),
-		scrollToIndex: vi.fn(),
-		toggleFocusMode: vi.fn(),
-		toggleDisplayMode: vi.fn(),
-		cyclePaneFocus: vi.fn(),
-	},
-	ui: {
-		showScriptSelector: overrides.showScriptSelector ?? false,
-		showHelp: false,
-		pendingConfirmation: null,
-		lineOverflow: LINE_OVERFLOW.WRAP,
-		openScriptSelector: vi.fn(),
-		closeScriptSelector: vi.fn(),
-		requestConfirmation: vi.fn(),
-		confirmPending: vi.fn(),
-		cancelPending: vi.fn(),
-		cycleLineOverflow: vi.fn(),
-		openHelp: vi.fn(),
-		closeHelp: vi.fn(),
-		toggleHelp: vi.fn(),
-	},
-	keepAlive: false,
-	quit: vi.fn(),
 });
 
 describe('exportCurrentLogsCommand', () => {
@@ -133,7 +38,7 @@ describe('exportCurrentLogsCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when tasks exist and selector hidden', () => {
-			expect(exportCurrentLogsCommand.isEnabled(createMockProviders())).toBe(
+			expect(exportCurrentLogsCommand.isEnabled(createMockDeps())).toBe(
 				true,
 			);
 		});
@@ -141,14 +46,14 @@ describe('exportCurrentLogsCommand', () => {
 		it('returns false when script selector is shown', () => {
 			expect(
 				exportCurrentLogsCommand.isEnabled(
-					createMockProviders({ showScriptSelector: true }),
+					createMockDeps({ showScriptSelector: true }),
 				),
 			).toBe(false);
 		});
 
 		it('returns false when no tasks', () => {
 			expect(
-				exportCurrentLogsCommand.isEnabled(createMockProviders({ tasks: [] })),
+				exportCurrentLogsCommand.isEnabled(createMockDeps({ tasks: [] })),
 			).toBe(false);
 		});
 	});
@@ -158,7 +63,7 @@ describe('exportCurrentLogsCommand', () => {
 			const saveSpy = vi
 				.spyOn(exportUtils, 'saveLogsToFile')
 				.mockResolvedValue('/logs/task1.log');
-			const providers = createMockProviders();
+			const providers = createMockDeps({ getLogsForTask: logsForTask });
 
 			exportCurrentLogsCommand.execute(providers);
 
@@ -170,7 +75,7 @@ describe('exportCurrentLogsCommand', () => {
 			const saveSpy = vi
 				.spyOn(exportUtils, 'saveLogsToFile')
 				.mockResolvedValue('');
-			const providers = createMockProviders({ noActiveTask: true });
+			const providers = createMockDeps({ activeTask: undefined });
 
 			exportCurrentLogsCommand.execute(providers);
 
@@ -199,7 +104,7 @@ describe('exportAllLogsCommand', () => {
 			const saveSpy = vi
 				.spyOn(exportUtils, 'saveLogsToFile')
 				.mockResolvedValue('');
-			const providers = createMockProviders({ tasks: ['task1', 'task2'] });
+			const providers = createMockDeps({ tasks: ['task1', 'task2'], getLogsForTask: logsForTask });
 
 			exportAllLogsCommand.execute(providers);
 
@@ -228,7 +133,7 @@ describe('copyCurrentLogsCommand', () => {
 			const clipSpy = vi
 				.spyOn(exportUtils, 'copyToClipboard')
 				.mockResolvedValue(undefined);
-			const providers = createMockProviders();
+			const providers = createMockDeps({ getLogsForTask: logsForTask });
 
 			copyCurrentLogsCommand.execute(providers);
 
@@ -239,7 +144,7 @@ describe('copyCurrentLogsCommand', () => {
 			const clipSpy = vi
 				.spyOn(exportUtils, 'copyToClipboard')
 				.mockResolvedValue(undefined);
-			const providers = createMockProviders({ noActiveTask: true });
+			const providers = createMockDeps({ activeTask: undefined });
 
 			copyCurrentLogsCommand.execute(providers);
 

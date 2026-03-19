@@ -1,6 +1,8 @@
 import { StatusMessage } from '@inkjs/ui';
+import { CommandFooter } from '@yaos-git/toolkit/tui/components';
 import { Box, Text } from 'ink';
-import { STATUS_VARIANTS } from './Footer.consts.js';
+import { theme } from '../../theme.js';
+import { SCROLL_AUTOSCROLL_COLOR, SCROLL_PAUSED_COLOR, STATUS_VARIANTS } from './Footer.consts.js';
 import type { FooterProps } from './Footer.types.js';
 
 export function Footer({
@@ -10,51 +12,53 @@ export function Footer({
 	logFilter,
 	scrollInfo,
 	width,
+	confirmation,
 }: FooterProps) {
+	const commandObjects = commands.map((cmd) => ({
+		id: `${cmd.displayKey}-${cmd.displayText}`,
+		keys: [],
+		displayKey: String(cmd.displayKey),
+		displayText: cmd.displayText,
+		footer: cmd.priority ? ('priority' as const) : ('optional' as const),
+		footerOrder: cmd.footerOrder,
+		isEnabled: () => true,
+		execute: () => {},
+	}));
+
+	const footerDeps = {
+		ui: {
+			activeOverlay: 'none' as const,
+			setActiveOverlay: () => {},
+			confirmation: confirmation ? { ...confirmation, onConfirm: () => {} } : null,
+			requestConfirmation: () => {},
+			clearConfirmation: () => {},
+			cycleFocus: () => {},
+		},
+		onQuit: () => {},
+	};
+
 	const scrollIndicator = scrollInfo && scrollInfo.totalLogs > 0 && (
 		<Text dimColor>
 			{scrollInfo.startLine}-{scrollInfo.endLine}/{scrollInfo.totalLogs}
 			{scrollInfo.autoScroll ? (
-				<Text color="green"> ▶</Text>
+				<Text color={SCROLL_AUTOSCROLL_COLOR}> ▶</Text>
 			) : (
-				<Text color="yellow"> ⏸</Text>
+				<Text color={SCROLL_PAUSED_COLOR}> ⏸</Text>
 			)}
 		</Text>
 	);
 
-	const terminalWidth = width ?? process.stdout.columns ?? 80;
-	const availableWidth = terminalWidth - 8; // border left/right (2) + paddingX=1 left/right (2) + 4 for the first/last separator
-	let currentWidth = 13; // "YAOSGit : run"
-
-	const priorityCommands = commands.filter((cmd) => cmd.priority);
-	const optionalCommands = commands.filter((cmd) => !cmd.priority);
-
-	const truncatedCommands: typeof commands = [];
-
-	// Add priority commands
-	for (const cmd of priorityCommands) {
-		const cmdWidth =
-			3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
-		truncatedCommands.push(cmd);
-		currentWidth += cmdWidth;
+	if (confirmation) {
+		return (
+			<CommandFooter
+				brand="run"
+				commands={commandObjects}
+				deps={footerDeps}
+				theme={theme}
+				width={width}
+			/>
+		);
 	}
-
-	// Fill remainder of space with optional commands
-	for (const cmd of optionalCommands) {
-		const cmdWidth =
-			3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
-		if (currentWidth + cmdWidth <= availableWidth) {
-			truncatedCommands.push(cmd);
-			currentWidth += cmdWidth;
-		} else {
-			break;
-		}
-	}
-
-	// Re-sort back to original chronological order
-	const finalCommands = commands.filter((cmd) =>
-		truncatedCommands.includes(cmd),
-	);
 
 	return (
 		<Box marginTop={1} flexDirection="column" gap={1}>
@@ -68,21 +72,13 @@ export function Footer({
 					{scrollIndicator}
 				</Box>
 			)}
-			<Box borderStyle="round" borderColor="gray" paddingX={1}>
-				<Text wrap="end">
-					<Text bold color="magenta">
-						YAOSGit
-						<Text dimColor> : </Text>
-						run
-					</Text>
-					{finalCommands.map((cmd) => (
-						<Text key={`${cmd.displayKey}-${cmd.displayText}`}>
-							<Text dimColor> │ </Text>
-							<Text bold>{cmd.displayKey}</Text> {cmd.displayText}
-						</Text>
-					))}
-				</Text>
-			</Box>
+			<CommandFooter
+				brand="run"
+				commands={commandObjects}
+				deps={footerDeps}
+				theme={theme}
+				width={width}
+			/>
 		</Box>
 	);
 }

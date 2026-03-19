@@ -1,7 +1,9 @@
 import { useCallback, useState } from 'react';
 import type { LineOverflow } from '../../types/LineOverflow/index.js';
 import { LINE_OVERFLOW } from '../../types/LineOverflow/index.js';
+import type { UIStateContextValue } from '../../providers/UIStateProvider/UIStateProvider.types.js';
 import type { PendingConfirmation } from './useUIState.types.js';
+export type { PendingConfirmation } from './useUIState.types.js';
 
 const LINE_OVERFLOW_CYCLE: LineOverflow[] = [
 	LINE_OVERFLOW.WRAP,
@@ -9,7 +11,7 @@ const LINE_OVERFLOW_CYCLE: LineOverflow[] = [
 	LINE_OVERFLOW.TRUNCATE_END,
 ];
 
-export const useUIState = (initialShowScriptSelector = false) => {
+export const useUIState = (initialShowScriptSelector = false): UIStateContextValue => {
 	const [showScriptSelector, setShowScriptSelector] = useState(
 		initialShowScriptSelector,
 	);

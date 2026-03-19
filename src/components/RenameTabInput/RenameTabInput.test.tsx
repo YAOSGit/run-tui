@@ -54,7 +54,7 @@ describe('RenameTabInput', () => {
 		expect(lastFrame()).toContain('cancel');
 	});
 
-	it('calls onClose when escape is pressed', () => {
+	it('calls onClose when escape is pressed', async () => {
 		const onClose = vi.fn();
 		const { stdin } = render(
 			<RenameTabInput
@@ -65,6 +65,7 @@ describe('RenameTabInput', () => {
 		);
 
 		stdin.write('\x1B');
+		await new Promise((r) => setImmediate(r));
 
 		expect(onClose).toHaveBeenCalledOnce();
 	});
@@ -86,7 +87,7 @@ describe('RenameTabInput', () => {
 		expect(onClose).toHaveBeenCalledOnce();
 	});
 
-	it('does not call onRename on escape', () => {
+	it('does not call onRename on escape', async () => {
 		const onRename = vi.fn();
 		const onClose = vi.fn();
 		const { stdin } = render(
@@ -98,6 +99,7 @@ describe('RenameTabInput', () => {
 		);
 
 		stdin.write('\x1B');
+		await new Promise((r) => setImmediate(r));
 
 		expect(onRename).not.toHaveBeenCalled();
 		expect(onClose).toHaveBeenCalledOnce();
