@@ -2,7 +2,11 @@ import { StatusMessage } from '@inkjs/ui';
 import { CommandFooter } from '@yaos-git/toolkit/tui/components';
 import { Box, Text } from 'ink';
 import { theme } from '../../theme.js';
-import { SCROLL_AUTOSCROLL_COLOR, SCROLL_PAUSED_COLOR, STATUS_VARIANTS } from './Footer.consts.js';
+import {
+	SCROLL_AUTOSCROLL_COLOR,
+	SCROLL_PAUSED_COLOR,
+	STATUS_VARIANTS,
+} from './Footer.consts.js';
 import type { FooterProps } from './Footer.types.js';
 
 export function Footer({
@@ -29,7 +33,9 @@ export function Footer({
 		ui: {
 			activeOverlay: 'none' as const,
 			setActiveOverlay: () => {},
-			confirmation: confirmation ? { ...confirmation, onConfirm: () => {} } : null,
+			confirmation: confirmation
+				? { ...confirmation, onConfirm: () => {} }
+				: null,
 			requestConfirmation: () => {},
 			clearConfirmation: () => {},
 			cycleFocus: () => {},

@@ -63,60 +63,44 @@ export const useTasksState = (initialTasks: string[]): UseTasksStateReturn => {
 		[],
 	);
 
-	// Add a new task to the state
-	const addTaskState = useCallback(
-		(taskName: string): string => {
-			setTaskStates((prev) => {
-				let finalTaskName = taskName;
-				let counter = 2;
-				while (finalTaskName in prev) {
-					finalTaskName = `${taskName} (${counter})`;
-					counter++;
-				}
-
-				const next = {
-					...prev,
-					[finalTaskName]: {
-						name: finalTaskName,
-						status: TASK_STATUS.PENDING,
-						exitCode: null,
-						hasUnseenStderr: false,
-						restartCount: 0,
-						startedAt: null,
-						endedAt: null,
-					},
-				};
-
-				// We need to update baseTasks inside the setState callback to ensure sync if used directly,
-				// but React state batching ensures the external setBaseTasks call below works.
-				return next;
-			});
-
-			// Compute the exact finalTaskName identically here so we can update baseTasks synchronously
-			setBaseTasks((prev) => {
-				let finalTaskName = taskName;
-				let counter = 2;
-				while (prev.includes(finalTaskName)) {
-					finalTaskName = `${taskName} (${counter})`;
-					counter++;
-				}
-				return [...prev, finalTaskName];
-			});
-
-			// Calculate the returned name string one more time outside setters for consumer use (like spawning)
-			let nameToReturn = taskName;
-			let counterReturn = 2;
-			while (
-				baseTasks.includes(nameToReturn) ||
-				taskStates[nameToReturn] !== undefined
-			) {
-				nameToReturn = `${taskName} (${counterReturn})`;
-				counterReturn++;
+	// Add a new task to the state.
+	// Returns the base taskName — deduplication is handled internally by the
+	// state setters, so callers should use the original name for spawning.
+	const addTaskState = useCallback((taskName: string): string => {
+		setTaskStates((prev) => {
+			let finalTaskName = taskName;
+			let counter = 2;
+			while (finalTaskName in prev) {
+				finalTaskName = `${taskName} (${counter})`;
+				counter++;
 			}
-			return nameToReturn;
-		},
-		[baseTasks, taskStates],
-	);
+
+			return {
+				...prev,
+				[finalTaskName]: {
+					name: finalTaskName,
+					status: TASK_STATUS.PENDING,
+					exitCode: null,
+					hasUnseenStderr: false,
+					restartCount: 0,
+					startedAt: null,
+					endedAt: null,
+				},
+			};
+		});
+
+		setBaseTasks((prev) => {
+			let finalTaskName = taskName;
+			let counter = 2;
+			while (prev.includes(finalTaskName)) {
+				finalTaskName = `${taskName} (${counter})`;
+				counter++;
+			}
+			return [...prev, finalTaskName];
+		});
+
+		return taskName;
+	}, []);
 
 	// Remove a task from the state
 	const removeTaskState = useCallback((taskName: string) => {

@@ -5,7 +5,12 @@ import { MAX_LOGS_PER_TASK } from './useLogs.consts.js';
 
 export type UseLogsReturn = {
 	addLog: (entry: LogEntry) => void;
-	getLogsForTask: (taskName: string, filter?: LogType | null, limit?: number, scrollOffset?: number) => LogEntry[];
+	getLogsForTask: (
+		taskName: string,
+		filter?: LogType | null,
+		limit?: number,
+		scrollOffset?: number,
+	) => LogEntry[];
 	getLogCountForTask: (taskName: string, filter?: LogType | null) => number;
 	clearLogsForTask: (taskName: string) => void;
 };

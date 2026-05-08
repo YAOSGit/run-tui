@@ -1,7 +1,7 @@
+import { createCommandsProvider } from '@yaos-git/toolkit/tui/commands';
 import type { Key } from 'ink';
 import type React from 'react';
 import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
-import { createCommandsProvider } from '@yaos-git/toolkit/tui/commands';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import { useLogs } from '../LogsProvider/index.js';
 import { useTasks } from '../TasksProvider/index.js';
@@ -25,9 +25,8 @@ import { getDisplayKey, isKeyMatch } from './CommandsProvider.utils.js';
  * Use createCommandsProvider to merge project commands with toolkit
  * shared commands (help, quit, scroll, cycleFocus).
  */
-const { COMMANDS: TOOLKIT_COMMANDS } = createCommandsProvider<RunTuiDeps>(
-	PROJECT_COMMANDS,
-);
+const { COMMANDS: TOOLKIT_COMMANDS } =
+	createCommandsProvider<RunTuiDeps>(PROJECT_COMMANDS);
 
 /**
  * Full merged COMMANDS array including toolkit shared commands.
@@ -164,10 +163,7 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 
 			// Find and execute matching command
 			for (const command of COMMANDS) {
-				if (
-					isKeyMatch(key, input, command.keys) &&
-					command.isEnabled(deps)
-				) {
+				if (isKeyMatch(key, input, command.keys) && command.isEnabled(deps)) {
 					// Check if command needs confirmation
 					if (command.needsConfirmation?.(deps)) {
 						const message =
@@ -175,9 +171,7 @@ export const CommandsProvider: React.FC<CommandsProviderProps> = ({
 								? command.confirmMessage(deps)
 								: (command.confirmMessage ?? 'Are you sure?');
 						pendingCommandRef.current = command;
-						uiState.requestConfirmation(message, () =>
-							command.execute(deps),
-						);
+						uiState.requestConfirmation(message, () => command.execute(deps));
 						return;
 					}
 

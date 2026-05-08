@@ -1,9 +1,5 @@
+import type { BaseDeps, Command, OverlayState } from '@yaos-git/toolkit/types';
 import type { Key } from 'ink';
-import type {
-	BaseDeps,
-	Command,
-	OverlayState,
-} from '@yaos-git/toolkit/types';
 import type { VisibleCommand } from '../../types/VisibleCommand/index.js';
 import type { LogsContextValue } from '../LogsProvider/LogsProvider.types.js';
 import type { TasksContextValue } from '../TasksProvider/TasksProvider.types.js';

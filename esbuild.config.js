@@ -1,5 +1,5 @@
-import * as esbuild from 'esbuild';
 import { createEsbuildConfig } from '@yaos-git/toolkit/build';
+import * as esbuild from 'esbuild';
 
 await esbuild.build({
 	...createEsbuildConfig({

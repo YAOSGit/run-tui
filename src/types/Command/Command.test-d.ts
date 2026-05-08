@@ -25,9 +25,7 @@ describe('Command type tests', () => {
 
 	it('execute is a function taking RunTuiDeps returning void', () => {
 		expectTypeOf<Command['execute']>().toBeFunction();
-		expectTypeOf<Command['execute']>().parameters.toEqualTypeOf<
-			[RunTuiDeps]
-		>();
+		expectTypeOf<Command['execute']>().parameters.toEqualTypeOf<[RunTuiDeps]>();
 		expectTypeOf<Command['execute']>().returns.toEqualTypeOf<void>();
 	});
 

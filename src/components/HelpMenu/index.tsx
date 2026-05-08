@@ -1,7 +1,7 @@
 import { HelpMenu as ToolkitHelpMenu } from '@yaos-git/toolkit/tui/components';
-import { COMMANDS } from '../../providers/CommandsProvider/index.js';
 import { SECTION_COLORS } from '../../providers/CommandsProvider/CommandsProvider.consts.js';
 import type { RunTuiDeps } from '../../providers/CommandsProvider/CommandsProvider.types.js';
+import { COMMANDS } from '../../providers/CommandsProvider/index.js';
 import { useUIState } from '../../providers/UIStateProvider/index.js';
 
 /**

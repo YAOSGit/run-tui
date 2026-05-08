@@ -2,10 +2,15 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+	createCLI,
+	fatalError,
+	formatError,
+	getExitCode,
+	runIfMain,
+} from '@yaos-git/toolkit/cli';
 import { Option } from 'commander';
 import { render } from 'ink';
-import { createCLI, runIfMain } from '@yaos-git/toolkit/cli';
-import { fatalError, formatError, getExitCode } from '@yaos-git/toolkit/cli';
 import type { PackageManager } from '../types/PackageManager/index.js';
 import type { RestartConfig } from '../types/RestartConfig/index.js';
 import { App } from './index.js';
@@ -77,16 +82,41 @@ async function runTUI(args: string[] = process.argv.slice(2)): Promise<void> {
 		.argument('[scripts...]', 'Script names or regex patterns to run')
 		.option('-r, --regex', 'Treat arguments as regex patterns')
 		.addOption(
-			new Option('-p, --package-manager <pm>', `Package manager to use (${PACKAGE_MANAGERS.join(', ')})`)
+			new Option(
+				'-p, --package-manager <pm>',
+				`Package manager to use (${PACKAGE_MANAGERS.join(', ')})`,
+			)
 				.default('npm')
 				.choices(PACKAGE_MANAGERS),
 		)
-		.option('-k, --keep-alive', 'Keep TUI open even with no scripts (allows adding scripts with "n" key)')
-		.option('-H, --height <lines>', 'Height of the log view in lines', (v) => parseInt(v, 10))
-		.option('--restart-on-failure', 'Automatically restart tasks when they fail (exit code !== 0)', false)
-		.option('--restart-delay <ms>', 'Delay in milliseconds before restarting a failed task', (v) => parseInt(v, 10), 2000)
-		.option('--max-restarts <count>', 'Maximum number of restart attempts per task', (v) => parseInt(v, 10), 3)
-		.option('--restart-codes <codes>', 'Comma-separated list of exit codes to restrict restarts to (e.g. "1,137")')
+		.option(
+			'-k, --keep-alive',
+			'Keep TUI open even with no scripts (allows adding scripts with "n" key)',
+		)
+		.option('-H, --height <lines>', 'Height of the log view in lines', (v) =>
+			parseInt(v, 10),
+		)
+		.option(
+			'--restart-on-failure',
+			'Automatically restart tasks when they fail (exit code !== 0)',
+			false,
+		)
+		.option(
+			'--restart-delay <ms>',
+			'Delay in milliseconds before restarting a failed task',
+			(v) => parseInt(v, 10),
+			2000,
+		)
+		.option(
+			'--max-restarts <count>',
+			'Maximum number of restart attempts per task',
+			(v) => parseInt(v, 10),
+			3,
+		)
+		.option(
+			'--restart-codes <codes>',
+			'Comma-separated list of exit codes to restrict restarts to (e.g. "1,137")',
+		)
 		.addHelpText(
 			'after',
 			`\nAvailable scripts:\n${availableScripts.map((s) => `  - ${s}`).join('\n')}`,
@@ -197,4 +227,6 @@ async function runTUI(args: string[] = process.argv.slice(2)): Promise<void> {
 	}
 }
 
-runIfMain(import.meta.url, () => { runTUI() });
+runIfMain(import.meta.url, () => {
+	runTUI();
+});

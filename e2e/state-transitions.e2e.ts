@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'vitest';
-import { PTYRunner, canSpawnPTY } from './utils';
+import { canSpawnPTY, PTYRunner } from './utils';
 
 describe.skipIf(!canSpawnPTY())('State Transitions', () => {
 	let runner: PTYRunner;

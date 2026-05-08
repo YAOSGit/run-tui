@@ -41,6 +41,7 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 		killAllProcesses,
 		clearRestartTimer,
 		resetRestartCount,
+		markPendingRestart,
 	} = useProcessManager({
 		initialTasks,
 		packageManager,
@@ -67,9 +68,11 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 		[removeTaskState],
 	);
 
-	// Public: Restart a completed or restarting task
+	// Public: Restart a task (running or completed)
 	const restartTask = useCallback(
 		(taskName: string) => {
+			const isRunning = getTaskStatus(taskName) === TASK_STATUS.RUNNING;
+
 			clearRestartTimer(taskName);
 			resetRestartCount(taskName);
 			updateTaskState(taskName, {
@@ -80,9 +83,25 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({
 				startedAt: null,
 				endedAt: null,
 			});
-			spawnProcess(taskName);
+
+			if (isRunning) {
+				// Task is still running — mark for restart and kill.
+				// The close handler will respawn once the old process exits.
+				markPendingRestart(taskName);
+				killProcess(taskName, true);
+			} else {
+				spawnProcess(taskName);
+			}
 		},
-		[updateTaskState, spawnProcess, clearRestartTimer, resetRestartCount],
+		[
+			updateTaskState,
+			spawnProcess,
+			killProcess,
+			clearRestartTimer,
+			resetRestartCount,
+			markPendingRestart,
+			getTaskStatus,
+		],
 	);
 
 	// Public: Kill a running task

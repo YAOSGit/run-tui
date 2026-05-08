@@ -122,7 +122,10 @@ export function ScriptSelector({
 								<Text color={isSelected ? theme.brand : undefined}>
 									{isSelected ? '▸ ' : '  '}
 								</Text>
-								<Text bold={isSelected} color={isSelected ? theme.brand : undefined}>
+								<Text
+									bold={isSelected}
+									color={isSelected ? theme.brand : undefined}
+								>
 									{script}
 								</Text>
 							</Box>

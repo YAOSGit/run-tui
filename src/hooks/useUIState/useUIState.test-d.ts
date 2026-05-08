@@ -9,6 +9,8 @@ describe('PendingConfirmation (re-exported)', () => {
 
 	it('has onConfirm as function returning void', () => {
 		expectTypeOf<PendingConfirmation>().toHaveProperty('onConfirm');
-		expectTypeOf<PendingConfirmation['onConfirm']>().toEqualTypeOf<() => void>();
+		expectTypeOf<PendingConfirmation['onConfirm']>().toEqualTypeOf<
+			() => void
+		>();
 	});
 });

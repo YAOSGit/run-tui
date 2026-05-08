@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { PTYRunner, canSpawnPTY } from './utils';
+import { canSpawnPTY, PTYRunner } from './utils';
 
 describe.skipIf(!canSpawnPTY())('Process Lifecycle', () => {
 	let runner: PTYRunner;

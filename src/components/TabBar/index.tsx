@@ -1,10 +1,13 @@
 import { StatusIcon } from '@yaos-git/toolkit/tui/components';
 import { Box, Text } from 'ink';
 import { useMemo } from 'react';
-import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 import { theme } from '../../theme.js';
+import { TASK_STATUS } from '../../types/TaskStatus/index.js';
 import { TaskTime } from '../TaskTime/index.js';
-import { ACTIVE_TAB_TEXT_COLOR, TAB_BAR_INDEX_COLORS } from './TabBar.consts.js';
+import {
+	ACTIVE_TAB_TEXT_COLOR,
+	TAB_BAR_INDEX_COLORS,
+} from './TabBar.consts.js';
 import type { TabBarProps } from './TabBar.types.js';
 
 const STATUS_ICON_MAP: Record<string, string> = {
@@ -171,7 +174,11 @@ export function TabBar({
 					return (
 						<Box key={task} gap={1}>
 							{isActive ? (
-								<Text backgroundColor={color} color={ACTIVE_TAB_TEXT_COLOR} bold>
+								<Text
+									backgroundColor={color}
+									color={ACTIVE_TAB_TEXT_COLOR}
+									bold
+								>
 									{isPinned ? '📌 ' : ''}
 									{displayTaskName}
 									<TaskTime
@@ -189,11 +196,19 @@ export function TabBar({
 									/>
 								</Text>
 							)}
-							{showStderrFlag && <Text color={theme.error} bold>ERR</Text>}
+							{showStderrFlag && (
+								<Text color={theme.error} bold>
+									ERR
+								</Text>
+							)}
 							{taskState?.restartCount && taskState.restartCount > 0 ? (
 								<Text color={theme.warning}>↻{taskState.restartCount}</Text>
 							) : null}
-							<StatusIcon status={STATUS_ICON_MAP[taskState?.status ?? 'pending'] ?? 'idle'} />
+							<StatusIcon
+								status={
+									STATUS_ICON_MAP[taskState?.status ?? 'pending'] ?? 'idle'
+								}
+							/>
 						</Box>
 					);
 				})}

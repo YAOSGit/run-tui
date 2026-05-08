@@ -14,11 +14,15 @@ describe('CommandsProviderProps', () => {
 	});
 
 	it('has optional keepAlive', () => {
-		expectTypeOf<CommandsProviderProps>().toMatchTypeOf<{ keepAlive?: boolean }>();
+		expectTypeOf<CommandsProviderProps>().toMatchTypeOf<{
+			keepAlive?: boolean;
+		}>();
 	});
 
 	it('has optional onQuit', () => {
-		expectTypeOf<CommandsProviderProps>().toMatchTypeOf<{ onQuit?: () => void }>();
+		expectTypeOf<CommandsProviderProps>().toMatchTypeOf<{
+			onQuit?: () => void;
+		}>();
 	});
 });
 

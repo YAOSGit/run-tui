@@ -88,14 +88,14 @@ describe('restartCommand', () => {
 			expect(providers.tasks.restartTask).toHaveBeenCalledWith('task1');
 		});
 
-		it('kills then restarts task when task is running', () => {
+		it('calls restartTask (which handles kill internally) when task is running', () => {
 			const providers = createMockDeps({
 				activeTask: 'task1',
 				taskStatus: 'running',
 			});
 			restartCommand.execute(providers);
-			expect(providers.tasks.killTask).toHaveBeenCalledOnce();
-			expect(providers.tasks.killTask).toHaveBeenCalledWith('task1');
+			// Kill is now handled inside restartTask via the pending restart pattern
+			expect(providers.tasks.killTask).not.toHaveBeenCalled();
 			expect(providers.tasks.restartTask).toHaveBeenCalledOnce();
 			expect(providers.tasks.restartTask).toHaveBeenCalledWith('task1');
 		});

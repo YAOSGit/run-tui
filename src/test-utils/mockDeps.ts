@@ -55,10 +55,8 @@ export type MockDepsOverrides = Partial<{
  * Creates a full RunTuiDeps mock suitable for unit-testing commands.
  * Pass overrides for any field you need to customise.
  */
-export function createMockDeps(
-	overrides: MockDepsOverrides = {},
-): RunTuiDeps {
-	return ({
+export function createMockDeps(overrides: MockDepsOverrides = {}): RunTuiDeps {
+	return {
 		tasks: {
 			tasks: overrides.tasks ?? ['task1'],
 			pinnedTasks: overrides.pinnedTasks ?? [],
@@ -76,23 +74,27 @@ export function createMockDeps(
 			renameTask: vi.fn(),
 			moveTaskLeft: vi.fn(),
 			moveTaskRight: vi.fn(),
-			getTaskStatus: overrides.getTaskStatus
-				?? ('taskStatus' in overrides
+			getTaskStatus:
+				overrides.getTaskStatus ??
+				('taskStatus' in overrides
 					? vi.fn().mockReturnValue(overrides.taskStatus)
 					: vi.fn()),
 		},
 		logs: {
 			addLog: vi.fn(),
 			getLogsForTask: overrides.getLogsForTask ?? vi.fn().mockReturnValue([]),
-			getLogCountForTask: overrides.getLogCountForTask ?? vi.fn().mockReturnValue(0),
+			getLogCountForTask:
+				overrides.getLogCountForTask ?? vi.fn().mockReturnValue(0),
 			clearLogsForTask: vi.fn(),
 		},
 		view: {
 			activeTabIndex: overrides.activeTabIndex ?? 0,
 			activeTask: 'activeTask' in overrides ? overrides.activeTask : 'task1',
 			logFilter: overrides.logFilter ?? null,
-			primaryScrollOffset: overrides.primaryScrollOffset ?? overrides.scrollOffset ?? 0,
-			primaryAutoScroll: overrides.primaryAutoScroll ?? overrides.autoScroll ?? true,
+			primaryScrollOffset:
+				overrides.primaryScrollOffset ?? overrides.scrollOffset ?? 0,
+			primaryAutoScroll:
+				overrides.primaryAutoScroll ?? overrides.autoScroll ?? true,
 			splitScrollOffset: overrides.splitScrollOffset ?? 0,
 			splitAutoScroll: overrides.splitAutoScroll ?? true,
 			splitTaskName: overrides.splitTaskName ?? null,
@@ -101,7 +103,10 @@ export function createMockDeps(
 			showSearch: overrides.showSearch ?? false,
 			searchQuery: overrides.searchQuery ?? '',
 			searchMatches: overrides.searchMatches ?? [],
-			currentMatchIndex: 'currentMatchIndex' in overrides ? overrides.currentMatchIndex ?? -1 : -1,
+			currentMatchIndex:
+				'currentMatchIndex' in overrides
+					? (overrides.currentMatchIndex ?? -1)
+					: -1,
 			showRenameInput: overrides.showRenameInput ?? false,
 			viewHeight: overrides.viewHeight ?? 20,
 			totalLogs: overrides.totalLogs ?? 10,
@@ -162,5 +167,5 @@ export function createMockDeps(
 		},
 		keepAlive: overrides.keepAlive ?? false,
 		onQuit: vi.fn(),
-	}) as unknown as RunTuiDeps;
+	} as unknown as RunTuiDeps;
 }

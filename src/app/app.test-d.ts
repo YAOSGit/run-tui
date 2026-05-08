@@ -1,5 +1,9 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import { SCROLL_AUTOSCROLL_COLOR, SCROLL_PAUSED_COLOR, SPLIT_PANE_TITLE_COLOR } from './app.consts.js';
+import {
+	SCROLL_AUTOSCROLL_COLOR,
+	SCROLL_PAUSED_COLOR,
+	SPLIT_PANE_TITLE_COLOR,
+} from './app.consts.js';
 
 describe('app constants', () => {
 	it('SCROLL_AUTOSCROLL_COLOR should be a string', () => {

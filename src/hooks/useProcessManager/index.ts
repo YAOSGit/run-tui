@@ -17,6 +17,7 @@ export type UseProcessManagerReturn = {
 	spawnProcess: (taskName: string) => void;
 	killProcess: (taskName: string, addDivider?: boolean) => void;
 	killAllProcesses: () => void;
+	markPendingRestart: (taskName: string) => void;
 };
 
 export const useProcessManager = ({
@@ -34,6 +35,7 @@ export const useProcessManager = ({
 	const taskTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 	const escalationTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 	const restartCounts = useRef<Map<string, number>>(new Map());
+	const pendingRestarts = useRef<Set<string>>(new Set());
 	// Capture initialTasks in a ref so the startup effect has exhaustive deps
 	const initialTasksRef = useRef(initialTasks);
 
@@ -193,6 +195,16 @@ export const useProcessManager = ({
 				const wasKilled = killedTasks.current.has(taskName);
 				if (wasKilled) {
 					killedTasks.current.delete(taskName);
+
+					// If a restart was requested, respawn now that the old process is gone
+					if (pendingRestarts.current.has(taskName)) {
+						pendingRestarts.current.delete(taskName);
+						spawnedTasks.current.delete(taskName);
+						childProcesses.current.delete(taskName);
+						spawnProcess(taskName);
+						return;
+					}
+
 					onTaskStateChange(taskName, {
 						status: TASK_STATUS.SUCCESS,
 						exitCode: code,
@@ -317,6 +329,11 @@ export const useProcessManager = ({
 		[onLogEntry, clearRestartTimer],
 	);
 
+	// Mark a task for restart after its current process exits
+	const markPendingRestart = useCallback((taskName: string) => {
+		pendingRestarts.current.add(taskName);
+	}, []);
+
 	// Kill all tracking and processes
 	const killAllProcesses = useCallback(() => {
 		for (const timer of taskTimers.current.values()) {
@@ -340,6 +357,7 @@ export const useProcessManager = ({
 		childProcesses.current.clear();
 		spawnedTasks.current.clear();
 		restartCounts.current.clear();
+		pendingRestarts.current.clear();
 	}, []);
 
 	// Spawn initial tasks once on mount, clean up on unmount
@@ -359,5 +377,6 @@ export const useProcessManager = ({
 		spawnProcess,
 		killProcess,
 		killAllProcesses,
+		markPendingRestart,
 	};
 };

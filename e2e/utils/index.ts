@@ -1,2 +1,2 @@
 export type { PTYRunnerOptions, WaitForOptions } from './pty-runner';
-export { PTYRunner, canSpawnPTY } from './pty-runner';
+export { canSpawnPTY, PTYRunner } from './pty-runner';

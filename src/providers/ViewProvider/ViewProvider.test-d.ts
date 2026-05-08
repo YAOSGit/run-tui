@@ -1,5 +1,8 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { ViewContextValue, ViewProviderProps } from './ViewProvider.types.js';
+import type {
+	ViewContextValue,
+	ViewProviderProps,
+} from './ViewProvider.types.js';
 
 describe('ViewProviderProps', () => {
 	it('has children property', () => {
@@ -20,7 +23,9 @@ describe('ViewContextValue', () => {
 
 	it('has activeTask as string or undefined', () => {
 		expectTypeOf<ViewContextValue>().toHaveProperty('activeTask');
-		expectTypeOf<ViewContextValue['activeTask']>().toEqualTypeOf<string | undefined>();
+		expectTypeOf<ViewContextValue['activeTask']>().toEqualTypeOf<
+			string | undefined
+		>();
 	});
 
 	it('has logFilter property', () => {
@@ -28,15 +33,27 @@ describe('ViewContextValue', () => {
 	});
 
 	it('has primary pane scroll properties', () => {
-		expectTypeOf<ViewContextValue['primaryScrollOffset']>().toEqualTypeOf<number>();
-		expectTypeOf<ViewContextValue['primaryAutoScroll']>().toEqualTypeOf<boolean>();
+		expectTypeOf<
+			ViewContextValue['primaryScrollOffset']
+		>().toEqualTypeOf<number>();
+		expectTypeOf<
+			ViewContextValue['primaryAutoScroll']
+		>().toEqualTypeOf<boolean>();
 	});
 
 	it('has split pane properties', () => {
-		expectTypeOf<ViewContextValue['activePane']>().toEqualTypeOf<'primary' | 'split'>();
-		expectTypeOf<ViewContextValue['splitTaskName']>().toEqualTypeOf<string | null>();
-		expectTypeOf<ViewContextValue['splitScrollOffset']>().toEqualTypeOf<number>();
-		expectTypeOf<ViewContextValue['splitAutoScroll']>().toEqualTypeOf<boolean>();
+		expectTypeOf<ViewContextValue['activePane']>().toEqualTypeOf<
+			'primary' | 'split'
+		>();
+		expectTypeOf<ViewContextValue['splitTaskName']>().toEqualTypeOf<
+			string | null
+		>();
+		expectTypeOf<
+			ViewContextValue['splitScrollOffset']
+		>().toEqualTypeOf<number>();
+		expectTypeOf<
+			ViewContextValue['splitAutoScroll']
+		>().toEqualTypeOf<boolean>();
 	});
 
 	it('has display properties', () => {
@@ -44,14 +61,20 @@ describe('ViewContextValue', () => {
 		expectTypeOf<ViewContextValue['showSearch']>().toEqualTypeOf<boolean>();
 		expectTypeOf<ViewContextValue['searchQuery']>().toEqualTypeOf<string>();
 		expectTypeOf<ViewContextValue['searchMatches']>().toEqualTypeOf<number[]>();
-		expectTypeOf<ViewContextValue['showRenameInput']>().toEqualTypeOf<boolean>();
+		expectTypeOf<
+			ViewContextValue['showRenameInput']
+		>().toEqualTypeOf<boolean>();
 		expectTypeOf<ViewContextValue['viewHeight']>().toEqualTypeOf<number>();
 		expectTypeOf<ViewContextValue['totalLogs']>().toEqualTypeOf<number>();
-		expectTypeOf<ViewContextValue['displayMode']>().toEqualTypeOf<'full' | 'compact'>();
+		expectTypeOf<ViewContextValue['displayMode']>().toEqualTypeOf<
+			'full' | 'compact'
+		>();
 	});
 
 	it('has currentMatchIndex as number or null', () => {
-		expectTypeOf<ViewContextValue['currentMatchIndex']>().toEqualTypeOf<number | null>();
+		expectTypeOf<ViewContextValue['currentMatchIndex']>().toEqualTypeOf<
+			number | null
+		>();
 	});
 
 	it('has navigation action methods returning void', () => {

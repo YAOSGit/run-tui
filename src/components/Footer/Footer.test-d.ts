@@ -1,5 +1,9 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import { SCROLL_AUTOSCROLL_COLOR, SCROLL_PAUSED_COLOR, STATUS_VARIANTS } from './Footer.consts.js';
+import {
+	SCROLL_AUTOSCROLL_COLOR,
+	SCROLL_PAUSED_COLOR,
+	STATUS_VARIANTS,
+} from './Footer.consts.js';
 
 describe('Footer constants', () => {
 	it('STATUS_VARIANTS should be a readonly object', () => {

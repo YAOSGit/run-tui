@@ -19,6 +19,7 @@ vi.mock('../../hooks/useProcessManager/index.js', () => ({
 		killAllProcesses: mockKillAllProcesses,
 		clearRestartTimer: vi.fn(),
 		resetRestartCount: vi.fn(),
+		markPendingRestart: vi.fn(),
 	}),
 }));
 

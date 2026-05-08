@@ -23,9 +23,7 @@ describe('clearCurrentLogsCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when tasks exist and selector hidden', () => {
-			expect(clearCurrentLogsCommand.isEnabled(createMockDeps())).toBe(
-				true,
-			);
+			expect(clearCurrentLogsCommand.isEnabled(createMockDeps())).toBe(true);
 		});
 
 		it('returns false when script selector is shown', () => {

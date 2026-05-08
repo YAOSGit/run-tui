@@ -38,9 +38,7 @@ describe('exportCurrentLogsCommand', () => {
 
 	describe('isEnabled', () => {
 		it('returns true when tasks exist and selector hidden', () => {
-			expect(exportCurrentLogsCommand.isEnabled(createMockDeps())).toBe(
-				true,
-			);
+			expect(exportCurrentLogsCommand.isEnabled(createMockDeps())).toBe(true);
 		});
 
 		it('returns false when script selector is shown', () => {
@@ -104,7 +102,10 @@ describe('exportAllLogsCommand', () => {
 			const saveSpy = vi
 				.spyOn(exportUtils, 'saveLogsToFile')
 				.mockResolvedValue('');
-			const providers = createMockDeps({ tasks: ['task1', 'task2'], getLogsForTask: logsForTask });
+			const providers = createMockDeps({
+				tasks: ['task1', 'task2'],
+				getLogsForTask: logsForTask,
+			});
 
 			exportAllLogsCommand.execute(providers);
 

@@ -36,12 +36,16 @@ describe('PendingConfirmation', () => {
 
 describe('UIStateContextValue', () => {
 	it('has boolean state properties', () => {
-		expectTypeOf<UIStateContextValue['showScriptSelector']>().toEqualTypeOf<boolean>();
+		expectTypeOf<
+			UIStateContextValue['showScriptSelector']
+		>().toEqualTypeOf<boolean>();
 		expectTypeOf<UIStateContextValue['showHelp']>().toEqualTypeOf<boolean>();
 	});
 
 	it('has pendingConfirmation as PendingConfirmation or null', () => {
-		expectTypeOf<UIStateContextValue['pendingConfirmation']>().toEqualTypeOf<PendingConfirmation | null>();
+		expectTypeOf<
+			UIStateContextValue['pendingConfirmation']
+		>().toEqualTypeOf<PendingConfirmation | null>();
 	});
 
 	it('has lineOverflow property', () => {
@@ -50,9 +54,13 @@ describe('UIStateContextValue', () => {
 
 	it('has script selector actions', () => {
 		expectTypeOf<UIStateContextValue['openScriptSelector']>().toBeFunction();
-		expectTypeOf<UIStateContextValue['openScriptSelector']>().returns.toBeVoid();
+		expectTypeOf<
+			UIStateContextValue['openScriptSelector']
+		>().returns.toBeVoid();
 		expectTypeOf<UIStateContextValue['closeScriptSelector']>().toBeFunction();
-		expectTypeOf<UIStateContextValue['closeScriptSelector']>().returns.toBeVoid();
+		expectTypeOf<
+			UIStateContextValue['closeScriptSelector']
+		>().returns.toBeVoid();
 	});
 
 	it('has confirmation actions', () => {

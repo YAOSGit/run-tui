@@ -37,8 +37,8 @@ import {
 import { searchCommand } from '../../commands/search/index.js';
 import { togglePinCommand } from '../../commands/togglePin/index.js';
 import { toggleTimestampsCommand } from '../../commands/toggleTimestamps/index.js';
-import type { RunTuiCommand } from './CommandsProvider.types.js';
 import type { KeyBinding } from '../../types/KeyBinding/index.js';
+import type { RunTuiCommand } from './CommandsProvider.types.js';
 
 export const CONFIRM_YES_KEYS: KeyBinding[] = [
 	{ textKey: 'y', ctrl: false },

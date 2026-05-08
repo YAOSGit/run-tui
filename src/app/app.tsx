@@ -1,4 +1,4 @@
-import { TUILayout, SplitPane } from '@yaos-git/toolkit/tui/components';
+import { SplitPane, TUILayout } from '@yaos-git/toolkit/tui/components';
 import { Box, type Key, Text, useInput, useStdout } from 'ink';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,14 +8,9 @@ import { RenameTabInput } from '../components/RenameTabInput/index.js';
 import { ScriptSelector } from '../components/ScriptSelector/index.js';
 import { SearchBar } from '../components/SearchBar/index.js';
 import { TabBar } from '../components/TabBar/index.js';
-import {
-	COMMANDS,
-	useCommands,
-} from '../providers/CommandsProvider/index.js';
-import {
-	SECTION_COLORS,
-} from '../providers/CommandsProvider/CommandsProvider.consts.js';
+import { SECTION_COLORS } from '../providers/CommandsProvider/CommandsProvider.consts.js';
 import type { RunTuiDeps } from '../providers/CommandsProvider/CommandsProvider.types.js';
+import { COMMANDS, useCommands } from '../providers/CommandsProvider/index.js';
 import { useLogs } from '../providers/LogsProvider/index.js';
 import { useTasks } from '../providers/TasksProvider/index.js';
 import { useUIState } from '../providers/UIStateProvider/index.js';
@@ -235,7 +230,9 @@ export const AppContent: React.FC<AppContentProps> = ({
 			view.displayMode === 'compact' ? (
 				<Box width="100%" borderStyle="round" borderColor="gray" paddingX={1}>
 					<Text wrap="truncate">
-						<Text bold color={theme.brand}>Compact</Text>
+						<Text bold color={theme.brand}>
+							Compact
+						</Text>
 						<Text dimColor> › </Text>
 						<Text>{tasks.tasks.length} tasks</Text>
 						{displayActiveTask && (

@@ -1,5 +1,8 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { TasksContextValue, TasksProviderProps } from './TasksProvider.types.js';
+import type {
+	TasksContextValue,
+	TasksProviderProps,
+} from './TasksProvider.types.js';
 
 describe('TasksProviderProps', () => {
 	it('has children property', () => {
@@ -8,7 +11,9 @@ describe('TasksProviderProps', () => {
 
 	it('has initialTasks as string array', () => {
 		expectTypeOf<TasksProviderProps>().toHaveProperty('initialTasks');
-		expectTypeOf<TasksProviderProps['initialTasks']>().toEqualTypeOf<string[]>();
+		expectTypeOf<TasksProviderProps['initialTasks']>().toEqualTypeOf<
+			string[]
+		>();
 	});
 
 	it('has packageManager property', () => {
@@ -43,7 +48,9 @@ describe('TasksContextValue', () => {
 
 	it('has tabAliases as Record<string, string>', () => {
 		expectTypeOf<TasksContextValue>().toHaveProperty('tabAliases');
-		expectTypeOf<TasksContextValue['tabAliases']>().toEqualTypeOf<Record<string, string>>();
+		expectTypeOf<TasksContextValue['tabAliases']>().toEqualTypeOf<
+			Record<string, string>
+		>();
 	});
 
 	it('has taskStates as Record', () => {
@@ -52,7 +59,9 @@ describe('TasksContextValue', () => {
 
 	it('has hasRunningTasks boolean', () => {
 		expectTypeOf<TasksContextValue>().toHaveProperty('hasRunningTasks');
-		expectTypeOf<TasksContextValue['hasRunningTasks']>().toEqualTypeOf<boolean>();
+		expectTypeOf<
+			TasksContextValue['hasRunningTasks']
+		>().toEqualTypeOf<boolean>();
 	});
 
 	it('has action methods returning void', () => {

@@ -31,8 +31,6 @@ export const restartCommand: Command = {
 	confirmMessage: (p) => `Restart ${p.view.activeTask}?`,
 	execute: (p) => {
 		if (p.view.activeTask) {
-			const status = p.tasks.getTaskStatus(p.view.activeTask);
-			if (status === 'running') p.tasks.killTask(p.view.activeTask);
 			p.tasks.restartTask(p.view.activeTask);
 		}
 	},
@@ -67,8 +65,6 @@ export const restartAllCommand: Command = {
 	confirmMessage: () => 'Restart all tasks?',
 	execute: (p) => {
 		for (const task of p.tasks.tasks) {
-			const status = p.tasks.getTaskStatus(task);
-			if (status === 'running') p.tasks.killTask(task);
 			p.tasks.restartTask(task);
 		}
 	},

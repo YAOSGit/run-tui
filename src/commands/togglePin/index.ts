@@ -1,5 +1,5 @@
-import type { Command } from '../../types/Command/index.js';
 import { modKey, modKeyBindings } from '@yaos-git/toolkit/tui/commands';
+import type { Command } from '../../types/Command/index.js';
 
 export const togglePinCommand: Command = {
 	id: 'TOGGLE_PIN',
